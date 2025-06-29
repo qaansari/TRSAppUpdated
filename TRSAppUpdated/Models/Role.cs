@@ -6,8 +6,7 @@ namespace TRSAppUpdated.Models
     public class Role
     {
         [Key]
-        [Column(TypeName = "varchar(70)")]
-        public string ID { get; set; }
+        public int ID { get; set; }
         [Column(TypeName="varchar(20)")]
         public string Title { get; set; }
         public bool IsDeleted { get; set; }

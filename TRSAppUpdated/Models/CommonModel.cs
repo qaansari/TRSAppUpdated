@@ -6,14 +6,11 @@ namespace TRSAppUpdated.Models
     {
         public bool IsDeleted { get; set; }
         [ForeignKey("CreatedByUser")]
-        [Column(TypeName = "varchar(70)")]
-        public string CreatedByUserID { get; set; }
+        public int CreatedByUserID { get; set; }
         [ForeignKey("UpdatedByUser")]
-        [Column(TypeName = "varchar(70)")]
-        public string? UpdatedByUserID { get; set; }
+        public int? UpdatedByUserID { get; set; }
         [ForeignKey("DeletedByUser")]
-        [Column(TypeName = "varchar(70)")]
-        public string? DeletedByUserID { get; set; }
+        public int? DeletedByUserID { get; set; }
         public DateTime CreatedDateTime { get; set; }
         public DateTime? UpdatedDateTime { get; set; }
         public DateTime? DeletedDateTime { get; set; }

@@ -6,8 +6,7 @@ namespace TRSAppUpdated.Models
     public class User
     {
         [Key]
-        [Column(TypeName = "varchar(70)")]
-        public string ID { get; set; }
+        public int ID { get; set; }
         [Column(TypeName = "varchar(20)")]
         public string FirstName { get; set; }
         [Column(TypeName = "varchar(20)")]
@@ -21,20 +20,20 @@ namespace TRSAppUpdated.Models
         public string Password { get; set; }
         [ForeignKey("Role")]
         [Column(TypeName = "varchar(70)")]
-        public string RoleID { get; set; }
+        public int RoleID { get; set; }
         [Column(TypeName = "varchar(300)")]
         public string? ImagePath { get; set; }
         public bool IsActive { get; set; }
         public bool IsDeleted { get; set; }
         [ForeignKey("CreatedByUser")]
         [Column(TypeName = "varchar(70)")]
-        public string? CreatedByUserID { get; set; }
+        public int? CreatedByUserID { get; set; }
         [ForeignKey("UpdatedByUser")]
         [Column(TypeName = "varchar(70)")]
-        public string? UpdatedByUserID { get; set; }
+        public int? UpdatedByUserID { get; set; }
         [ForeignKey("DeletedByUser")]
         [Column(TypeName = "varchar(70)")]
-        public string? DeletedByUserID { get; set; }
+        public int? DeletedByUserID { get; set; }
         public DateTime? CreatedDateTime { get; set; }
         public DateTime? UpdatedDateTime { get; set; }
         public DateTime? DeletedDateTime { get; set; }
