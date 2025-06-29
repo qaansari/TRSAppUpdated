@@ -13,5 +13,6 @@ namespace TRSAppUpdated.Models
         public string Address { get; set; }
         [Column(TypeName = "varchar(300)")]
         public string? ImagePath { get; set; }
+        public ICollection<Auditorium> Auditoriums { get; set; }
     }
 }

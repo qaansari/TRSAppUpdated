@@ -26,13 +26,10 @@ namespace TRSAppUpdated.Models
         public bool IsActive { get; set; }
         public bool IsDeleted { get; set; }
         [ForeignKey("CreatedByUser")]
-        [Column(TypeName = "varchar(70)")]
         public int? CreatedByUserID { get; set; }
         [ForeignKey("UpdatedByUser")]
-        [Column(TypeName = "varchar(70)")]
         public int? UpdatedByUserID { get; set; }
         [ForeignKey("DeletedByUser")]
-        [Column(TypeName = "varchar(70)")]
         public int? DeletedByUserID { get; set; }
         public DateTime? CreatedDateTime { get; set; }
         public DateTime? UpdatedDateTime { get; set; }
