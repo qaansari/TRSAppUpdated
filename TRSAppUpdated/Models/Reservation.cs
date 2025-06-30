@@ -8,6 +8,8 @@ namespace TRSAppUpdated.Models
     {
         [Key]
         public int ID { get; set; }
+        [Column(TypeName = "varchar(20)")]
+        public string TicketNumber { get; set; }
         [Column(TypeName = "varchar(41)")]
         public string CustomerName { get; set; }
         [Column(TypeName = "varchar(20)")]

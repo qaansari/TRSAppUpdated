@@ -20,7 +20,7 @@ namespace TRSAppUpdated.Models
             }
         }
         [Column(TypeName = "varchar(20)")]
-        public string ContactNo { get; set; }
+        public string ContactNumber { get; set; }
         [Column(TypeName = "varchar(320)")]
         [DataType(DataType.EmailAddress)]
         public string Email { get; set; }

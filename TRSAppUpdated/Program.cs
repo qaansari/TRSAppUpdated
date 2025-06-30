@@ -1,3 +1,6 @@
+using Microsoft.EntityFrameworkCore;
+using TRSAppUpdated.Models;
+
 namespace TRSAppUpdated
 {
     public class Program
@@ -8,7 +11,11 @@ namespace TRSAppUpdated
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
-            builder.Services.AddDbContext<>()
+            builder.Services.AddDbContext<AppDbContext>(options =>
+            {
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+                options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+            });
 
             var app = builder.Build();
 
