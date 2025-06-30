@@ -11,5 +11,6 @@ namespace TRSAppUpdated.Models
         [ForeignKey("Column")]
         public int ColumnID { get; set; }
         public Column Column { get; set; }
+        public ICollection<Ticket> Tickets { get; set; }
     }
 }

@@ -34,9 +34,28 @@ namespace TRSAppUpdated.Models
         public DateTime? CreatedDateTime { get; set; }
         public DateTime? UpdatedDateTime { get; set; }
         public DateTime? DeletedDateTime { get; set; }
-        public User? CreatedByUser { get; set; }
-        public User? UpdatedByUser { get; set; }
-        public User? DeletedByUser { get; set; }
+        public User? UserCreatedByUser { get; set; }
+        public User? UserUpdatedByUser { get; set; }
+        public User? UserDeletedByUser { get; set; }
         public Role Role { get; set; }
+        //Inverse props
+        [InverseProperty("UserCreatedByUser")]
+        public ICollection<User> UsersCreated { get; set; }
+        [InverseProperty("UserUpdatedByUser")]
+        public ICollection<User> UsersUpdated { get; set; }
+        [InverseProperty("UserDeletedByUser")]
+        public ICollection<User> UsersDeleted { get; set; }
+        [InverseProperty("CreatedByUser")]
+        public ICollection<Auditorium> AuditoriumsCreated { get; set; }
+        [InverseProperty("UpdatedByUser")]
+        public ICollection<Auditorium> AuditoriumsUpdated { get; set; }
+        [InverseProperty("DeletedByUser")]
+        public ICollection<Auditorium> AuditoriumsDeleted { get; set; }
+        [InverseProperty("CreatedByUser")]
+        public ICollection<Category> CategoriesCreated { get; set; }
+        [InverseProperty("UpdatedByUser")]
+        public ICollection<Category> CategoriesUpdated { get; set; }
+        [InverseProperty("DeletedByUser")]
+        public ICollection<Category> CategoriesDeleted { get; set; }
     }
 }
