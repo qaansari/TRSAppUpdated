@@ -15,6 +15,7 @@ namespace TRSAppUpdated.Models
         public DbSet<Expense> Expenses { get; set; }
         public DbSet<PaymentMode> PaymentModes { get; set; }
         public DbSet<Reservation> Reservations { get; set; }
+        public DbSet<ReservationImage> ReservationImages { get; set; }
         public DbSet<ReservationStatus> ReservationStatuses { get; set; }
         public DbSet<ReservationTicket> ReservationTickets { get; set; }
         public DbSet<Role> Roles { get; set; }
@@ -27,7 +28,41 @@ namespace TRSAppUpdated.Models
         public DbSet<User> Users { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<Role>().HasData(
+                new Role()
+            {
+                ID=1,
+                Title="Super Admin",
+                IsDeleted=false,
+            },
+                 new Role()
+                 {
+                     ID = 2,
+                     Title = "Admin",
+                     IsDeleted = false,
+                 },
+                  new Role()
+                  {
+                      ID = 3,
+                      Title = "Moderator",
+                      IsDeleted = false,
+                  },
+                   new Role()
+                   {
+                       ID = 4,
+                       Title = "User",
+                       IsDeleted = false,
+                   }
+            );
+            modelBuilder.Entity<User>().HasData(
+               new User()
+               {
+                   ID = 1,
+                   RoleID = 1,
+                   FirstName="Super",
+                   LastName="Admin",
+                   IsDeleted = false,
+               });
         }
 
     }

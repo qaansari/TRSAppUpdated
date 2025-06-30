@@ -31,5 +31,6 @@ namespace TRSAppUpdated.Models
         public PaymentMode PaymentMode { get; set; }
         public ReservationStatus ReservationStatus { get; set; }
         public ICollection<ReservationTicket> ReservationTickets { get; set; }
+        public ICollection<ReservationImage> ReservationImages { get; set; }
     }
 }
