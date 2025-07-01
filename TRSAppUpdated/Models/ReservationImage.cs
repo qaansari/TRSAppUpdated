@@ -7,12 +7,9 @@ namespace TRSAppUpdated.Models
     {
         [Key]
         public int ID { get; set; }
-        [ForeignKey("Reservation")]
+        [ForeignKey("Reservations")]
         public int ReservationID { get; set; }
         public string ImagePath { get; set; }
-        [InverseProperty("Reservations")]
-        public Reservation Reservation { get; set; }
-        [InverseProperty("Reservation")]
         public ICollection<Reservation> Reservations { get; set; }
     }
 }

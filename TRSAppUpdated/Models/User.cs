@@ -27,17 +27,16 @@ namespace TRSAppUpdated.Models
         [Column(TypeName = "varchar(max)")]
         public string Password { get; set; }
         [ForeignKey("Role")]
-        [Column(TypeName = "varchar(70)")]
         public int RoleID { get; set; }
         [Column(TypeName = "varchar(300)")]
         public string? ImagePath { get; set; }
         public bool IsActive { get; set; }
         public bool IsDeleted { get; set; }
-        [ForeignKey("CreatedByUser")]
+        [ForeignKey("UserCreatedByUser")]
         public int? CreatedByUserID { get; set; }
-        [ForeignKey("UpdatedByUser")]
+        [ForeignKey("UserUpdatedByUser")]
         public int? UpdatedByUserID { get; set; }
-        [ForeignKey("DeletedByUser")]
+        [ForeignKey("UserDeletedByUser")]
         public int? DeletedByUserID { get; set; }
         public DateTime? CreatedDateTime { get; set; }
         public DateTime? UpdatedDateTime { get; set; }

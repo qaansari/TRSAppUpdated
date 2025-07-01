@@ -121,7 +121,7 @@ namespace TRSAppUpdated.Models
                },
                 new PaymentMode()
                 {
-                    ID = 1,
+                    ID = 2,
                     Title = "Easypaisa",
                     CreatedByUserID = 1,
                     CreatedDateTime = DateTime.UtcNow.AddHours(5),
@@ -150,7 +150,7 @@ namespace TRSAppUpdated.Models
               },
                new ReservationStatus()
                {
-                   ID = 1,
+                   ID = 2,
                    Title = "Not Attended",
                    CreatedByUserID = 1,
                    CreatedDateTime = DateTime.UtcNow.AddHours(5),

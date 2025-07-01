@@ -4,7 +4,7 @@ namespace TRSAppUpdated.Models
 {
     public class CommonModel
     {
-        public bool IsDeleted { get; set; }
+        public bool IsDeleted { get; set; } = false;
         [ForeignKey("CreatedByUser")]
         public int CreatedByUserID { get; set; }
         [ForeignKey("UpdatedByUser")]
