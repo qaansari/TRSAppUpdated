@@ -947,17 +947,17 @@ namespace TRSAppUpdated.Migrations
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "ID", "ContactNumber", "CreatedByUserID", "CreatedDateTime", "DeletedByUserID", "DeletedDateTime", "Email", "FirstName", "ImagePath", "IsActive", "IsDeleted", "LastName", "Password", "RoleID", "UpdatedByUserID", "UpdatedDateTime" },
-                values: new object[] { 1, "+923312541767", null, new DateTime(2025, 7, 1, 8, 32, 0, 876, DateTimeKind.Utc).AddTicks(6440), null, null, "sa@trs.com", "Super", null, true, false, "Admin", "kURf+0ZfNXWTV7IriNK1iqoX8HJ6/4BZIsJaaLgaTfE=", 1, null, null });
+                values: new object[] { 1, "+923312541767", null, new DateTime(2025, 7, 1, 16, 27, 34, 400, DateTimeKind.Utc).AddTicks(3448), null, null, "sa@trs.com", "Super", null, true, false, "Admin", "kURf+0ZfNXWTV7IriNK1iqoX8HJ6/4BZIsJaaLgaTfE=", 1, null, null });
 
             migrationBuilder.InsertData(
                 table: "PaymentModes",
                 columns: new[] { "ID", "CreatedByUserID", "CreatedDateTime", "DeletedByUserID", "DeletedDateTime", "IsDeleted", "Title", "UpdatedByUserID", "UpdatedDateTime" },
                 values: new object[,]
                 {
-                    { 1, 1, new DateTime(2025, 7, 1, 8, 32, 1, 91, DateTimeKind.Utc).AddTicks(9961), null, null, false, "Cash", null, null },
-                    { 2, 1, new DateTime(2025, 7, 1, 8, 32, 1, 91, DateTimeKind.Utc).AddTicks(9965), null, null, false, "Easypaisa", null, null },
-                    { 3, 1, new DateTime(2025, 7, 1, 8, 32, 1, 91, DateTimeKind.Utc).AddTicks(9966), null, null, false, "Jazzcash", null, null },
-                    { 4, 1, new DateTime(2025, 7, 1, 8, 32, 1, 91, DateTimeKind.Utc).AddTicks(9968), null, null, false, "Bank Transfer", null, null }
+                    { 1, 1, new DateTime(2025, 7, 1, 16, 27, 34, 623, DateTimeKind.Utc).AddTicks(2711), null, null, false, "Cash", null, null },
+                    { 2, 1, new DateTime(2025, 7, 1, 16, 27, 34, 623, DateTimeKind.Utc).AddTicks(2717), null, null, false, "Easypaisa", null, null },
+                    { 3, 1, new DateTime(2025, 7, 1, 16, 27, 34, 623, DateTimeKind.Utc).AddTicks(2718), null, null, false, "Jazzcash", null, null },
+                    { 4, 1, new DateTime(2025, 7, 1, 16, 27, 34, 623, DateTimeKind.Utc).AddTicks(2719), null, null, false, "Bank Transfer", null, null }
                 });
 
             migrationBuilder.InsertData(
@@ -965,9 +965,10 @@ namespace TRSAppUpdated.Migrations
                 columns: new[] { "ID", "CreatedByUserID", "CreatedDateTime", "DeletedByUserID", "DeletedDateTime", "IsDeleted", "Title", "UpdatedByUserID", "UpdatedDateTime" },
                 values: new object[,]
                 {
-                    { 1, 1, new DateTime(2025, 7, 1, 8, 32, 1, 92, DateTimeKind.Utc).AddTicks(25), null, null, false, "Arrival Pending", null, null },
-                    { 2, 1, new DateTime(2025, 7, 1, 8, 32, 1, 92, DateTimeKind.Utc).AddTicks(27), null, null, false, "Not Attended", null, null },
-                    { 3, 1, new DateTime(2025, 7, 1, 8, 32, 1, 92, DateTimeKind.Utc).AddTicks(28), null, null, false, "Closed", null, null }
+                    { 1, 1, new DateTime(2025, 7, 1, 16, 27, 34, 623, DateTimeKind.Utc).AddTicks(2777), null, null, false, "Arrival Pending", null, null },
+                    { 2, 1, new DateTime(2025, 7, 1, 16, 27, 34, 623, DateTimeKind.Utc).AddTicks(2779), null, null, false, "Not Attended", null, null },
+                    { 3, 1, new DateTime(2025, 7, 1, 16, 27, 34, 623, DateTimeKind.Utc).AddTicks(2780), null, null, false, "Closed", null, null },
+                    { 4, 1, new DateTime(2025, 7, 1, 16, 27, 34, 623, DateTimeKind.Utc).AddTicks(2781), null, null, false, "Refunded", null, null }
                 });
 
             migrationBuilder.InsertData(
@@ -975,9 +976,9 @@ namespace TRSAppUpdated.Migrations
                 columns: new[] { "ID", "ContactNumber", "CreatedByUserID", "CreatedDateTime", "DeletedByUserID", "DeletedDateTime", "Email", "FirstName", "ImagePath", "IsActive", "IsDeleted", "LastName", "Password", "RoleID", "UpdatedByUserID", "UpdatedDateTime" },
                 values: new object[,]
                 {
-                    { 2, "+923312541767", 1, new DateTime(2025, 7, 1, 8, 32, 0, 953, DateTimeKind.Utc).AddTicks(8450), null, null, "qa.ansari80@trs.com", "Qamar", null, true, false, "Ansari", "Lkej/d5kATMjqn/M3Ku6xHURlNX+8UjTX1IGD38nWgA=", 2, null, null },
-                    { 3, "+923162361582", 1, new DateTime(2025, 7, 1, 8, 32, 1, 23, DateTimeKind.Utc).AddTicks(3238), null, null, "stayyabahmed85@trs.com", "Tayyab", null, true, false, "Ahmed", "0ihPPTvs1St6AoZbcGjX2OBvl9iCyjRbs3xu/NvdeII=", 2, null, null },
-                    { 4, "+923091265921", 1, new DateTime(2025, 7, 1, 8, 32, 1, 91, DateTimeKind.Utc).AddTicks(9432), null, null, "anasali4772@trs.com", "Anas", null, true, false, "Ali", "mNIvAtqhtWlJG6AG2sfaPWxKC1i9huTTqVcxkhD5qBM=", 2, null, null }
+                    { 2, "+923312541767", 1, new DateTime(2025, 7, 1, 16, 27, 34, 475, DateTimeKind.Utc).AddTicks(1962), null, null, "qa.ansari80@trs.com", "Qamar", null, true, false, "Ansari", "Lkej/d5kATMjqn/M3Ku6xHURlNX+8UjTX1IGD38nWgA=", 2, null, null },
+                    { 3, "+923162361582", 1, new DateTime(2025, 7, 1, 16, 27, 34, 549, DateTimeKind.Utc).AddTicks(8198), null, null, "stayyabahmed85@trs.com", "Tayyab", null, true, false, "Ahmed", "0ihPPTvs1St6AoZbcGjX2OBvl9iCyjRbs3xu/NvdeII=", 2, null, null },
+                    { 4, "+923091265921", 1, new DateTime(2025, 7, 1, 16, 27, 34, 623, DateTimeKind.Utc).AddTicks(2046), null, null, "anasali4772@trs.com", "Anas", null, true, false, "Ali", "mNIvAtqhtWlJG6AG2sfaPWxKC1i9huTTqVcxkhD5qBM=", 2, null, null }
                 });
 
             migrationBuilder.CreateIndex(

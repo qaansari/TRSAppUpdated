@@ -161,6 +161,13 @@ namespace TRSAppUpdated.Models
                     Title = "Closed",
                     CreatedByUserID = 1,
                     CreatedDateTime = DateTime.UtcNow.AddHours(5),
+                },
+                new ReservationStatus()
+                {
+                    ID = 4,
+                    Title = "Refunded",
+                    CreatedByUserID = 1,
+                    CreatedDateTime = DateTime.UtcNow.AddHours(5),
                 });
         }
 
