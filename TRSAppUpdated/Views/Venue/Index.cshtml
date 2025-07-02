@@ -3,4 +3,53 @@
     ViewData["Title"] = "Venues";
     string _PageTitle = "Venue";
 }
+<div class="row">
+    <!-- Styled Table Card-->
+    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+        <div class="card table-card">
+            <div class="card-header pb-0">
+                <h4>@(ViewData["Title"])
+                    <span class="float-right">
+                        <a asp-action="AddOrEdit" asp-route-ID="0" class="btn btn-primary sm-btn">Add @_PageTitle</a>
+                    </span>
+                </h4>
+            </div>
+            <div class="card-body">
+                <table id="@(_PageTitle)" class="table table-striped table-bordered dt-responsive nowrap" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Address</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Count > 0)
+                        {
+                            foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>@(item.Title)</td>
+                                    <td>@(item.Address)</td>
+                                    <td>
+                                        <a asp-action="AddOrEdit" asp-route-ID="@(item.ID)" class="btn btn-primary sm-btn">Edit</a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="3" class="text-center">
+                                    <img class="error_img" src="~/assets/images/no-data.png"/>
+                                </td>
+                            </tr>
+                        }
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 

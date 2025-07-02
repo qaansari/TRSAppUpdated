@@ -1,7 +1,8 @@
 ﻿@inject IHttpContextAccessor _HttpContextAccessor
 @{
     string _Username = _HttpContextAccessor.HttpContext.User.FindFirst("Username").Value;
-    string _RoleTitle = _HttpContextAccessor.HttpContext.User.FindFirst("RoleTitle").Value;
+    string _RoleTitle = _HttpContextAccessor.HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.Role).Value;
+    string _ImagePath = _HttpContextAccessor.HttpContext.User.FindFirst("Image").Value;
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -16,7 +17,6 @@
     <link rel="stylesheet" type="text/css" href="~/assets/css/font-awesome.min.css">
     <link rel="stylesheet" type="text/css" href="~/assets/css/icofont.min.css">
     <link rel="stylesheet" type="text/css" href="~/assets/css/style.css">
-    <link rel="stylesheet" id="theme-change" type="text/css" href="#">
     <!--Custom css-->
     <link rel="stylesheet" type="text/css" href="~/assets/css/custom.css">
     <!--Lolibox css-->
@@ -49,7 +49,14 @@
                     <div class="header-controls">
                         <div class="user-info-wrapper header-links">
                             <a href="javascript:void(0);" class="user-info">
-                                <img src="~/assets/images/user.jpg" alt="" class="user-img">
+                                @{
+                                    string _src = "no-image-found.png";
+                                    if (!string.IsNullOrEmpty(_ImagePath))
+                                    {
+                                        _src = $"users/{_ImagePath}";
+                                    }
+                                }
+                                <img src="~/assets/images/@(_src)" alt="" class="user-img">
                                 <div class="blink-animation">
                                     <span class="blink-circle"></span>
                                     <span class="main-circle"></span>
@@ -72,7 +79,7 @@
                                         </a>
                                     </li> *@
                                     <li>
-                                        <a href="~/Home/Logout">
+                                        <a href="@(Url.Action("Index", "Home"))">
                                             <i class="fas fa-sign-out-alt"></i> logout
                                         </a>
                                     </li>
@@ -94,7 +101,7 @@
             <div class="side-menu-wrap">
                 <ul class="main-menu">
                     <li>
-                        <a href="~/Dashboard/Index" class="active">
+                        <a href="@(Url.Action("Index","Dashboard"))" class="active">
                             <span class="icon-menu feather-icon">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-home"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
                             </span>
@@ -116,7 +123,7 @@
                             </a>
                             <ul class="sub-menu">
                                 <li>
-                                    <a href="javascript:;">
+                                    <a href="@(Url.Action("Index", "Venue"))">
                                         <span class="icon-dash">
                                         </span>
                                         <span class="menu-text">
@@ -149,12 +156,6 @@
             </div>
         </div>
     </div>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
-
     <footer class="border-top footer text-muted">
         <div class="container">
             &copy; 2025 - Event Land - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
@@ -164,11 +165,6 @@
     <script src="~/assets/js/jquery.min.js"></script>
     <script src="~/assets/js/popper.min.js" type="text/javascript"></script>
     <script src="~/assets/js/bootstrap.min.js" type="text/javascript"></script>
-    <script src="~/assets/js/swiper.min.js" type="text/javascript"></script>
-    <script src="~/assets/js/apexchart/apexcharts.min.js" type="text/javascript"></script>
-    <script src="~/assets/js/apexchart/control-chart-apexcharts.js" type="text/javascript"></script>
-    <!-- Page Specific -->
-    <script src="~/assets/js/nice-select.min.js" type="text/javascript"></script>
     <!-- Custom Script -->
     <script src="~/assets/js/custom.js" type="text/javascript"></script>
     <!--Lolibox js-->

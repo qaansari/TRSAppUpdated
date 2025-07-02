@@ -21,14 +21,16 @@ namespace TRSAppUpdated.Controllers
             _logger = logger;
             _httpContextAccessor = httpContextAccessor;
         }
+        //Index (Login) (GET)
         public IActionResult Index()
         {
             if (_httpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
             {
                 return RedirectToAction("Index", "Dashboard");
             }
-            return View();
+            return View(new LoginVM());
         }
+        //Index (Login) (POST)
         [HttpPost]
         public async Task<IActionResult> Index(LoginVM Model)
         {
@@ -46,6 +48,7 @@ namespace TRSAppUpdated.Controllers
                         LastName = x.LastName,
                         Email = x.Email,
                         ContactNumber = x.ContactNumber,
+                        ImagePath = x.ImagePath,
                         RoleID = x.RoleID,
                         RoleTitle = x.Role.Title,
                         IsActive = x.IsActive,
@@ -69,9 +72,10 @@ namespace TRSAppUpdated.Controllers
                 }
                 var claims = new List<Claim>() {
             new Claim("UserID",user.ID.ToString()),
-            new Claim("Username",user.FullName),
+            new Claim("Username",user.FullName.Trim()),
             new Claim("RoleID",user.RoleID.ToString()),
-            new Claim("RoleTitle",user.RoleTitle),
+            new Claim(ClaimTypes.Role,!string.IsNullOrEmpty(user.RoleTitle)? user.RoleTitle:""),
+            new Claim("Image",!string.IsNullOrEmpty(user.ImagePath)?user.ImagePath.Trim():string.Empty),
             };
                 var claimsIndentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                 var claimsPrincipal = new ClaimsPrincipal(claimsIndentity);
@@ -88,16 +92,18 @@ namespace TRSAppUpdated.Controllers
             }
             return View(Model);
         }
+        //Logout
         public async Task<IActionResult> Logout()
         {
             await _httpContextAccessor.HttpContext.SignOutAsync();
             return RedirectToAction("Index", "Home");
         }
+        //Privacy
         public IActionResult Privacy()
         {
             return View();
         }
-
+        //Error
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {

@@ -36,3 +36,9 @@
 .field-validation-error {
     color: var(--danger);
 }
+.error_img{
+    width:600px;
+}
+.float-right{
+    float:right;
+}

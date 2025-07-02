@@ -99,7 +99,7 @@ h1, h2, h3, h4, h5, h6 {
     padding: 0;
     text-transform: capitalize;
     line-height: 1.2;
-    color: var(--main-black2);
+    color: var(--main-white2);
 }
 
 iframe {
