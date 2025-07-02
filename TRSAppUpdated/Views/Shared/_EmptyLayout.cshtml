@@ -1,0 +1,28 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] | Event Land</title>
+    <!--Start Style -->
+    <link rel="stylesheet" type="text/css" href="~/assets/css/fonts.css">
+    <link rel="stylesheet" type="text/css" href="~/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="~/assets/css/auth.css">
+    <!--Custom css-->
+    <link rel="stylesheet" type="text/css" href="~/assets/css/custom.css">
+    <!--Lolibox css-->
+    <link rel="stylesheet" href="~/assets/css/lobibox.min.css" />
+    <!--Boxicons css-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/boxicons/2.1.0/css/boxicons.min.css" />
+    <!-- Favicon Link -->
+    <link rel="shortcut icon" type="image/png" href="~/assets/images/web-favicon.png">
+</head>
+<body>
+    @RenderBody()
+    <script src="~/assets/js/jquery.min.js"></script>
+    <!--Lolibox js-->
+    <script src="~/assets/js/lobibox.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+    
+</body>
+</html>

@@ -1,35 +1,154 @@
-﻿<!DOCTYPE html>
+﻿@inject IHttpContextAccessor _HttpContextAccessor
+@{
+    string _Username = _HttpContextAccessor.HttpContext.User.FindFirst("Username").Value;
+    string _RoleTitle = _HttpContextAccessor.HttpContext.User.FindFirst("RoleTitle").Value;
+}
+<!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - TRSAppUpdated</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/TRSAppUpdated.styles.css" asp-append-version="true" />
+    <title>@ViewData["Title"] | Event Land</title>
+    <!--Start Style -->
+    <link rel="stylesheet" type="text/css" href="~/assets/css/fonts.css">
+    <link rel="stylesheet" type="text/css" href="~/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="~/assets/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="~/assets/css/icofont.min.css">
+    <link rel="stylesheet" type="text/css" href="~/assets/css/style.css">
+    <link rel="stylesheet" id="theme-change" type="text/css" href="#">
+    <!--Custom css-->
+    <link rel="stylesheet" type="text/css" href="~/assets/css/custom.css">
+    <!--Lolibox css-->
+    <link rel="stylesheet" href="~/assets/css/lobibox.min.css" />
+    <!--Boxicons css-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/boxicons/2.1.0/css/boxicons.min.css" />
+    <!-- Favicon Link -->
+    <link rel="shortcut icon" type="image/png" href="~/assets/images/web-favicon.png">
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">TRSAppUpdated</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
+    <div class="loader">
+        <div class="spinner">
+            <img src="~/assets/images/loader.gif" alt="" />
+        </div>
+    </div>
+    <div class="page-wrapper">
+        <!-- Header Start -->
+        <header class="header-wrapper main-header">
+            <div class="header-inner-wrapper">
+                <div class="header-right">
+                    <div class="serch-wrapper">
+                    </div>
+                    <div class="header-left">
+                        <div class="header-links">
+                            <a href="javascript:void(0);" class="toggle-btn">
+                                <span></span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="header-controls">
+                        <div class="user-info-wrapper header-links">
+                            <a href="javascript:void(0);" class="user-info">
+                                <img src="~/assets/images/user.jpg" alt="" class="user-img">
+                                <div class="blink-animation">
+                                    <span class="blink-circle"></span>
+                                    <span class="main-circle"></span>
+                                </div>
+                            </a>
+                            <div class="user-info-box">
+                                <div class="drop-down-header">
+                                    <h4>@(_Username)</h4>
+                                    <p>@(_RoleTitle)</p>
+                                </div>
+                                <ul>
+                                    @* <li>
+                                        <a href="javascript:;">
+                                            <i class="far fa-edit"></i> Edit Profile
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="javascript:;">
+                                            <i class="fas fa-cog"></i> Settings
+                                        </a>
+                                    </li> *@
+                                    <li>
+                                        <a href="~/Home/Logout">
+                                            <i class="fas fa-sign-out-alt"></i> logout
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </nav>
-    </header>
+        </header>
+        <!-- Sidebar Start -->
+        <aside class="sidebar-wrapper">
+            <div class="logo-wrapper">
+                <a href="javascript:;" class="admin-logo">
+                    <img src="~/assets/images/web-logo.png" alt="" class="sp_logo">
+                    <img src="~/assets/images/web-mini-logo.png" alt="" class="sp_mini_logo">
+                </a>
+            </div>
+            <div class="side-menu-wrap">
+                <ul class="main-menu">
+                    <li>
+                        <a href="~/Dashboard/Index" class="active">
+                            <span class="icon-menu feather-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-home"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                            </span>
+                            <span class="menu-text">
+                                Dashboard
+                            </span>
+                        </a>
+                    </li>
+                    @if (_RoleTitle == "Super Admin")
+                    {
+                        <li>
+                            <a href="javascript:void(0);">
+                                <span class="icon-menu feather-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-alert-octagon"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                                </span>
+                                <span class="menu-text">
+                                    Admin Options
+                                </span>
+                            </a>
+                            <ul class="sub-menu">
+                                <li>
+                                    <a href="javascript:;">
+                                        <span class="icon-dash">
+                                        </span>
+                                        <span class="menu-text">
+                                            Venues
+                                        </span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="javascript:;">
+                                        <span class="icon-dash">
+                                        </span>
+                                        <span class="menu-text">
+                                            Auditoriums
+                                        </span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </aside>
+        <!-- Container Start -->
+        <div class="page-wrapper">
+            <div class="main-content">
+                @RenderBody()
+                <div class="ad-footer-btm">
+                    <p>Copyright @(DateTime.UtcNow.Year) © Event Land All Rights Reserved.</p>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
@@ -38,12 +157,22 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2025 - TRSAppUpdated - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            &copy; 2025 - Event Land - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+    <!-- Script Start -->
+    <script src="~/assets/js/jquery.min.js"></script>
+    <script src="~/assets/js/popper.min.js" type="text/javascript"></script>
+    <script src="~/assets/js/bootstrap.min.js" type="text/javascript"></script>
+    <script src="~/assets/js/swiper.min.js" type="text/javascript"></script>
+    <script src="~/assets/js/apexchart/apexcharts.min.js" type="text/javascript"></script>
+    <script src="~/assets/js/apexchart/control-chart-apexcharts.js" type="text/javascript"></script>
+    <!-- Page Specific -->
+    <script src="~/assets/js/nice-select.min.js" type="text/javascript"></script>
+    <!-- Custom Script -->
+    <script src="~/assets/js/custom.js" type="text/javascript"></script>
+    <!--Lolibox js-->
+    <script src="~/assets/js/lobibox.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

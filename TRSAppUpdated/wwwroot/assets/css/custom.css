@@ -1,0 +1,38 @@
+﻿:root {
+    --black: #000000;
+    --white: #16192f;
+    --white-color: #ffffff;
+    --off-white: #25284b;
+    --border-color: #41466f;
+    --muted: #72799a;
+    --primary: #1aa48b;
+    --primary-light: #1aa48b;
+    --secondary: #10181a;
+    --secondary-light: #315f72;
+    --danger: #e81a46;
+    --danger-light: #ed4b71;
+    --success: #6ca329;
+    --success-light: #79b530;
+    --info: #07a8ff;
+    --info-light: #5fc5ff;
+    --warning: #ffa000;
+    --warning-light: #ffb448;
+    --dark: #3b4067;
+    --dark-light: #122e67;
+    --light: #dae0e5;
+    --light-light: #d3d9df;
+    --facebook: #3b5998;
+    --twitter: #00acee;
+    --instagram: #dd2a7b;
+    --google: #F4B400;
+    --rating: #ffca2b;
+    --price: #ff6b50;
+    --light-bg: #fbf2f2;
+    --text: #eaecf5;
+    --title-color: #eaecf5;
+    --hover-color: #0079bd;
+}
+
+.field-validation-error {
+    color: var(--danger);
+}

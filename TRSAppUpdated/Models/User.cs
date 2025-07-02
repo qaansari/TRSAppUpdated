@@ -30,8 +30,11 @@ namespace TRSAppUpdated.Models
         public int RoleID { get; set; }
         [Column(TypeName = "varchar(300)")]
         public string? ImagePath { get; set; }
+        [Column(TypeName = "varchar(68)")]
+        public string? UserToken { get; set; }
         public bool IsActive { get; set; }
         public bool IsDeleted { get; set; }
+        public bool IsVerified { get; set; }
         [ForeignKey("UserCreatedByUser")]
         public int? CreatedByUserID { get; set; }
         [ForeignKey("UserUpdatedByUser")]
