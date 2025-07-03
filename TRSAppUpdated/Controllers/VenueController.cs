@@ -29,15 +29,15 @@ namespace TRSAppUpdated.Controllers
             _UserID = Convert.ToInt32(_httpContextAccessor.HttpContext.User.FindFirstValue("UserID"));
         }
         //Index (Get All)
-        public async Task<IActionResult> Index(int _pageNo = 1, int _pageSize = 10, string searchedTerm = "")
+        public async Task<IActionResult> Index(int _pageNo = 1, int _pageSize = 1, string _searchedTerm = "")
         {
             try
             {
-                var (_result, totalRecords) = await GetList(_pageNo, _pageSize, searchedTerm);
+                var (_result, totalRecords) = await GetList(_pageNo, _pageSize, _searchedTerm);
                 ViewBag.TotalRecords = totalRecords;
                 ViewBag.PageNo = _pageNo;
                 ViewBag.PageSize = _pageSize;
-                ViewBag.SearchedTerm = searchedTerm;
+                ViewBag.SearchedTerm = _searchedTerm;
                 return View(_result ?? new List<VenueVM>());
             }
             catch (Exception ex)
@@ -46,16 +46,24 @@ namespace TRSAppUpdated.Controllers
             }
             return View(new List<VenueVM>());
         }
-       
+        // GetPartial
         [HttpGet]
-        public async Task<IActionResult> GetVenuesPartial(int _pageNo = 1, int _pageSize = 10, string searchedTerm = "")
+        public async Task<IActionResult> GetPartial(int _pageNo = 1, int _pageSize = 1, string _searchedTerm = "")
         {
-            var (_result, totalRecords) = await GetList(_pageNo,_pageSize,searchedTerm);
-            ViewBag.TotalRecords = totalRecords;
-            ViewBag.PageNo = _pageNo;
-            ViewBag.PageSize = _pageSize;
-            ViewBag.SearchedTerm = searchedTerm;
-            return PartialView("_VenuesTablePartial", _result);
+            try
+            {
+                var (_result, totalRecords) = await GetList(_pageNo, _pageSize, _searchedTerm);
+                ViewBag.TotalRecords = totalRecords;
+                ViewBag.PageNo = _pageNo;
+                ViewBag.PageSize = _pageSize;
+                ViewBag.SearchedTerm = _searchedTerm;
+                return PartialView("_VenuesTablePartial", _result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error occured at GetVenuesPartial in {_Title} Controller due to {ex}");
+            }
+            return PartialView("_VenuesTablePartial", new List<VenueVM>());
         }
         //AddOrEdit (GET)
         public IActionResult AddOrEdit(int ID = 0)
@@ -178,7 +186,7 @@ namespace TRSAppUpdated.Controllers
             return RedirectToAction("Index");
         }
         [NonAction]
-        public async Task<(List<VenueVM> _result, int totalRecords)> GetList(int _pageNo, int _pageSize, string searchedTerm)
+        public async Task<(List<VenueVM> _result, int totalRecords)> GetList(int _pageNo, int _pageSize, string _searchedTerm)
 
         {
             var _result = new List<VenueVM>();
@@ -194,11 +202,11 @@ namespace TRSAppUpdated.Controllers
                        })
                        .AsNoTracking()
                        .AsQueryable();
-            if (!string.IsNullOrEmpty(searchedTerm))
+            if (!string.IsNullOrEmpty(_searchedTerm))
             {
                 _query = _query
-                    .Where(x => x.Title.Trim().ToLower().Contains(searchedTerm.Trim().ToLower())
-                || x.Address.Trim().ToLower().Contains(searchedTerm.Trim().ToLower()));
+                    .Where(x => x.Title.Trim().ToLower().Contains(_searchedTerm.Trim().ToLower())
+                || x.Address.Trim().ToLower().Contains(_searchedTerm.Trim().ToLower()));
             }
             int _skip = (_pageNo - 1) * _pageSize;
             totalRecords = await _query.CountAsync();

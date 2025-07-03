@@ -23,7 +23,16 @@
             </div>
             <div class="card-body">
                 <div class="row mb-2">
-                    <div class="col-md-6"></div>
+                    <div class="col-md-6">
+                        show
+                        <select id="pageSizeDropdown" class="w-25 form-control form-control-sm">
+                            <option value="1" selected="@(_PageSize == 1)">1</option>
+                            <option value="2" selected="@(_PageSize == 2)">2</option>
+                            <option value="3" selected="@(_PageSize == 3)">3</option>
+                            <option value="4" selected="@(_PageSize == 4)">4</option>
+                        </select>
+                        entries
+                    </div>
                     <div class="col-md-6">
                         <div class="d-flex form-inline mb-3 float-right">
                             <input type="text" id="searchInput" class="form-control mr-2 w-75" placeholder="Search..." value="@searchedTerm" />
@@ -84,7 +93,10 @@
             $('#searchBtn').click(function() {
                 loadVenues(1);
             });
-
+                 $('#pageSizeDropdown').change(function() {
+            // Reset to page 1 when changing page size
+            loadVenues(1);
+        });
             $('#searchInput').keypress(function(e) {
                 if(e.which == 13) { // Enter key
                     loadVenues(1);
@@ -99,29 +111,30 @@
             });
 
             // Function to load venues via AJAX
-            function loadVenues(pageNo) {
-                var searchedTerm = $('#searchInput').val();
+                 function loadVenues(pageNo) {
+            var searchedTerm = $('#searchInput').val();
+            var pageSize = $('#pageSizeDropdown').val(); // Get selected page size
 
-                $.ajax({
-                    url: '@Url.Action("GetVenuesPartial")',
-                    type: 'GET',
-                    data: {
-                        pageNo: pageNo || 1,
-                        pageSize: @_PageSize,
-                        searchedTerm: searchedTerm
-                    },
-                    beforeSend: function() {
-                        // Show loading indicator if needed
-                    },
-                    success: function(data) {
-                        $('#venuesTableContainer').html(data);
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('Error loading venues:', error);
-                        // Show error message if needed
-                    }
-                });
-            }
+            $.ajax({
+                url: '@Url.Action("GetPartial")',
+                type: 'GET',
+                data: {
+                    _pageNo: pageNo || 1,
+                    _pageSize: pageSize, // Use selected page size
+                    _searchedTerm: searchedTerm
+                },
+                beforeSend: function() {
+                    // Show loading indicator if needed
+                },
+                success: function(data) {
+                    $('#venuesTableContainer').html(data);
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error loading venues:', error);
+                    // Show error message if needed
+                }
+            });
+        }
         });
 
         @if (_Message != null)
