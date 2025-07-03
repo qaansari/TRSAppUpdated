@@ -7,7 +7,7 @@
     int _PageNo = ViewBag.PageNo;
     int _PageSize = ViewBag.PageSize;
     int _TotalPages = (int)Math.Ceiling((double)_TotalRecords / _PageSize);
-    string searchedTerm = ViewBag.SearchedTerm != null ? ViewBag.SearchedTerm as string : string.Empty;
+    string _searchedTerm = ViewBag.SearchedTerm != null ? ViewBag.SearchedTerm as string : string.Empty;
 }
 <div class="row">
     <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
@@ -22,27 +22,26 @@
             </div>
             <div class="card-body">
                 <div class="row mb-2">
-                    <div class="col-md-6">
+                    <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
                         show
-                        <select id="pageSizeDropdown" class="w-25 form-control form-control-sm">
-                            <option value="1" selected="@(_PageSize == 1)">1</option>
-                            <option value="2" selected="@(_PageSize == 2)">2</option>
-                            <option value="3" selected="@(_PageSize == 3)">3</option>
-                            <option value="4" selected="@(_PageSize == 4)">4</option>
+                        <select id="pageSizeDropdown" class="w-20 form-control form-control-sm">
+                            <option value="10" selected="@(_PageSize == 10)">10</option>
+                            <option value="20" selected="@(_PageSize == 20)">20</option>
+                            <option value="50" selected="@(_PageSize == 50)">50</option>
+                            <option value="100" selected="@(_PageSize == 100)">100</option>
                         </select>
                         entries
                     </div>
-                    <div class="col-md-6">
-                        <div class="d-flex form-inline mb-3 float-right">
-                            <input type="text" id="searchInput" class="form-control mr-2 w-75" placeholder="Search..." value="@searchedTerm" />
-                            <button type="button" id="searchBtn" class="btn btn-primary sm-btn">Search</button>
+                    <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                        <div class="d-flex form-inline mb-3">
+                            <span class="search_span">Search</span> <input type="text" id="searchInput" class="form-control mr-2" placeholder="Search..." />
                         </div>
                     </div>
                 </div>
 
                 <!-- Table container that will be updated via AJAX -->
                 <div id="venuesTableContainer">
-                    @await Html.PartialAsync("_VenuesTablePartial", Model)
+                    @await Html.PartialAsync("_VenueTablePartial", Model)
                 </div>
             </div>
         </div>
@@ -76,13 +75,29 @@
 @section Scripts {
     <script>
         $(document).ready(function(){
+                var currentSearchTerm = '@_searchedTerm';
+        $('#searchInput').val(currentSearchTerm);
+             // Search functionality
+        var searchTimeout;
+        $('#searchInput').on('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(function() {
+                loadVenues(1); // Always reset to page 1 when search term changes
+            }, 500); // 500ms delay after typing stops
+        });
+
+        $('#searchInput').keypress(function(e) {
+            if(e.which == 13) { // Enter key
+                clearTimeout(searchTimeout);
+                loadVenues(1);
+            }
+        });
             // Delete functionality
-            $(document).on('click', '.deleteBtn', function(){
+             $(document).on('click', '.deleteBtn', function(){
                 var selectedID = $(this).data("id");
                 $(".selectedIdElement").val(selectedID);
                 $("#deleteModal").modal("show");
             });
-
             $(".confirmDeleteBtn").click(function(){
                 $(".delete_form").submit();
                 $("#deleteModal").modal("hide");
@@ -138,34 +153,34 @@
 
         @if (_Message != null)
         {
-                if (_Message.StartsWith("1"))
-                {
-                        <text>
-                        Lobibox.notify('success', {
-                            pauseDelayOnHover: true,
-                            size: 'mini',
-                            icon: 'bx bx-info-circle',
-                            continueDelayOnInactiveTab: false,
-                            position: 'bottom right',
-                            msg: '@(_Message.Substring(2))',
-                            soundPath: '/assets/sounds/'
-                        });
-                        </text>
-                }
-                else
-                {
-                        <text>
-                        Lobibox.notify('error', {
-                            pauseDelayOnHover: true,
-                            size: 'mini',
-                            icon: 'bx bx-info-circle',
-                            continueDelayOnInactiveTab: false,
-                            position: 'bottom right',
-                            msg: '@(_Message.Substring(2))',
-                            soundPath: '/assets/sounds/'
-                        });
-                        </text>
-                }
+                    if (_Message.StartsWith("1"))
+                    {
+                                <text>
+                                Lobibox.notify('success', {
+                                    pauseDelayOnHover: true,
+                                    size: 'mini',
+                                    icon: 'bx bx-info-circle',
+                                    continueDelayOnInactiveTab: false,
+                                    position: 'bottom right',
+                                    msg: '@(_Message.Substring(2))',
+                                    soundPath: '/assets/sounds/'
+                                });
+                                </text>
+                    }
+                    else
+                    {
+                                <text>
+                                Lobibox.notify('error', {
+                                    pauseDelayOnHover: true,
+                                    size: 'mini',
+                                    icon: 'bx bx-info-circle',
+                                    continueDelayOnInactiveTab: false,
+                                    position: 'bottom right',
+                                    msg: '@(_Message.Substring(2))',
+                                    soundPath: '/assets/sounds/'
+                                });
+                                </text>
+                    }
         }
     </script>
 }

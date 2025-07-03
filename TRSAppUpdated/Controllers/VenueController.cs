@@ -29,7 +29,7 @@ namespace TRSAppUpdated.Controllers
             _UserID = Convert.ToInt32(_httpContextAccessor.HttpContext.User.FindFirstValue("UserID"));
         }
         //Index (Get All)
-        public async Task<IActionResult> Index(int _pageNo = 1, int _pageSize = 1, string _searchedTerm = "")
+        public async Task<IActionResult> Index(int _pageNo = 1, int _pageSize = 10, string _searchedTerm = "")
         {
             try
             {
@@ -48,7 +48,7 @@ namespace TRSAppUpdated.Controllers
         }
         // GetPartial
         [HttpGet]
-        public async Task<IActionResult> GetPartial(int _pageNo = 1, int _pageSize = 1, string _searchedTerm = "")
+        public async Task<IActionResult> GetPartial(int _pageNo = 1, int _pageSize = 10, string _searchedTerm = "")
         {
             try
             {
@@ -57,13 +57,13 @@ namespace TRSAppUpdated.Controllers
                 ViewBag.PageNo = _pageNo;
                 ViewBag.PageSize = _pageSize;
                 ViewBag.SearchedTerm = _searchedTerm;
-                return PartialView("_VenuesTablePartial", _result);
+                return PartialView($"_{_Title}TablePartial", _result);
             }
             catch (Exception ex)
             {
                 _logger.LogError($"Error occured at GetVenuesPartial in {_Title} Controller due to {ex}");
             }
-            return PartialView("_VenuesTablePartial", new List<VenueVM>());
+            return PartialView($"_{_Title}TablePartial", new List<VenueVM>());
         }
         //AddOrEdit (GET)
         public IActionResult AddOrEdit(int ID = 0)
