@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
+using Syncfusion.EJ2.FileManager.Base;
 using Syncfusion.EJ2.Layouts;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -28,31 +29,15 @@ namespace TRSAppUpdated.Controllers
             _UserID = Convert.ToInt32(_httpContextAccessor.HttpContext.User.FindFirstValue("UserID"));
         }
         //Index (Get All)
-        public async Task<IActionResult> Index(int _pageNo = 1, int _pageSize = 50,string searchedTerm="")
+        public async Task<IActionResult> Index(int _pageNo = 1, int _pageSize = 10, string searchedTerm = "")
         {
             try
             {
-                var _query = _context.Venues.Where(x => !x.IsDeleted)
-                        .Select(x => new VenueVM()
-                        {
-                            ID = x.ID,
-                            Title = x.Title,
-                            Address = x.Address,
-                            ImagePath = x.ImagePath,
-                        })
-                        .AsNoTracking()
-                        .AsQueryable();
-                if (!string.IsNullOrEmpty(searchedTerm))
-                {
-                    ViewBag.SearchedTerm = searchedTerm;
-                    _query = _query.Where(x => x.Title.Trim().ToLower() == searchedTerm.Trim().ToLower() || x.Address.Trim().ToLower() == searchedTerm.Trim().ToLower());
-                }
-                int _skip = (_pageNo - 1) * _pageSize;
-                ViewBag.TotalRecords = await _query.CountAsync();
+                var (_result, totalRecords) = await GetList(_pageNo, _pageSize, searchedTerm);
+                ViewBag.TotalRecords = totalRecords;
                 ViewBag.PageNo = _pageNo;
                 ViewBag.PageSize = _pageSize;
-                _query = _query.Take(_pageSize).Skip(_skip);
-                var _result = await _query.ToListAsync();
+                ViewBag.SearchedTerm = searchedTerm;
                 return View(_result ?? new List<VenueVM>());
             }
             catch (Exception ex)
@@ -60,6 +45,17 @@ namespace TRSAppUpdated.Controllers
                 _logger.LogError($"Error occured at Index in {_Title} Controller due to {ex}");
             }
             return View(new List<VenueVM>());
+        }
+       
+        [HttpGet]
+        public async Task<IActionResult> GetVenuesPartial(int _pageNo = 1, int _pageSize = 10, string searchedTerm = "")
+        {
+            var (_result, totalRecords) = await GetList(_pageNo,_pageSize,searchedTerm);
+            ViewBag.TotalRecords = totalRecords;
+            ViewBag.PageNo = _pageNo;
+            ViewBag.PageSize = _pageSize;
+            ViewBag.SearchedTerm = searchedTerm;
+            return PartialView("_VenuesTablePartial", _result);
         }
         //AddOrEdit (GET)
         public IActionResult AddOrEdit(int ID = 0)
@@ -107,7 +103,7 @@ namespace TRSAppUpdated.Controllers
                         var _fileName = $"venue" + "_" + Guid.NewGuid().ToString().Replace("-", "") + Path.GetExtension(Model.ImageFile.FileName);
                         Model.ImagePath = _fileName.Trim();
                         var _filePath = Path.Combine(folderPath, _fileName);
-                        using (var _stream=new FileStream(_filePath,FileMode.Create))
+                        using (var _stream = new FileStream(_filePath, FileMode.Create))
                         {
                             await Model.ImageFile.CopyToAsync(_stream);
                         }
@@ -180,6 +176,35 @@ namespace TRSAppUpdated.Controllers
                 _logger.LogError($"Error occured at Delete (POST) in {_Title} Controller due to {ex}");
             }
             return RedirectToAction("Index");
+        }
+        [NonAction]
+        public async Task<(List<VenueVM> _result, int totalRecords)> GetList(int _pageNo, int _pageSize, string searchedTerm)
+
+        {
+            var _result = new List<VenueVM>();
+            int totalRecords = 0;
+            // For AJAX calls
+            var _query = _context.Venues.Where(x => !x.IsDeleted)
+                       .Select(x => new VenueVM()
+                       {
+                           ID = x.ID,
+                           Title = x.Title,
+                           Address = x.Address,
+                           ImagePath = x.ImagePath,
+                       })
+                       .AsNoTracking()
+                       .AsQueryable();
+            if (!string.IsNullOrEmpty(searchedTerm))
+            {
+                _query = _query
+                    .Where(x => x.Title.Trim().ToLower().Contains(searchedTerm.Trim().ToLower())
+                || x.Address.Trim().ToLower().Contains(searchedTerm.Trim().ToLower()));
+            }
+            int _skip = (_pageNo - 1) * _pageSize;
+            totalRecords = await _query.CountAsync();
+            _query = _query.Skip(_skip).Take(_pageSize);
+            _result = await _query.ToListAsync();
+            return (_result, totalRecords);
         }
     }
 }
