@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using Syncfusion.EJ2.Layouts;
 using System.Security.Claims;
@@ -8,6 +10,7 @@ using TRSAppUpdated.ViewModels;
 
 namespace TRSAppUpdated.Controllers
 {
+    [Authorize(Roles = "Super Admin")]
     public class VenueController : Controller
     {
         private readonly AppDbContext _context;
@@ -25,20 +28,25 @@ namespace TRSAppUpdated.Controllers
             _UserID = Convert.ToInt32(_httpContextAccessor.HttpContext.User.FindFirstValue("UserID"));
         }
         //Index (Get All)
-        public async Task<IActionResult> Index(int _pageNo = 1, int _pageSize = 50)
+        public async Task<IActionResult> Index(int _pageNo = 1, int _pageSize = 50,string searchedTerm="")
         {
             try
             {
                 var _query = _context.Venues.Where(x => !x.IsDeleted)
                         .Select(x => new VenueVM()
                         {
+                            ID = x.ID,
                             Title = x.Title,
                             Address = x.Address,
                             ImagePath = x.ImagePath,
                         })
-                        .OrderByDescending(x => x.ID)
                         .AsNoTracking()
                         .AsQueryable();
+                if (!string.IsNullOrEmpty(searchedTerm))
+                {
+                    ViewBag.SearchedTerm = searchedTerm;
+                    _query = _query.Where(x => x.Title.Trim().ToLower() == searchedTerm.Trim().ToLower() || x.Address.Trim().ToLower() == searchedTerm.Trim().ToLower());
+                }
                 int _skip = (_pageNo - 1) * _pageSize;
                 ViewBag.TotalRecords = await _query.CountAsync();
                 ViewBag.PageNo = _pageNo;
@@ -98,6 +106,11 @@ namespace TRSAppUpdated.Controllers
                         }
                         var _fileName = $"venue" + "_" + Guid.NewGuid().ToString().Replace("-", "") + Path.GetExtension(Model.ImageFile.FileName);
                         Model.ImagePath = _fileName.Trim();
+                        var _filePath = Path.Combine(folderPath, _fileName);
+                        using (var _stream=new FileStream(_filePath,FileMode.Create))
+                        {
+                            await Model.ImageFile.CopyToAsync(_stream);
+                        }
                     }
                     if (Model.ID != 0)
                     {
@@ -123,14 +136,17 @@ namespace TRSAppUpdated.Controllers
                         _item.ImagePath = Model.ImagePath;
                         _item.CreatedByUserID = _UserID;
                         _item.CreatedDateTime = DateTime.UtcNow.AddHours(5);
-                        _context.ChangeTracker.Clear();
                         _context.Venues.Add(_item);
                         await _context.SaveChangesAsync();
                         TempData["Message"] = $"1,{_Title} Successfully Added";
                     }
                     return RedirectToAction("Index");
                 }
+                else
+                {
+                }
             }
+
             catch (Exception ex)
             {
                 _logger.LogError($"Error occured at AddOrEdit (POST) in {_Title} Controller due to {ex}");

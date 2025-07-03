@@ -42,3 +42,15 @@
 .float-right{
     float:right;
 }
+.tabular_img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 1px solid var(--primary);
+}
+.preview_venue_img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 1px solid var(--primary);
+}

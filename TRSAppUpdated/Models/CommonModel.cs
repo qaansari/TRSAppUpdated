@@ -14,7 +14,7 @@ namespace TRSAppUpdated.Models
         public DateTime CreatedDateTime { get; set; }
         public DateTime? UpdatedDateTime { get; set; }
         public DateTime? DeletedDateTime { get; set; }
-        public User CreatedByUser { get; set; }
+        public User? CreatedByUser { get; set; }
         public User? UpdatedByUser { get; set; }
         public User? DeletedByUser { get; set; }
     }

@@ -7,6 +7,7 @@
     }
     string _PageTitle = "Venue";
     ViewData["Title"] = $"{_fn} {_PageTitle}";
+    var _Message = TempData["Message"] as string;
 }
 <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
     <div class="card">
@@ -15,10 +16,10 @@
         </div>
         <div class="card-body">
             <form class="separate-form" enctype="multipart/form-data" method="post" asp-action="AddOrEdit">
-                <input type="hidden" asp-for="ID"/>
-                <input type="hidden" asp-for="ImagePath"/>
-                <input type="hidden" asp-for="CreatedByUserID"/>
-                <input type="hidden" asp-for="CreatedDateTime"/>
+                <input type="hidden" asp-for="ID" />
+                <input type="hidden" asp-for="ImagePath" />
+                <input type="hidden" asp-for="CreatedByUserID" />
+                <input type="hidden" asp-for="CreatedDateTime" />
                 <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
                     <div class="row">
                         <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
@@ -31,23 +32,90 @@
                         <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
                             <div class="form-group">
                                 <label class="col-form-label">Picture</label>
-                                <input class="form-control" type="file" asp-for="ImageFile">
+                                <input class="form-control" type="file" asp-for="ImageFile" id="imgSelector">
                             </div>
                         </div>
                         <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
                             <div class="form-group">
                                 <label class="col-form-label">Address <span class="text-danger">*</span></label>
-                                <input class="form-control" type="text" placeholder="Enter @_PageTitle Address">
+                                <input class="form-control" type="text" placeholder="Enter @_PageTitle Address" asp-for="Address">
                                 <span asp-validation-for="Address"></span>
                             </div>
                         </div>
+                        <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                            <div class="form-group mb-0">
+                                <input class="btn btn-primary" type="submit">
+                                <a class="btn btn-danger" href="@(Url.Action("Index"))">Back</a>
+                            </div>
+                        </div>
+                        <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                            <div class="form-group mb-0">
+                                @{
+                                    string _src = "no-image-found.png";
+                                    if (!string.IsNullOrEmpty(Model.ImagePath))
+                                    {
+                                        _src = $"venues/{Model.ImagePath}";
+                                    }
+                                }
+                                <img src="~/assets/images/@(_src)" class="preview_venue_img" id="imgPreview">
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-group mb-0">
-                        <input class="btn btn-primary" type="submit">
-                        <a class="btn btn-danger" href="@(Url.Action("Index"))">Back</a>
-                    </div>
+                    
                 </div>
             </form>
         </div>
     </div>
 </div>
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $("#imgSelector").change(
+                function PreviewSelectedImage() {
+                    var imageFile = document.getElementById("imgSelector");
+                    var imagePreview = document.getElementById("imgPreview");
+                    var imageReader = new FileReader();
+                    imageReader.onload = function (e) {
+                        imagePreview.src = e.target.result;
+                        imagePreview.style.display = "block";
+                    };
+                    imageReader.readAsDataURL(imageFile.files[0]);
+                });
+        });
+    </script>
+    @if (_Message != null)
+    {
+        if (_Message.StartsWith("1"))
+        {
+            <script>
+                $(document).ready(function () {
+                    Lobibox.notify('success', {
+                        pauseDelayOnHover: true,
+                        size: 'mini',
+                        icon: 'bx bx-info-circle',
+                        continueDelayOnInactiveTab: false,
+                        position: 'bottom right',
+                        msg: '@(_Message.Substring(2))',
+                        soundPath: '/assets/sounds/'
+                    });
+                });
+            </script>
+        }
+        else
+        {
+            <script>
+                $(document).ready(function () {
+                    Lobibox.notify('error', {
+                        pauseDelayOnHover: true,
+                        size: 'mini',
+                        icon: 'bx bx-info-circle',
+                        continueDelayOnInactiveTab: false,
+                        position: 'bottom right',
+                        msg: '@(_Message.Substring(2))',
+                        soundPath: '/assets/sounds/'
+                    });
+                });
+            </script>
+        }
+    }
+}
