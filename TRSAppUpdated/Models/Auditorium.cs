@@ -11,6 +11,9 @@ namespace TRSAppUpdated.Models
         public string Title { get; set; }
         [Column(TypeName = "varchar(300)")]
         public string? ImagePath { get; set; }
+        public int NoOfRows { get; set; }
+        [Column(TypeName = "varchar(1)")]
+        public string StartingRow { get; set; }
         [ForeignKey("Venue")]
         public int VenueID { get; set; }
         public Venue Venue { get; set; }

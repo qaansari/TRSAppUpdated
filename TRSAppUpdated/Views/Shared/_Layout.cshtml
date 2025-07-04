@@ -19,6 +19,8 @@
     <link rel="stylesheet" type="text/css" href="~/assets/css/style.css">
     <!--Custom css-->
     <link rel="stylesheet" type="text/css" href="~/assets/css/custom.css">
+    <!--Syncfusion css-->
+    <link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/30.1.38/bootstrap5-dark.css" />
     <!--Lolibox css-->
     <link rel="stylesheet" href="~/assets/css/lobibox.min.css" />
     <!--Boxicons css-->
@@ -79,7 +81,7 @@
                                         </a>
                                     </li> *@
                                     <li>
-                                        <a href="@(Url.Action("Index", "Home"))">
+                                        <a href="@(Url.Action("Logout", "Home"))">
                                             <i class="fas fa-sign-out-alt"></i> logout
                                         </a>
                                     </li>
@@ -132,7 +134,7 @@
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="javascript:;">
+                                    <a href="@(Url.Action("Index", "Auditorium"))">
                                         <span class="icon-dash">
                                         </span>
                                         <span class="menu-text">
@@ -157,14 +159,16 @@
         </div>
     </div>
     <!-- Script Start -->
-    <script src="~/assets/js/jquery-3.7.1.js"></script>
+    <script src="~/assets/js/jquery.min.js"></script>
     <script src="~/assets/js/popper.min.js"></script>
     <script src="~/assets/js/bootstrap.min.js"></script>
+    <!--Syncfusion js-->
+    <script src="https://cdn.syncfusion.com/ej2/30.1.38/dist/ej2.min.js"></script>
     <!--Lolibox js-->
     <script src="~/assets/js/lobibox.min.js"></script>
     <!-- Custom Script -->
     <script src="@Url.Content("~/assets/js/custom.js")"></script>
-   
+    <ejs-scripts></ejs-scripts>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

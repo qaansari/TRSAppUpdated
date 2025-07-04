@@ -4,7 +4,7 @@
     --white-color: #ffffff;
     --off-white: #25284b;
     --border-color: #41466f;
-    --muted: #72799a;
+    --muted: #eff2ff;
     --primary: #1aa48b;
     --primary-light: #1aa48b;
     --secondary: #10181a;
@@ -36,28 +36,72 @@
 .field-validation-error {
     color: var(--danger);
 }
-.error_img{
-    width:600px;
+
+.error_img {
+    width: 600px;
 }
-.float-right{
-    float:right;
+
+.float-right {
+    float: right;
 }
+
 .tabular_img {
     width: 60px;
     height: 60px;
     border-radius: 50%;
     border: 1px solid var(--primary);
 }
+
 .preview_venue_img {
     width: 80px;
     height: 80px;
     border-radius: 50%;
     border: 1px solid var(--primary);
 }
+.preview_auditorium_img {
+    width: 100%;
+    height: 200px;
+    border-radius: 10px;
+    border: 1px solid var(--primary);
+}
 .search_span {
     align-self: center;
     margin-right: 5px;
 }
-.w-20{
-    width:20%;
+
+.w-20 {
+    width: 20%;
 }
+
+.ad-auth-feilds {
+    position: relative;
+}
+
+.ad-input {
+    padding-left: 35px;
+    padding-right: 35px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.left-icon {
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    transform: translateY(-50%);
+    padding-left: 10px;
+}
+
+.right-icon {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    padding-right: 10px;
+    cursor: pointer;
+}
+/** Syncfusion Custom CSS Start **/
+.e-input-group, .e-input-group.e-control-wrapper, .e-float-input, .e-float-input.e-input-group, .e-float-input.e-control-wrapper, .e-float-input.e-input-group.e-control-wrapper {
+    background:var(--white) !important;
+}
+/** Syncfusion Custom CSS End **/

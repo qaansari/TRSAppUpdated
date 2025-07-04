@@ -12,7 +12,7 @@ using TRSAppUpdated.Models;
 namespace TRSAppUpdated.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250702081805_Db Init")]
+    [Migration("20250704105325_Db Init")]
     partial class DbInit
     {
         /// <inheritdoc />
@@ -125,6 +125,13 @@ namespace TRSAppUpdated.Migrations
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
+
+                    b.Property<int>("NoOfRows")
+                        .HasColumnType("int");
+
+                    b.Property<string>("StartingRow")
+                        .IsRequired()
+                        .HasColumnType("varchar(1)");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -449,7 +456,7 @@ namespace TRSAppUpdated.Migrations
                         {
                             ID = 1,
                             CreatedByUserID = 1,
-                            CreatedDateTime = new DateTime(2025, 7, 2, 13, 18, 4, 545, DateTimeKind.Utc).AddTicks(7513),
+                            CreatedDateTime = new DateTime(2025, 7, 4, 15, 53, 24, 92, DateTimeKind.Utc).AddTicks(7855),
                             IsDeleted = false,
                             Title = "Cash"
                         },
@@ -457,7 +464,7 @@ namespace TRSAppUpdated.Migrations
                         {
                             ID = 2,
                             CreatedByUserID = 1,
-                            CreatedDateTime = new DateTime(2025, 7, 2, 13, 18, 4, 545, DateTimeKind.Utc).AddTicks(7517),
+                            CreatedDateTime = new DateTime(2025, 7, 4, 15, 53, 24, 92, DateTimeKind.Utc).AddTicks(7858),
                             IsDeleted = false,
                             Title = "Easypaisa"
                         },
@@ -465,7 +472,7 @@ namespace TRSAppUpdated.Migrations
                         {
                             ID = 3,
                             CreatedByUserID = 1,
-                            CreatedDateTime = new DateTime(2025, 7, 2, 13, 18, 4, 545, DateTimeKind.Utc).AddTicks(7518),
+                            CreatedDateTime = new DateTime(2025, 7, 4, 15, 53, 24, 92, DateTimeKind.Utc).AddTicks(7860),
                             IsDeleted = false,
                             Title = "Jazzcash"
                         },
@@ -473,7 +480,7 @@ namespace TRSAppUpdated.Migrations
                         {
                             ID = 4,
                             CreatedByUserID = 1,
-                            CreatedDateTime = new DateTime(2025, 7, 2, 13, 18, 4, 545, DateTimeKind.Utc).AddTicks(7519),
+                            CreatedDateTime = new DateTime(2025, 7, 4, 15, 53, 24, 92, DateTimeKind.Utc).AddTicks(7861),
                             IsDeleted = false,
                             Title = "Bank Transfer"
                         });
@@ -665,7 +672,7 @@ namespace TRSAppUpdated.Migrations
                         {
                             ID = 1,
                             CreatedByUserID = 1,
-                            CreatedDateTime = new DateTime(2025, 7, 2, 13, 18, 4, 545, DateTimeKind.Utc).AddTicks(7670),
+                            CreatedDateTime = new DateTime(2025, 7, 4, 15, 53, 24, 92, DateTimeKind.Utc).AddTicks(7928),
                             IsDeleted = false,
                             Title = "Arrival Pending"
                         },
@@ -673,7 +680,7 @@ namespace TRSAppUpdated.Migrations
                         {
                             ID = 2,
                             CreatedByUserID = 1,
-                            CreatedDateTime = new DateTime(2025, 7, 2, 13, 18, 4, 545, DateTimeKind.Utc).AddTicks(7673),
+                            CreatedDateTime = new DateTime(2025, 7, 4, 15, 53, 24, 92, DateTimeKind.Utc).AddTicks(7930),
                             IsDeleted = false,
                             Title = "Not Attended"
                         },
@@ -681,7 +688,7 @@ namespace TRSAppUpdated.Migrations
                         {
                             ID = 3,
                             CreatedByUserID = 1,
-                            CreatedDateTime = new DateTime(2025, 7, 2, 13, 18, 4, 545, DateTimeKind.Utc).AddTicks(7674),
+                            CreatedDateTime = new DateTime(2025, 7, 4, 15, 53, 24, 92, DateTimeKind.Utc).AddTicks(7932),
                             IsDeleted = false,
                             Title = "Closed"
                         },
@@ -689,7 +696,7 @@ namespace TRSAppUpdated.Migrations
                         {
                             ID = 4,
                             CreatedByUserID = 1,
-                            CreatedDateTime = new DateTime(2025, 7, 2, 13, 18, 4, 545, DateTimeKind.Utc).AddTicks(7675),
+                            CreatedDateTime = new DateTime(2025, 7, 4, 15, 53, 24, 92, DateTimeKind.Utc).AddTicks(7934),
                             IsDeleted = false,
                             Title = "Refunded"
                         });
@@ -1143,7 +1150,7 @@ namespace TRSAppUpdated.Migrations
                         {
                             ID = 1,
                             ContactNumber = "+923312541767",
-                            CreatedDateTime = new DateTime(2025, 7, 2, 13, 18, 4, 298, DateTimeKind.Utc).AddTicks(8811),
+                            CreatedDateTime = new DateTime(2025, 7, 4, 15, 53, 23, 854, DateTimeKind.Utc).AddTicks(5282),
                             Email = "sa@eventland.pk",
                             FirstName = "Super",
                             IsActive = true,
@@ -1158,7 +1165,7 @@ namespace TRSAppUpdated.Migrations
                             ID = 2,
                             ContactNumber = "+923312541767",
                             CreatedByUserID = 1,
-                            CreatedDateTime = new DateTime(2025, 7, 2, 13, 18, 4, 396, DateTimeKind.Utc).AddTicks(3665),
+                            CreatedDateTime = new DateTime(2025, 7, 4, 15, 53, 23, 935, DateTimeKind.Utc).AddTicks(9772),
                             Email = "qa.ansari80@eventland.pk",
                             FirstName = "Qamar",
                             IsActive = true,
@@ -1173,7 +1180,7 @@ namespace TRSAppUpdated.Migrations
                             ID = 3,
                             ContactNumber = "+923162361582",
                             CreatedByUserID = 1,
-                            CreatedDateTime = new DateTime(2025, 7, 2, 13, 18, 4, 469, DateTimeKind.Utc).AddTicks(6339),
+                            CreatedDateTime = new DateTime(2025, 7, 4, 15, 53, 24, 17, DateTimeKind.Utc).AddTicks(789),
                             Email = "stayyabahmed85@eventland.pk",
                             FirstName = "Tayyab",
                             IsActive = true,
@@ -1188,7 +1195,7 @@ namespace TRSAppUpdated.Migrations
                             ID = 4,
                             ContactNumber = "+923091265921",
                             CreatedByUserID = 1,
-                            CreatedDateTime = new DateTime(2025, 7, 2, 13, 18, 4, 545, DateTimeKind.Utc).AddTicks(6844),
+                            CreatedDateTime = new DateTime(2025, 7, 4, 15, 53, 24, 92, DateTimeKind.Utc).AddTicks(7237),
                             Email = "anasali4772@eventland.pk",
                             FirstName = "Anas",
                             IsActive = true,

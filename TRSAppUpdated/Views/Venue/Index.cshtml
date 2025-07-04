@@ -41,7 +41,7 @@
 
                 <!-- Table container that will be updated via AJAX -->
                 <div id="venuesTableContainer">
-                    @await Html.PartialAsync("_VenueTablePartial", Model)
+                    @await Html.PartialAsync($"_{_PageTitle}TablePartial", Model)
                 </div>
             </div>
         </div>

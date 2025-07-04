@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using TRSAppUpdated.Interfaces;
 using TRSAppUpdated.Models;
+using TRSAppUpdated.Services;
 
 namespace TRSAppUpdated
 {
@@ -20,6 +22,7 @@ namespace TRSAppUpdated
             builder.Services.AddDistributedMemoryCache();
             builder.Services.AddSession();
             builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            builder.Services.AddScoped<IVenueService, VenueService>();
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
             {
 

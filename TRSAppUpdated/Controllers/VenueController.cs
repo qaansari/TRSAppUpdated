@@ -101,6 +101,7 @@ namespace TRSAppUpdated.Controllers
                 if (ModelState.IsValid)
                 {
                     var _item = new Venue();
+                    
                     if (Model.ImageFile != null)
                     {
                         var folderPath = Path.Combine(_webHostEnvironment.WebRootPath, "assets", "images", "venues");
@@ -118,6 +119,15 @@ namespace TRSAppUpdated.Controllers
                     }
                     if (Model.ID != 0)
                     {
+                        var isExists = _context.Venues.Where(x => !x.IsDeleted
+                            && x.ID!=Model.ID
+                            && x.Title.Trim().ToLower() == Model.Title.Trim().ToLower())
+                        .Any();
+                        if (isExists)
+                        {
+                            TempData["Message"] = $"0,{_Title} Already Exists";
+                            return View(Model);
+                        }
                         _item = _context.Venues.Where(x => !x.IsDeleted && x.ID == Model.ID)
                             .AsNoTracking().FirstOrDefault();
                         if (_item != null)
@@ -135,6 +145,14 @@ namespace TRSAppUpdated.Controllers
                     }
                     else
                     {
+                        var isExists = _context.Venues.Where(x => !x.IsDeleted
+                            && x.Title.Trim().ToLower() == Model.Title.Trim().ToLower())
+                        .Any();
+                        if (isExists)
+                        {
+                            TempData["Message"] = $"0,{_Title} Already Exists";
+                            return View(Model);
+                        }
                         _item.Title = Model.Title.Trim();
                         _item.Address = Model.Address.Trim();
                         _item.ImagePath = Model.ImagePath;
@@ -185,33 +203,41 @@ namespace TRSAppUpdated.Controllers
             }
             return RedirectToAction("Index");
         }
+        //Get List
         [NonAction]
         public async Task<(List<VenueVM> _result, int totalRecords)> GetList(int _pageNo, int _pageSize, string _searchedTerm)
-
         {
-            var _result = new List<VenueVM>();
-            int totalRecords = 0;
-            // For AJAX calls
-            var _query = _context.Venues.Where(x => !x.IsDeleted)
-                       .Select(x => new VenueVM()
-                       {
-                           ID = x.ID,
-                           Title = x.Title,
-                           Address = x.Address,
-                           ImagePath = x.ImagePath,
-                       })
-                       .AsNoTracking()
-                       .AsQueryable();
-            if (!string.IsNullOrEmpty(_searchedTerm))
+           
+                var _result = new List<VenueVM>();
+                int totalRecords = 0;
+            try
             {
-                _query = _query
-                    .Where(x => x.Title.Trim().ToLower().Contains(_searchedTerm.Trim().ToLower())
-                || x.Address.Trim().ToLower().Contains(_searchedTerm.Trim().ToLower()));
+                // For AJAX calls
+                var _query = _context.Venues.Where(x => !x.IsDeleted)
+                           .Select(x => new VenueVM()
+                           {
+                               ID = x.ID,
+                               Title = x.Title,
+                               Address = x.Address,
+                               ImagePath = x.ImagePath,
+                           })
+                           .AsNoTracking()
+                           .AsQueryable();
+                if (!string.IsNullOrEmpty(_searchedTerm))
+                {
+                    _query = _query
+                        .Where(x => x.Title.Trim().ToLower().Contains(_searchedTerm.Trim().ToLower())
+                    || x.Address.Trim().ToLower().Contains(_searchedTerm.Trim().ToLower()));
+                }
+                int _skip = (_pageNo - 1) * _pageSize;
+                totalRecords = await _query.CountAsync();
+                _query = _query.Skip(_skip).Take(_pageSize);
+                _result = await _query.OrderByDescending(x=>x.ID).ToListAsync();
             }
-            int _skip = (_pageNo - 1) * _pageSize;
-            totalRecords = await _query.CountAsync();
-            _query = _query.Skip(_skip).Take(_pageSize);
-            _result = await _query.ToListAsync();
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error occured at GetList in {_Title} Controller due to {ex}");
+            }
             return (_result, totalRecords);
         }
     }
