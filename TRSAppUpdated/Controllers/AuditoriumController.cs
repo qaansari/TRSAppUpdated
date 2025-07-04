@@ -297,5 +297,76 @@ namespace TRSAppUpdated.Controllers
             }
             return (_result, totalRecords);
         }
+        //Update Columns (GET)
+        public IActionResult UpdateColumns(int AuditoriumId)
+        {
+            try
+            {
+                var _rows = _context.Rows
+                        .Where(x => !x.IsDeleted && x.AuditoriumID == AuditoriumId)
+                        .Select(x => new RowWithColumnVM
+                        {
+                            RowID = x.ID,
+                            RowLabel = x.RowLabel,
+                            ColumnCount = _context.Columns.Count(y => !y.IsDeleted && y.RowID == x.ID)
+                        })
+                        .ToList();
+                return View(_rows ?? new List<RowWithColumnVM>());
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error occured at UpdateColumns (GET) in {_Title} Controller due to {ex}");
+            }
+            return View(new List<RowWithColumnVM>());
+        }
+        //Update Columns (POST)
+        [HttpPost]
+        public async Task<IActionResult> UpdateColumns(List<RowWithColumnVM> model)
+        {
+            try
+            {
+                foreach (var item in model)
+                {
+                    // Get the row object including its label
+                    var row = _context.Rows.FirstOrDefault(r => !r.IsDeleted && r.ID == item.RowID);
+                    if (row == null)
+                    {
+                        continue;
+                    }
+                    var existingColumns = _context.Columns
+                        .Where(c => !c.IsDeleted && c.RowID == row.ID)
+                        .OrderBy(c => c.ColumnNumber)
+                        .ToList();
+                    int existingCount = existingColumns.Count;
+                    // Delete extra columns if any
+                    if (existingCount > item.ColumnCount)
+                    {
+                        var toRemove = existingColumns.Skip(item.ColumnCount).ToList();
+                        _context.Columns.RemoveRange(toRemove);
+                    }
+                    // Add new columns if needed
+                    else if (existingCount < item.ColumnCount)
+                    {
+                        for (int i = existingCount + 1; i <= item.ColumnCount; i++)
+                        {
+                            _context.Columns.Add(new Column
+                            {
+                                RowID = row.ID,
+                                ColumnNumber = i,
+                                CreatedByUserID=_UserID,
+                                CreatedDateTime=DateTime.UtcNow.AddHours(5),
+                            });
+                        }
+                    }
+                }
+                await _context.SaveChangesAsync();
+                TempData["Message"] = $"1,Columns Successfully Updated";
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error occured at UpdateColumns (POST) in {_Title} Controller due to {ex}");
+            }
+            return RedirectToAction("Index"); // or your desired route
+        }
     }
 }

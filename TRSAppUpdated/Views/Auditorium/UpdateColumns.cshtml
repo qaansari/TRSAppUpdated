@@ -1,0 +1,68 @@
+﻿@model List<RowWithColumnVM>
+@{
+    ViewData["Title"] = "Update Columns";
+    var _Message = TempData["Message"] as string;
+}
+<form asp-action="UpdateColumns" method="post">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Row</th>
+                <th>Number of Columns</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.Count; i++)
+            {
+                <tr>
+                    <td>
+                        @Model[i].RowLabel
+                        <input type="hidden" asp-for="@Model[i].RowID" />
+                        <input type="hidden" asp-for="@Model[i].RowLabel" />
+                    </td>
+                    <td>
+                        <input type="number" asp-for="@Model[i].ColumnCount" class="form-control" />
+                        <span asp-validation-for="@Model[i].ColumnCount"></span>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a href="@(Url.Action("Index"))" class="btn btn-danger ml-2">Back</a>
+</form>
+@section Scripts {
+    <script>
+    @if (_Message != null)
+    {
+        if (_Message.StartsWith("1"))
+        {
+            <text>
+                Lobibox.notify('success', {
+                pauseDelayOnHover: true,
+                size: 'mini',
+                icon: 'bx bx-info-circle',
+                continueDelayOnInactiveTab: false,
+                position: 'bottom right',
+                msg: '@(_Message.Substring(2))',
+                soundPath: '/assets/sounds/'
+                });
+            </text>
+        }
+        else
+        {
+            <text>
+                Lobibox.notify('error', {
+                pauseDelayOnHover: true,
+                size: 'mini',
+                icon: 'bx bx-info-circle',
+                continueDelayOnInactiveTab: false,
+                position: 'bottom right',
+                msg: '@(_Message.Substring(2))',
+                soundPath: '/assets/sounds/'
+                });
+            </text>
+        }
+    }
+    </script>
+}
