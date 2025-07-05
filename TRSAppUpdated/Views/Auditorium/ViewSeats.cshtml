@@ -3,31 +3,35 @@
     ViewData["Title"] = "Seats";
     Layout = "_EmptyLayout";
 }
-<div class="info w-100">
-        <div class="form-group mb-0 float-right my-2 mr-5px">
-            <a class="btn btn-danger" href="@(Url.Action("Index"))">Back</a>
+<div class="row">
+    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+        <div class="info w-100">
+            <div class="form-group mb-0 float-right my-2 mr-5px">
+                <a class="btn btn-danger" href="@(Url.Action("Index"))">Back</a>
+            </div>
+            <h1 class="fw-bold text-uppercase text-center">@Model.AuditoriumName</h1>
+            <h2 class="fw-medium text-uppercase text-center">@Model.VenueName</h2>
+            <h3 class="fw-medium text-uppercase text-center">@(Model.Rows.SelectMany(x => x.Columns).SelectMany(x => x.Seats).Count()) SEATS</h3>
         </div>
-    <h1 class="fw-bold text-uppercase text-center">@Model.AuditoriumName</h1>
-    <h2 class="fw-medium text-uppercase text-center">@Model.VenueName</h2>
-    <p class="fw-bold text-uppercase text-center">@(Model.Rows.SelectMany(x => x.Columns).SelectMany(x => x.Seats).Count()) SEATS</p>
-</div>
-<div class="w-100">
-@foreach (var row in Model.Rows)
-{
-        <div class="seat-row mt-2">
-            <span class="row_label  mr-5px">@(row.RowLabel)</span>
-        @foreach (var column in row.Columns)
-        {
-                @foreach (var seat in column.Seats)
-                {
-                    <div class="seat">
-                        @seat
-                    </div>
-                }
-                <div class="column-gap"></div>
-        }
-                <span class="row_label">@(row.RowLabel)</span>
+        <div class="w-100">
+            @foreach (var row in Model.Rows)
+            {
+                <div class="seat-row mt-2">
+                    <span class="row_label  mr-5px">@(row.RowLabel)</span>
+                    @foreach (var column in row.Columns)
+                    {
+                        @foreach (var seat in column.Seats)
+                        {
+                            <div class="seat">
+                                @seat
+                            </div>
+                        }
+                        <div class="column-gap"></div>
+                    }
+                    <span class="row_label">@(row.RowLabel)</span>
+                </div>
+            }
+        </div>
     </div>
-}
 </div>
 

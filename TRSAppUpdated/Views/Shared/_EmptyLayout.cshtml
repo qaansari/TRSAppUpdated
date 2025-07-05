@@ -18,10 +18,17 @@
     <link rel="shortcut icon" type="image/png" href="~/assets/images/web-favicon.png">
 </head>
 <body>
+    <div class="loader">
+        <div class="spinner">
+            <img src="~/assets/images/loader_modified.gif" alt="" />
+        </div>
+    </div>
     @RenderBody()
-    <script src="~/assets/js/jquery.min.js"></script>
+    <script src="~/assets/js/jquery-3.7.1.js"></script>
     <!--Lolibox js-->
     <script src="~/assets/js/lobibox.min.js"></script>
+    <!-- Custom Script -->
+    <script src="~/assets/js/custom.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
     
 </body>

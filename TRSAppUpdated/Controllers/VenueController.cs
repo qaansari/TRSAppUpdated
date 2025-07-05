@@ -101,26 +101,10 @@ namespace TRSAppUpdated.Controllers
                 if (ModelState.IsValid)
                 {
                     var _item = new Venue();
-                    
-                    if (Model.ImageFile != null)
-                    {
-                        var folderPath = Path.Combine(_webHostEnvironment.WebRootPath, "assets", "images", "venues");
-                        if (!Directory.Exists(folderPath))
-                        {
-                            Directory.CreateDirectory(folderPath);
-                        }
-                        var _fileName = $"venue" + "_" + Guid.NewGuid().ToString().Replace("-", "") + Path.GetExtension(Model.ImageFile.FileName);
-                        Model.ImagePath = _fileName.Trim();
-                        var _filePath = Path.Combine(folderPath, _fileName);
-                        using (var _stream = new FileStream(_filePath, FileMode.Create))
-                        {
-                            await Model.ImageFile.CopyToAsync(_stream);
-                        }
-                    }
                     if (Model.ID != 0)
                     {
                         var isExists = _context.Venues.Where(x => !x.IsDeleted
-                            && x.ID!=Model.ID
+                            && x.ID != Model.ID
                             && x.Title.Trim().ToLower() == Model.Title.Trim().ToLower())
                         .Any();
                         if (isExists)
@@ -134,7 +118,6 @@ namespace TRSAppUpdated.Controllers
                         {
                             _item.Title = Model.Title.Trim();
                             _item.Address = Model.Address.Trim();
-                            _item.ImagePath = Model.ImagePath;
                             _item.UpdatedByUserID = _UserID;
                             _item.UpdatedDateTime = DateTime.UtcNow.AddHours(5);
                             _context.ChangeTracker.Clear();
@@ -155,17 +138,31 @@ namespace TRSAppUpdated.Controllers
                         }
                         _item.Title = Model.Title.Trim();
                         _item.Address = Model.Address.Trim();
-                        _item.ImagePath = Model.ImagePath;
                         _item.CreatedByUserID = _UserID;
                         _item.CreatedDateTime = DateTime.UtcNow.AddHours(5);
                         _context.Venues.Add(_item);
                         await _context.SaveChangesAsync();
                         TempData["Message"] = $"1,{_Title} Successfully Added";
                     }
+                    if (_item != null && Model.ImageFile != null)
+                    {
+                        var folderPath = Path.Combine(_webHostEnvironment.WebRootPath, "assets", "images", "venues");
+                        if (!Directory.Exists(folderPath))
+                        {
+                            Directory.CreateDirectory(folderPath);
+                        }
+                        var _fileName = $"venue" + "_" + _item.CreatedDateTime.ToString("yyyyddMMhhmmss") + Path.GetExtension(Model.ImageFile.FileName);
+                        _item.ImagePath = _fileName.Trim();
+                        var _filePath = Path.Combine(folderPath, _fileName);
+                        using (var _stream = new FileStream(_filePath, FileMode.Create))
+                        {
+                            await Model.ImageFile.CopyToAsync(_stream);
+                        }
+                        _context.ChangeTracker.Clear();
+                        _context.Entry(_item).State = EntityState.Modified;
+                        await _context.SaveChangesAsync();
+                    }
                     return RedirectToAction("Index");
-                }
-                else
-                {
                 }
             }
 
@@ -207,9 +204,9 @@ namespace TRSAppUpdated.Controllers
         [NonAction]
         public async Task<(List<VenueVM> _result, int totalRecords)> GetList(int _pageNo, int _pageSize, string _searchedTerm)
         {
-           
-                var _result = new List<VenueVM>();
-                int totalRecords = 0;
+
+            var _result = new List<VenueVM>();
+            int totalRecords = 0;
             try
             {
                 // For AJAX calls
@@ -232,7 +229,7 @@ namespace TRSAppUpdated.Controllers
                 int _skip = (_pageNo - 1) * _pageSize;
                 totalRecords = await _query.CountAsync();
                 _query = _query.Skip(_skip).Take(_pageSize);
-                _result = await _query.OrderByDescending(x=>x.ID).ToListAsync();
+                _result = await _query.OrderByDescending(x => x.ID).ToListAsync();
             }
             catch (Exception ex)
             {

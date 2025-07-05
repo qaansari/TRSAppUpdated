@@ -105,21 +105,7 @@ namespace TRSAppUpdated.Controllers
                 if (ModelState.IsValid)
                 {
                     var _item = new Auditorium();
-                    if (Model.ImageFile != null)
-                    {
-                        var folderPath = Path.Combine(_webHostEnvironment.WebRootPath, "assets", "images", "auditoriums");
-                        if (!Directory.Exists(folderPath))
-                        {
-                            Directory.CreateDirectory(folderPath);
-                        }
-                        var _fileName = $"auditorium" + "_" + Guid.NewGuid().ToString().Replace("-", "") + Path.GetExtension(Model.ImageFile.FileName);
-                        Model.ImagePath = _fileName.Trim();
-                        var _filePath = Path.Combine(folderPath, _fileName);
-                        using (var _stream = new FileStream(_filePath, FileMode.Create))
-                        {
-                            await Model.ImageFile.CopyToAsync(_stream);
-                        }
-                    }
+                    
                     if (Model.ID != 0)
                     {
                         var isExists = _context.Auditoriums.Where(x => !x.IsDeleted
@@ -175,7 +161,6 @@ namespace TRSAppUpdated.Controllers
                             }
                             _item.Title = Model.Title.Trim();
                             _item.VenueID = Model.VenueID;
-                            _item.ImagePath = Model.ImagePath;
                             _item.NoOfRows = Model.NoOfRows;
                             _item.StartingRow = Model.StartingRow.Trim();
                             _item.UpdatedByUserID = _UserID;
@@ -197,7 +182,6 @@ namespace TRSAppUpdated.Controllers
                         }
                         _item.Title = Model.Title.Trim();
                         _item.VenueID = Model.VenueID;
-                        _item.ImagePath = Model.ImagePath;
                         _item.NoOfRows = Model.NoOfRows;
                         _item.StartingRow = Model.StartingRow.Trim();
                         _item.CreatedByUserID = _UserID;
@@ -223,6 +207,24 @@ namespace TRSAppUpdated.Controllers
                         //Rows Insertion End
                         await _context.SaveChangesAsync();
                         TempData["Message"] = $"1,{_Title} Successfully Added";
+                    }
+                    if (_item != null && Model.ImageFile != null)
+                    {
+                        var folderPath = Path.Combine(_webHostEnvironment.WebRootPath, "assets", "images", "auditoriums");
+                        if (!Directory.Exists(folderPath))
+                        {
+                            Directory.CreateDirectory(folderPath);
+                        }
+                        var _fileName = $"auditorium" + "_" + _item.CreatedDateTime.ToString("yyyyddMMhhmmss") + Path.GetExtension(Model.ImageFile.FileName);
+                        _item.ImagePath = _fileName.Trim();
+                        var _filePath = Path.Combine(folderPath, _fileName);
+                        using (var _stream = new FileStream(_filePath, FileMode.Create))
+                        {
+                            await Model.ImageFile.CopyToAsync(_stream);
+                        }
+                        _context.ChangeTracker.Clear();
+                        _context.Entry(_item).State = EntityState.Modified;
+                        await _context.SaveChangesAsync();
                     }
                     return RedirectToAction("Index");
                 }
