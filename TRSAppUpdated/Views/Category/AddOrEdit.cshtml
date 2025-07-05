@@ -44,21 +44,6 @@
     </div>
 </div>
 @section Scripts {
-    <script>
-        $(document).ready(function () {
-            $("#imgSelector").change(
-                function PreviewSelectedImage() {
-                    var imageFile = document.getElementById("imgSelector");
-                    var imagePreview = document.getElementById("imgPreview");
-                    var imageReader = new FileReader();
-                    imageReader.onload = function (e) {
-                        imagePreview.src = e.target.result;
-                        imagePreview.style.display = "block";
-                    };
-                    imageReader.readAsDataURL(imageFile.files[0]);
-                });
-        });
-    </script>
     @if (_Message != null)
     {
         if (_Message.StartsWith("1"))

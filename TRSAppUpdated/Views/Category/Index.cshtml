@@ -3,6 +3,7 @@
     ViewData["Title"] = "Categories";
     var _Message = TempData["Message"] as string;
     string _PageTitle = "Category";
+    string _PartialViewName = _PageTitle.Contains(" ") ? _PageTitle.Replace(" ", "") : _PageTitle;
     int _TotalRecords = ViewBag.TotalRecords;
     int _PageNo = ViewBag.PageNo;
     int _PageSize = ViewBag.PageSize;
@@ -40,8 +41,8 @@
                 </div>
 
                 <!-- Table container that will be updated via AJAX -->
-                <div id="CategoriesTableContainer">
-                    @await Html.PartialAsync($"_{_PageTitle}TablePartial", Model)
+                <div id="tableContainer">
+                    @await Html.PartialAsync($"_{_PartialViewName}TablePartial", Model)
                 </div>
             </div>
         </div>
@@ -141,7 +142,7 @@
                     // Show loading indicator if needed
                 },
                 success: function(data) {
-                    $('#CategoriesTableContainer').html(data);
+                    $('#tableContainer').html(data);
                 },
                 error: function(xhr, status, error) {
                     console.error('Error loading Categories:', error);

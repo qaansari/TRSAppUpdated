@@ -50,6 +50,7 @@ namespace TRSAppUpdated.Controllers
         [HttpGet]
         public async Task<IActionResult> GetPartial(int _pageNo = 1, int _pageSize = 10, string _searchedTerm = "")
         {
+            var _partialViewName = _Title.Contains(" ") ? _Title.Replace(" ", "") : _Title;
             try
             {
                 var (_result, totalRecords) = await GetList(_pageNo, _pageSize, _searchedTerm);
@@ -57,13 +58,13 @@ namespace TRSAppUpdated.Controllers
                 ViewBag.PageNo = _pageNo;
                 ViewBag.PageSize = _pageSize;
                 ViewBag.SearchedTerm = _searchedTerm;
-                return PartialView($"_{_Title}TablePartial", _result);
+                return PartialView($"_{_partialViewName}TablePartial", _result);
             }
             catch (Exception ex)
             {
                 _logger.LogError($"Error occured at GetAuditoriumsPartial in {_Title} Controller due to {ex}");
             }
-            return PartialView($"_{_Title}TablePartial", new List<AuditoriumVM>());
+            return PartialView($"_{_partialViewName}TablePartial", new List<AuditoriumVM>());
         }
         //AddOrEdit (GET)
         public IActionResult AddOrEdit(int ID = 0)
