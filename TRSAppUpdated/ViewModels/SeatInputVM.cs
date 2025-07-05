@@ -10,5 +10,6 @@
     {
         public int ColumnID { get; set; }
         public int ColumnNumber { get; set; }
+        public int SeatCount { get; set; }
     }
 }

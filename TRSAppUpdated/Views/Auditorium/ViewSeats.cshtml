@@ -1,0 +1,59 @@
+﻿@model SeatVM
+@{
+    ViewData["Title"] = "Seats";
+}
+<style>
+    .container {
+        text-align: center;
+    }
+
+    .info {
+        margin-bottom: 20px;
+    }
+
+    .row {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 4px;
+    }
+
+    .row-label {
+        width: 30px;
+        font-weight: bold;
+        margin-right: 5px;
+    }
+
+    .seat {
+        width: 24px;
+        height: 24px;
+        border: 1px solid #333;
+        margin: 1px;
+        background-color: #eee;
+        text-align: center;
+        font-size: 12px;
+        color: #000;
+        background: #bdc1f7;
+        line-height: 24px;
+    }
+</style>
+<div class="info">
+    <h1>@Model.AuditoriumName</h1>
+    <h2>@Model.VenueName</h2>
+</div>
+@foreach (var row in Model.Rows)
+{
+    <div class="row">
+        <span class="row-label">@row.RowLabel</span>
+        @foreach (var column in row.Columns)
+        {
+            <div class="d-flex">
+                @foreach (var seat in column.Seats)
+                {
+                    <span class="seat">
+                        @seat
+                    </span>
+                }
+            </div>
+        }
+    </div>
+}

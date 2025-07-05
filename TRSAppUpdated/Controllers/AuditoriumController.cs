@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using System.Security.Cryptography.Xml;
 using TRSAppUpdated.Interfaces;
 using TRSAppUpdated.Models;
 using TRSAppUpdated.ViewModels;
@@ -137,6 +138,7 @@ namespace TRSAppUpdated.Controllers
                             if (_item.NoOfRows != Model.NoOfRows || _item.StartingRow.Trim() != Model.StartingRow.Trim())
                             {
                                 var _rows = _context.Rows.Include(x => x.Columns)
+                                    .ThenInclude(x => x.Seats)
                                     .Where(x => !x.IsDeleted
                                     && x.AuditoriumID == _item.ID).ToList();
                                 if (_rows.Count > 0)
@@ -144,6 +146,11 @@ namespace TRSAppUpdated.Controllers
                                     var _columns = _rows.SelectMany(r => r.Columns).ToList();
                                     if (_columns.Count > 0)
                                     {
+                                        var _seats = _columns.SelectMany(r => r.Seats).ToList();
+                                        if (_seats.Count > 0)
+                                        {
+                                            _context.Seats.RemoveRange(_seats);
+                                        }
                                         _context.Columns.RemoveRange(_columns);
                                     }
                                     _context.Rows.RemoveRange(_rows);
@@ -368,12 +375,47 @@ namespace TRSAppUpdated.Controllers
             }
             return RedirectToAction("Index"); // or your desired route
         }
+        //View Seats (GET)
+        public IActionResult ViewSeats(int AuditoriumId)
+        {
+            // Get all rows with their columns from database
+            try
+            {
+                var _object = _context.Auditoriums
+                    .Include(x => x.Venue)
+                    .Include(x => x.Rows)
+                    .ThenInclude(x => x.Columns)
+                    .Where(x => !x.IsDeleted && x.ID == AuditoriumId).Select(x => new SeatVM()
+                    {
+                        AuditoriumName = x.Title.Trim(),
+                        VenueName = x.Venue.Title.Trim(),
+                        Rows = x.Rows.Where(y => !y.IsDeleted).Select(y => new RowVM()
+                        {
+                            RowLabel = y.RowLabel,
+                            Columns=y.Columns.Where(z=>!z.IsDeleted).Select(c=>new ColumnVM()
+                            {
+                                ID = c.ID,
+                                ColumnNumber = c.ColumnNumber,
+                                Seats=c.Seats.Where(s=>!s.IsDeleted).Select(s=>s.SeatNumber).ToList()
+                            }).ToList()
+                        }).ToList()
+                    }).FirstOrDefault();
+                return View(_object ?? new SeatVM());
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error occured at UpdateSeats (GET) in {_Title} Controller due to {ex}");
+            }
+            return View(new SeatVM());
+        }
+        //Update Seats (GET)
         public IActionResult UpdateSeats(int AuditoriumId)
         {
             // Get all rows with their columns from database
             try
             {
-                var rows = _context.Rows.Include(r => r.Columns).ThenInclude(x => x.Seats).Where(r => !r.IsDeleted).ToList();
+                var rows = _context.Rows.Include(r => r.Columns).ThenInclude(x => x.Seats).Where(r => !r.IsDeleted
+                && r.AuditoriumID == AuditoriumId).ToList();
                 var _list = rows.Select(r => new RowSeatInputVM
                 {
                     RowID = r.ID,
@@ -383,6 +425,7 @@ namespace TRSAppUpdated.Controllers
                                       {
                                           ColumnID = c.ID,
                                           ColumnNumber = c.ColumnNumber,
+                                          SeatCount = c.Seats.Where(x => !x.IsDeleted).Count()
                                       }).ToList()
                 }).ToList();
                 return View(_list);
@@ -394,43 +437,50 @@ namespace TRSAppUpdated.Controllers
             return View(new List<RowSeatInputVM>());
         }
         [HttpPost]
-        public async Task<IActionResult> UpdateColumns(List<RowSeatInputVM> model)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateSeats(List<RowSeatInputVM> model)
         {
             try
             {
                 foreach (var row in model)
                 {
-                    // Get existing columns for this row
-                    var existingColumns = _context.Columns.Where(c => !c.IsDeleted
-                    && c.RowID == row.RowID).ToList();
-                    // Process each submitted column
                     foreach (var column in row.Columns)
                     {
-                        if (existingColumns.Any(c => c.ColumnNumber == column.ColumnNumber))
+                        // Fetch existing seats for the column
+                        var existingSeats = _context.Seats
+                            .Where(s => s.ColumnID == column.ColumnID && !s.IsDeleted)
+                            .ToList();
+
+                        // Soft-delete existing seats
+                        if (existingSeats.Count > 0)
                         {
-                            continue;
+                            _context.Seats.RemoveRange(existingSeats);
                         }
-                        else
+                        // Add new seats
+                        int _counter = 1;
+                        for (int i = 1; i <= column.SeatCount; i++)
                         {
-                            // Add new column
-                            _context.Columns.Add(new Column
+                            var newSeat = new Seat
                             {
-                                RowID = row.RowID,
-                                ColumnNumber = column.ColumnNumber,
+                                ColumnID = column.ColumnID,
+                                SeatNumber = _counter,
                                 CreatedByUserID = _UserID,
                                 CreatedDateTime = DateTime.UtcNow.AddHours(5),
-                            });
+                                // Add any other necessary properties here
+                            };
+                            _context.Seats.Add(newSeat);
+                            _counter++;
                         }
                     }
                 }
                 await _context.SaveChangesAsync();
-                return View(_list);
+                TempData["Message"] = $"1,Seats Successfully Updated";
             }
             catch (Exception ex)
             {
-               
+                _logger.LogError($"Error occured at UpdateSeats (POST) in {_Title} Controller due to {ex}");
             }
-            return View(new List<RowSeatInputVM>());
+            return RedirectToAction("Index");
         }
 
     }

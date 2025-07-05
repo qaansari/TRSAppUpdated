@@ -50,7 +50,9 @@
                     <td>@(item.NoOfRows)</td>
                     <td>@(item.StartingRow)</td>
                     <td>
+                        <a asp-action="ViewSeats" asp-route-AuditoriumId="@(item.ID)" class="btn btn-primary sm-btn">View Seats</a>
                         <a asp-action="UpdateColumns" asp-route-AuditoriumId="@(item.ID)" class="btn btn-primary sm-btn">Update Columns</a>
+                        <a asp-action="UpdateSeats" asp-route-AuditoriumId="@(item.ID)" class="btn btn-primary sm-btn">Update Seats</a>
                         <a asp-action="AddOrEdit" asp-route-ID="@(item.ID)" class="btn btn-primary sm-btn">Edit</a>
                         <button type="button" class="btn btn-danger sm-btn deleteBtn" data-id="@(item.ID)">Delete</button>
                     </td>
