@@ -58,12 +58,14 @@
     border-radius: 50%;
     border: 1px solid var(--primary);
 }
+
 .preview_auditorium_img {
     width: 100%;
     height: 200px;
     border-radius: 10px;
     border: 1px solid var(--primary);
 }
+
 .search_span {
     align-self: center;
     margin-right: 5px;
@@ -106,21 +108,57 @@
 .auditorium-row {
     display: flex;
     margin: 5px 0;
-    gap:20px;
+    gap: 20px;
     flex-wrap: wrap; /* allows wrapping on smaller screens */
-    width:100%;
+    width: 100%;
 }
-.fs-12{
-    font-size:12px;
+
+.fs-12 {
+    font-size: 12px;
+}
+
+.mr-5px {
+    margin-right: 5px;
 }
 /** Syncfusion Custom CSS Start **/
 .e-input-group, .e-input-group.e-control-wrapper, .e-float-input, .e-float-input.e-input-group, .e-float-input.e-control-wrapper, .e-float-input.e-input-group.e-control-wrapper {
     background: var(--white) !important;
 }
+
 span.e-input-group.e-control-wrapper.form-control.form-control-sm.e-ddl.e-lib.e-keyboard {
     padding: 10px !important;
 }
+
 .e-input-group:not(.e-success):not(.e-warning):not(.e-error), .e-input-group.e-control-wrapper:not(.e-success):not(.e-warning):not(.e-error) {
     border-color: var(--border-color);
 }
 /** Syncfusion Custom CSS End **/
+.seat-row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap; /* Prevent wrapping */
+    justify-content: center;
+    padding: 5px;
+    width: 100%; /* Ensure full width */
+    overflow: auto; /* Hide overflow if any */
+}
+
+.seat {
+    flex-grow: 1; /* Allow seats to grow */
+    flex-basis: 0; /* Shrinks the seat size to fit */
+    max-width: 20px; /* Max seat size */
+    min-width: 20px; /* Minimum seat size */
+    height: 20px;
+    background-color: var(--primary);
+    border: 1px solid var(--border-color);
+    text-align: center;
+    line-height: 20px;
+    font-size: 11px;
+    /* margin-right: 5px; */
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.column-gap {
+    width: 10px; /* Space between columns */
+}
