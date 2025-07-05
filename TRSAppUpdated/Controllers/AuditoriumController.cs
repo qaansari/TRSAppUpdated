@@ -392,11 +392,11 @@ namespace TRSAppUpdated.Controllers
                         Rows = x.Rows.Where(y => !y.IsDeleted).Select(y => new RowVM()
                         {
                             RowLabel = y.RowLabel,
-                            Columns=y.Columns.Where(z=>!z.IsDeleted).Select(c=>new ColumnVM()
+                            Columns = y.Columns.Where(z => !z.IsDeleted).Select(c => new ColumnVM()
                             {
                                 ID = c.ID,
                                 ColumnNumber = c.ColumnNumber,
-                                Seats=c.Seats.Where(s=>!s.IsDeleted).Select(s=>s.SeatNumber).ToList()
+                                Seats = c.Seats.Where(s => !s.IsDeleted).Select(s => s.SeatNumber).ToList()
                             }).ToList()
                         }).ToList()
                     }).FirstOrDefault();
@@ -444,31 +444,28 @@ namespace TRSAppUpdated.Controllers
             {
                 foreach (var row in model)
                 {
+                    int _counter = 1;
                     foreach (var column in row.Columns)
                     {
                         // Fetch existing seats for the column
                         var existingSeats = _context.Seats
                             .Where(s => s.ColumnID == column.ColumnID && !s.IsDeleted)
                             .ToList();
-
-                        // Soft-delete existing seats
                         if (existingSeats.Count > 0)
                         {
                             _context.Seats.RemoveRange(existingSeats);
                         }
                         // Add new seats
-                        int _counter = 1;
                         for (int i = 1; i <= column.SeatCount; i++)
                         {
-                            var newSeat = new Seat
+                            _context.Seats.Add(new Seat
                             {
                                 ColumnID = column.ColumnID,
                                 SeatNumber = _counter,
                                 CreatedByUserID = _UserID,
                                 CreatedDateTime = DateTime.UtcNow.AddHours(5),
                                 // Add any other necessary properties here
-                            };
-                            _context.Seats.Add(newSeat);
+                            });
                             _counter++;
                         }
                     }

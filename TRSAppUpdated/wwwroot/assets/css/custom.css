@@ -100,9 +100,22 @@
     padding-right: 10px;
     cursor: pointer;
 }
+/** Seat Plan Custom CSS Start **/
+
+/* Container for each row */
+.auditorium-row {
+    display: flex;
+    margin: 5px 0;
+    gap:20px;
+    flex-wrap: wrap; /* allows wrapping on smaller screens */
+    width:100%;
+}
+.fs-12{
+    font-size:12px;
+}
 /** Syncfusion Custom CSS Start **/
 .e-input-group, .e-input-group.e-control-wrapper, .e-float-input, .e-float-input.e-input-group, .e-float-input.e-control-wrapper, .e-float-input.e-input-group.e-control-wrapper {
-    background:var(--white) !important;
+    background: var(--white) !important;
 }
 span.e-input-group.e-control-wrapper.form-control.form-control-sm.e-ddl.e-lib.e-keyboard {
     padding: 10px !important;
