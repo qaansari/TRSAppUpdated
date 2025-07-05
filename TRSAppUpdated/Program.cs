@@ -40,6 +40,8 @@ namespace TRSAppUpdated
                 Formatting = Newtonsoft.Json.Formatting.Indented,
                 ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore,
             };
+            //Syncfusion
+            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1JEaF5cXmRCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdmWXhedHZWQmlZWE1yXkpWYEk=");
             var app = builder.Build();
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())

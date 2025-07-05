@@ -353,8 +353,8 @@ namespace TRSAppUpdated.Controllers
                             {
                                 RowID = row.ID,
                                 ColumnNumber = i,
-                                CreatedByUserID=_UserID,
-                                CreatedDateTime=DateTime.UtcNow.AddHours(5),
+                                CreatedByUserID = _UserID,
+                                CreatedDateTime = DateTime.UtcNow.AddHours(5),
                             });
                         }
                     }
@@ -368,5 +368,70 @@ namespace TRSAppUpdated.Controllers
             }
             return RedirectToAction("Index"); // or your desired route
         }
+        public IActionResult UpdateSeats(int AuditoriumId)
+        {
+            // Get all rows with their columns from database
+            try
+            {
+                var rows = _context.Rows.Include(r => r.Columns).ThenInclude(x => x.Seats).Where(r => !r.IsDeleted).ToList();
+                var _list = rows.Select(r => new RowSeatInputVM
+                {
+                    RowID = r.ID,
+                    RowLabel = r.RowLabel,
+                    Columns = r.Columns.OrderBy(c => c.ColumnNumber)
+                                      .Select(c => new ColumnSeatInputVM
+                                      {
+                                          ColumnID = c.ID,
+                                          ColumnNumber = c.ColumnNumber,
+                                      }).ToList()
+                }).ToList();
+                return View(_list);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error occured at UpdateSeats (GET) in {_Title} Controller due to {ex}");
+            }
+            return View(new List<RowSeatInputVM>());
+        }
+        [HttpPost]
+        public async Task<IActionResult> UpdateColumns(List<RowSeatInputVM> model)
+        {
+            try
+            {
+                foreach (var row in model)
+                {
+                    // Get existing columns for this row
+                    var existingColumns = _context.Columns.Where(c => !c.IsDeleted
+                    && c.RowID == row.RowID).ToList();
+                    // Process each submitted column
+                    foreach (var column in row.Columns)
+                    {
+                        if (existingColumns.Any(c => c.ColumnNumber == column.ColumnNumber))
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            // Add new column
+                            _context.Columns.Add(new Column
+                            {
+                                RowID = row.RowID,
+                                ColumnNumber = column.ColumnNumber,
+                                CreatedByUserID = _UserID,
+                                CreatedDateTime = DateTime.UtcNow.AddHours(5),
+                            });
+                        }
+                    }
+                }
+                await _context.SaveChangesAsync();
+                return View(_list);
+            }
+            catch (Exception ex)
+            {
+               
+            }
+            return View(new List<RowSeatInputVM>());
+        }
+
     }
 }

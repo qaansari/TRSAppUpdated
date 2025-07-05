@@ -104,4 +104,10 @@
 .e-input-group, .e-input-group.e-control-wrapper, .e-float-input, .e-float-input.e-input-group, .e-float-input.e-control-wrapper, .e-float-input.e-input-group.e-control-wrapper {
     background:var(--white) !important;
 }
+span.e-input-group.e-control-wrapper.form-control.form-control-sm.e-ddl.e-lib.e-keyboard {
+    padding: 10px !important;
+}
+.e-input-group:not(.e-success):not(.e-warning):not(.e-error), .e-input-group.e-control-wrapper:not(.e-success):not(.e-warning):not(.e-error) {
+    border-color: var(--border-color);
+}
 /** Syncfusion Custom CSS End **/
