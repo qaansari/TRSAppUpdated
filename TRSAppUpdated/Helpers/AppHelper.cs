@@ -5,6 +5,7 @@ namespace TRSAppUpdated.Helpers
 {
     public static class AppHelper
     {
+        public static List<string> Cities = new List<string> { "Karachi","Lahore","Islamabad","Peshawar","Quetta" };
         public static string HashWithSalt(this string password)
         {
             string saltstring = "CHYzqeN4plZekNC88Umm1Q==";

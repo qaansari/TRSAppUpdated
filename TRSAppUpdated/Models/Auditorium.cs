@@ -18,5 +18,6 @@ namespace TRSAppUpdated.Models
         public int VenueID { get; set; }
         public Venue Venue { get; set; }
         public ICollection<Row> Rows { get; set; }
+        public ICollection<Event> Events { get; set; }
     }
 }

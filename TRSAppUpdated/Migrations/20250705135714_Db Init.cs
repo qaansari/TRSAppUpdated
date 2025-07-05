@@ -114,6 +114,44 @@ namespace TRSAppUpdated.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Countries",
+                columns: table => new
+                {
+                    ID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Title = table.Column<string>(type: "varchar(40)", nullable: false),
+                    DialingCode = table.Column<string>(type: "varchar(4)", nullable: false),
+                    Flag = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedByUserID = table.Column<int>(type: "int", nullable: false),
+                    UpdatedByUserID = table.Column<int>(type: "int", nullable: true),
+                    DeletedByUserID = table.Column<int>(type: "int", nullable: true),
+                    CreatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeletedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Countries", x => x.ID);
+                    table.ForeignKey(
+                        name: "FK_Countries_Users_CreatedByUserID",
+                        column: x => x.CreatedByUserID,
+                        principalTable: "Users",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.NoAction);
+                    table.ForeignKey(
+                        name: "FK_Countries_Users_DeletedByUserID",
+                        column: x => x.DeletedByUserID,
+                        principalTable: "Users",
+                        principalColumn: "ID");
+                    table.ForeignKey(
+                        name: "FK_Countries_Users_UpdatedByUserID",
+                        column: x => x.UpdatedByUserID,
+                        principalTable: "Users",
+                        principalColumn: "ID");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "EventCategories",
                 columns: table => new
                 {
@@ -151,6 +189,42 @@ namespace TRSAppUpdated.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "EventStatuses",
+                columns: table => new
+                {
+                    ID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Title = table.Column<string>(type: "varchar(40)", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedByUserID = table.Column<int>(type: "int", nullable: false),
+                    UpdatedByUserID = table.Column<int>(type: "int", nullable: true),
+                    DeletedByUserID = table.Column<int>(type: "int", nullable: true),
+                    CreatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeletedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EventStatuses", x => x.ID);
+                    table.ForeignKey(
+                        name: "FK_EventStatuses_Users_CreatedByUserID",
+                        column: x => x.CreatedByUserID,
+                        principalTable: "Users",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.NoAction);
+                    table.ForeignKey(
+                        name: "FK_EventStatuses_Users_DeletedByUserID",
+                        column: x => x.DeletedByUserID,
+                        principalTable: "Users",
+                        principalColumn: "ID");
+                    table.ForeignKey(
+                        name: "FK_EventStatuses_Users_UpdatedByUserID",
+                        column: x => x.UpdatedByUserID,
+                        principalTable: "Users",
+                        principalColumn: "ID");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Expenses",
                 columns: table => new
                 {
@@ -181,6 +255,42 @@ namespace TRSAppUpdated.Migrations
                         principalColumn: "ID");
                     table.ForeignKey(
                         name: "FK_Expenses_Users_UpdatedByUserID",
+                        column: x => x.UpdatedByUserID,
+                        principalTable: "Users",
+                        principalColumn: "ID");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "NoteTypes",
+                columns: table => new
+                {
+                    ID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Title = table.Column<string>(type: "varchar(20)", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedByUserID = table.Column<int>(type: "int", nullable: false),
+                    UpdatedByUserID = table.Column<int>(type: "int", nullable: true),
+                    DeletedByUserID = table.Column<int>(type: "int", nullable: true),
+                    CreatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeletedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_NoteTypes", x => x.ID);
+                    table.ForeignKey(
+                        name: "FK_NoteTypes_Users_CreatedByUserID",
+                        column: x => x.CreatedByUserID,
+                        principalTable: "Users",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.NoAction);
+                    table.ForeignKey(
+                        name: "FK_NoteTypes_Users_DeletedByUserID",
+                        column: x => x.DeletedByUserID,
+                        principalTable: "Users",
+                        principalColumn: "ID");
+                    table.ForeignKey(
+                        name: "FK_NoteTypes_Users_UpdatedByUserID",
                         column: x => x.UpdatedByUserID,
                         principalTable: "Users",
                         principalColumn: "ID");
@@ -371,6 +481,49 @@ namespace TRSAppUpdated.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Cities",
+                columns: table => new
+                {
+                    ID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Title = table.Column<string>(type: "varchar(40)", nullable: false),
+                    CountryID = table.Column<int>(type: "int", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedByUserID = table.Column<int>(type: "int", nullable: false),
+                    UpdatedByUserID = table.Column<int>(type: "int", nullable: true),
+                    DeletedByUserID = table.Column<int>(type: "int", nullable: true),
+                    CreatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeletedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Cities", x => x.ID);
+                    table.ForeignKey(
+                        name: "FK_Cities_Countries_CountryID",
+                        column: x => x.CountryID,
+                        principalTable: "Countries",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.NoAction);
+                    table.ForeignKey(
+                        name: "FK_Cities_Users_CreatedByUserID",
+                        column: x => x.CreatedByUserID,
+                        principalTable: "Users",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.NoAction);
+                    table.ForeignKey(
+                        name: "FK_Cities_Users_DeletedByUserID",
+                        column: x => x.DeletedByUserID,
+                        principalTable: "Users",
+                        principalColumn: "ID");
+                    table.ForeignKey(
+                        name: "FK_Cities_Users_UpdatedByUserID",
+                        column: x => x.UpdatedByUserID,
+                        principalTable: "Users",
+                        principalColumn: "ID");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "CategoryEventCategory",
                 columns: table => new
                 {
@@ -392,6 +545,51 @@ namespace TRSAppUpdated.Migrations
                         principalTable: "EventCategories",
                         principalColumn: "ID",
                         onDelete: ReferentialAction.NoAction);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Notes",
+                columns: table => new
+                {
+                    ID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Seq = table.Column<int>(type: "int", nullable: false),
+                    EnTitle = table.Column<string>(type: "varchar(max)", nullable: false),
+                    UrduTitle = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    NoteTypeID = table.Column<int>(type: "int", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedByUserID = table.Column<int>(type: "int", nullable: false),
+                    UpdatedByUserID = table.Column<int>(type: "int", nullable: true),
+                    DeletedByUserID = table.Column<int>(type: "int", nullable: true),
+                    CreatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeletedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Notes", x => x.ID);
+                    table.ForeignKey(
+                        name: "FK_Notes_NoteTypes_NoteTypeID",
+                        column: x => x.NoteTypeID,
+                        principalTable: "NoteTypes",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.NoAction);
+                    table.ForeignKey(
+                        name: "FK_Notes_Users_CreatedByUserID",
+                        column: x => x.CreatedByUserID,
+                        principalTable: "Users",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.NoAction);
+                    table.ForeignKey(
+                        name: "FK_Notes_Users_DeletedByUserID",
+                        column: x => x.DeletedByUserID,
+                        principalTable: "Users",
+                        principalColumn: "ID");
+                    table.ForeignKey(
+                        name: "FK_Notes_Users_UpdatedByUserID",
+                        column: x => x.UpdatedByUserID,
+                        principalTable: "Users",
+                        principalColumn: "ID");
                 });
 
             migrationBuilder.CreateTable(
@@ -451,9 +649,10 @@ namespace TRSAppUpdated.Migrations
                     EndDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsGeneral = table.Column<bool>(type: "bit", nullable: false),
-                    IsEnded = table.Column<bool>(type: "bit", nullable: false),
                     ImagePath = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CityID = table.Column<int>(type: "int", nullable: false),
                     AuditoriumID = table.Column<int>(type: "int", nullable: false),
+                    EventStatusID = table.Column<int>(type: "int", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     CreatedByUserID = table.Column<int>(type: "int", nullable: false),
                     UpdatedByUserID = table.Column<int>(type: "int", nullable: true),
@@ -469,6 +668,18 @@ namespace TRSAppUpdated.Migrations
                         name: "FK_Events_Auditoriums_AuditoriumID",
                         column: x => x.AuditoriumID,
                         principalTable: "Auditoriums",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.NoAction);
+                    table.ForeignKey(
+                        name: "FK_Events_Cities_CityID",
+                        column: x => x.CityID,
+                        principalTable: "Cities",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.NoAction);
+                    table.ForeignKey(
+                        name: "FK_Events_EventStatuses_EventStatusID",
+                        column: x => x.EventStatusID,
+                        principalTable: "EventStatuses",
                         principalColumn: "ID",
                         onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
@@ -951,39 +1162,7 @@ namespace TRSAppUpdated.Migrations
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "ID", "ContactNumber", "CreatedByUserID", "CreatedDateTime", "DeletedByUserID", "DeletedDateTime", "Email", "FirstName", "ImagePath", "IsActive", "IsDeleted", "IsVerified", "LastName", "Password", "RoleID", "UpdatedByUserID", "UpdatedDateTime", "UserToken" },
-                values: new object[] { 1, "+923312541767", null, new DateTime(2025, 7, 4, 15, 53, 23, 854, DateTimeKind.Utc).AddTicks(5282), null, null, "sa@eventland.pk", "Super", null, true, false, true, "Admin", "6FkLTXY5CrK8ccZIBV6HAibnMhfq44wfgPMuzSxJjQ4=", 1, null, null, null });
-
-            migrationBuilder.InsertData(
-                table: "PaymentModes",
-                columns: new[] { "ID", "CreatedByUserID", "CreatedDateTime", "DeletedByUserID", "DeletedDateTime", "IsDeleted", "Title", "UpdatedByUserID", "UpdatedDateTime" },
-                values: new object[,]
-                {
-                    { 1, 1, new DateTime(2025, 7, 4, 15, 53, 24, 92, DateTimeKind.Utc).AddTicks(7855), null, null, false, "Cash", null, null },
-                    { 2, 1, new DateTime(2025, 7, 4, 15, 53, 24, 92, DateTimeKind.Utc).AddTicks(7858), null, null, false, "Easypaisa", null, null },
-                    { 3, 1, new DateTime(2025, 7, 4, 15, 53, 24, 92, DateTimeKind.Utc).AddTicks(7860), null, null, false, "Jazzcash", null, null },
-                    { 4, 1, new DateTime(2025, 7, 4, 15, 53, 24, 92, DateTimeKind.Utc).AddTicks(7861), null, null, false, "Bank Transfer", null, null }
-                });
-
-            migrationBuilder.InsertData(
-                table: "ReservationStatuses",
-                columns: new[] { "ID", "CreatedByUserID", "CreatedDateTime", "DeletedByUserID", "DeletedDateTime", "IsDeleted", "Title", "UpdatedByUserID", "UpdatedDateTime" },
-                values: new object[,]
-                {
-                    { 1, 1, new DateTime(2025, 7, 4, 15, 53, 24, 92, DateTimeKind.Utc).AddTicks(7928), null, null, false, "Arrival Pending", null, null },
-                    { 2, 1, new DateTime(2025, 7, 4, 15, 53, 24, 92, DateTimeKind.Utc).AddTicks(7930), null, null, false, "Not Attended", null, null },
-                    { 3, 1, new DateTime(2025, 7, 4, 15, 53, 24, 92, DateTimeKind.Utc).AddTicks(7932), null, null, false, "Closed", null, null },
-                    { 4, 1, new DateTime(2025, 7, 4, 15, 53, 24, 92, DateTimeKind.Utc).AddTicks(7934), null, null, false, "Refunded", null, null }
-                });
-
-            migrationBuilder.InsertData(
-                table: "Users",
-                columns: new[] { "ID", "ContactNumber", "CreatedByUserID", "CreatedDateTime", "DeletedByUserID", "DeletedDateTime", "Email", "FirstName", "ImagePath", "IsActive", "IsDeleted", "IsVerified", "LastName", "Password", "RoleID", "UpdatedByUserID", "UpdatedDateTime", "UserToken" },
-                values: new object[,]
-                {
-                    { 2, "+923312541767", 1, new DateTime(2025, 7, 4, 15, 53, 23, 935, DateTimeKind.Utc).AddTicks(9772), null, null, "qa.ansari80@eventland.pk", "Qamar", null, true, false, true, "Ansari", "Lkej/d5kATMjqn/M3Ku6xHURlNX+8UjTX1IGD38nWgA=", 2, null, null, null },
-                    { 3, "+923162361582", 1, new DateTime(2025, 7, 4, 15, 53, 24, 17, DateTimeKind.Utc).AddTicks(789), null, null, "stayyabahmed85@eventland.pk", "Tayyab", null, true, false, true, "Ahmed", "0ihPPTvs1St6AoZbcGjX2OBvl9iCyjRbs3xu/NvdeII=", 2, null, null, null },
-                    { 4, "+923091265921", 1, new DateTime(2025, 7, 4, 15, 53, 24, 92, DateTimeKind.Utc).AddTicks(7237), null, null, "anasali4772@eventland.pk", "Anas", null, true, false, true, "Ali", "mNIvAtqhtWlJG6AG2sfaPWxKC1i9huTTqVcxkhD5qBM=", 2, null, null, null }
-                });
+                values: new object[] { 1, "+923312541767", null, new DateTime(2025, 7, 5, 18, 57, 13, 730, DateTimeKind.Utc).AddTicks(6659), null, null, "sa@eventland.pk", "Super", null, true, false, true, "Admin", "6FkLTXY5CrK8ccZIBV6HAibnMhfq44wfgPMuzSxJjQ4=", 1, null, null, null });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Auditoriums_CreatedByUserID",
@@ -1026,6 +1205,26 @@ namespace TRSAppUpdated.Migrations
                 column: "EventCategoriesListID");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Cities_CountryID",
+                table: "Cities",
+                column: "CountryID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Cities_CreatedByUserID",
+                table: "Cities",
+                column: "CreatedByUserID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Cities_DeletedByUserID",
+                table: "Cities",
+                column: "DeletedByUserID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Cities_UpdatedByUserID",
+                table: "Cities",
+                column: "UpdatedByUserID");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Columns_CreatedByUserID",
                 table: "Columns",
                 column: "CreatedByUserID");
@@ -1043,6 +1242,21 @@ namespace TRSAppUpdated.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Columns_UpdatedByUserID",
                 table: "Columns",
+                column: "UpdatedByUserID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Countries_CreatedByUserID",
+                table: "Countries",
+                column: "CreatedByUserID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Countries_DeletedByUserID",
+                table: "Countries",
+                column: "DeletedByUserID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Countries_UpdatedByUserID",
+                table: "Countries",
                 column: "UpdatedByUserID");
 
             migrationBuilder.CreateIndex(
@@ -1071,6 +1285,11 @@ namespace TRSAppUpdated.Migrations
                 column: "AuditoriumID");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Events_CityID",
+                table: "Events",
+                column: "CityID");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Events_CreatedByUserID",
                 table: "Events",
                 column: "CreatedByUserID");
@@ -1081,8 +1300,28 @@ namespace TRSAppUpdated.Migrations
                 column: "DeletedByUserID");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Events_EventStatusID",
+                table: "Events",
+                column: "EventStatusID");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Events_UpdatedByUserID",
                 table: "Events",
+                column: "UpdatedByUserID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EventStatuses_CreatedByUserID",
+                table: "EventStatuses",
+                column: "CreatedByUserID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EventStatuses_DeletedByUserID",
+                table: "EventStatuses",
+                column: "DeletedByUserID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EventStatuses_UpdatedByUserID",
+                table: "EventStatuses",
                 column: "UpdatedByUserID");
 
             migrationBuilder.CreateIndex(
@@ -1098,6 +1337,41 @@ namespace TRSAppUpdated.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Expenses_UpdatedByUserID",
                 table: "Expenses",
+                column: "UpdatedByUserID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Notes_CreatedByUserID",
+                table: "Notes",
+                column: "CreatedByUserID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Notes_DeletedByUserID",
+                table: "Notes",
+                column: "DeletedByUserID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Notes_NoteTypeID",
+                table: "Notes",
+                column: "NoteTypeID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Notes_UpdatedByUserID",
+                table: "Notes",
+                column: "UpdatedByUserID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_NoteTypes_CreatedByUserID",
+                table: "NoteTypes",
+                column: "CreatedByUserID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_NoteTypes_DeletedByUserID",
+                table: "NoteTypes",
+                column: "DeletedByUserID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_NoteTypes_UpdatedByUserID",
+                table: "NoteTypes",
                 column: "UpdatedByUserID");
 
             migrationBuilder.CreateIndex(
@@ -1366,6 +1640,9 @@ namespace TRSAppUpdated.Migrations
                 name: "EventEventCategory");
 
             migrationBuilder.DropTable(
+                name: "Notes");
+
+            migrationBuilder.DropTable(
                 name: "ReservationReservationImage");
 
             migrationBuilder.DropTable(
@@ -1382,6 +1659,9 @@ namespace TRSAppUpdated.Migrations
 
             migrationBuilder.DropTable(
                 name: "EventCategories");
+
+            migrationBuilder.DropTable(
+                name: "NoteTypes");
 
             migrationBuilder.DropTable(
                 name: "ReservationImages");
@@ -1420,7 +1700,16 @@ namespace TRSAppUpdated.Migrations
                 name: "Rows");
 
             migrationBuilder.DropTable(
+                name: "Cities");
+
+            migrationBuilder.DropTable(
+                name: "EventStatuses");
+
+            migrationBuilder.DropTable(
                 name: "Auditoriums");
+
+            migrationBuilder.DropTable(
+                name: "Countries");
 
             migrationBuilder.DropTable(
                 name: "Venues");
