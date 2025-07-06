@@ -20,6 +20,9 @@
             <div class="card-body @(noteDataList.Count > 0?"":"text-center")">
                 @if (noteDataList.Count > 0)
                 {
+                    <h3>Live Preview</h3>
+                    <hr />
+                    <div id="livePreview"></div>
                     <form asp-action="UpdateNotes" method="post" id="seqForm">
                         <div id="noteEditor">
                             @for (int i = 0; i < noteDataList.Count; i++)
@@ -28,7 +31,7 @@
                                     <input type="hidden" name="notes[@i].ID" value="@noteDataList[i].ID" />
                                     <input type="number" class="form-control form-control-sm seq-input" name="notes[@i].Seq" value="@noteDataList[i].Seq"
                                           data-index="@i" />
-                                    <div class="seq-error text-danger" style="font-size: 0.9em;"></div>
+                                    <div class="text-danger invalid-feedback d-none">Duplicate Seq value</div>
                                     <textarea class="form-control" rows="3" readonly>@noteDataList[i].EnTitle</textarea>
                                     <textarea class="form-control" rows="3" readonly>@noteDataList[i].UrduTitle</textarea>
                                 </div>
@@ -37,9 +40,6 @@
                         <button type="submit" class="btn btn-primary">Submit</button>
                         <a class="btn btn-danger" href="@(Url.Action("Index"))">Back</a>
                     </form>
-                    <hr />
-                    <h3>Live Preview</h3>
-                    <div id="livePreview"></div>
                 }
                 else
                 {
@@ -49,53 +49,63 @@
         </div>
     </div>
 </div>
-      @section Scripts {
-<script>
-    const seqInputs = document.querySelectorAll('.seq-input');
-        const noteData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(noteDataList));
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const preview = document.getElementById("livePreview");
+            const noteData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(noteDataList));
 
-    function renderPreviewAndValidate() {
-        const seqMap = {};
-        const updatedNotes = [];
+            function renderPreview() {
+                const seqValues = {};
+                const updatedNotes = [];
 
-        seqInputs.forEach((input, i) => {
-            const errorDiv = input.parentElement.querySelector('.seq-error');
-            const value = parseInt(input.value);
-            const note = { ...noteData[i], Seq: value };
+                const noteItems = document.querySelectorAll(".note-item");
 
-            updatedNotes.push(note);
+                noteItems.forEach((item, index) => {
+                    const seqInput = item.querySelector("input.seq-input");
+                    const feedback = item.querySelector(".invalid-feedback");
 
-            // Reset error
-            errorDiv.textContent = "";
+                    const rawSeq = seqInput.value.trim();
+                    const seq = parseInt(rawSeq) || 0;
 
-            // Validation for duplicate Seq
-            if (!isNaN(value)) {
-                if (seqMap[value]) {
-                    errorDiv.textContent = `Duplicate Seq: ${value} already used.`;
-                } else {
-                    seqMap[value] = true;
-                }
-            }
-        });
+                    // Default: remove error class
+                    seqInput.classList.remove("is-invalid");
+                    feedback.classList.add("d-none");
 
-        // Sort and render live preview
-        updatedNotes.sort((a, b) => a.Seq - b.Seq);
+                    // Check for duplicate
+                    if (rawSeq !== "") {
+                        if (seqValues[seq]) {
+                            // This is a duplicate: highlight this field
+                            seqInput.classList.add("is-invalid");
+                            feedback.classList.remove("d-none");
+                        } else {
+                            seqValues[seq] = true;
+                        }
+                    }
 
-        const preview = document.getElementById("livePreview");
-        preview.innerHTML = "";
+                    updatedNotes.push({
+                        ...noteData[index],
+                        Seq: seq
+                    });
+                });
 
-        updatedNotes.forEach(note => {
-            const div = document.createElement("div");
+                updatedNotes.sort((a, b) => a.Seq - b.Seq);
+
+                preview.innerHTML = "";
+                updatedNotes.forEach(note => {
+                    const div = document.createElement("div");
                     div.innerHTML = `<strong>${note.Seq}</strong> - ${note.EnTitle} <br/><em>${note.UrduTitle}</em><hr/>`;
-            preview.appendChild(div);
+                    preview.appendChild(div);
+                });
+            }
+
+            // Attach on change event
+            document.querySelectorAll(".seq-input").forEach(input => {
+                input.addEventListener("change", renderPreview);
+            });
+
+            renderPreview();
         });
-    }
-
-    seqInputs.forEach(input => {
-        input.addEventListener('input', renderPreviewAndValidate);
-    });
-
-    // Initial render
-    renderPreviewAndValidate();
-</script>
+    </script>
 }
+
