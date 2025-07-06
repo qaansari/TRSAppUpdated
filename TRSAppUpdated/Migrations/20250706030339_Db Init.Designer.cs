@@ -12,7 +12,7 @@ using TRSAppUpdated.Models;
 namespace TRSAppUpdated.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250705135714_Db Init")]
+    [Migration("20250706030339_Db Init")]
     partial class DbInit
     {
         /// <inheritdoc />
@@ -269,33 +269,14 @@ namespace TRSAppUpdated.Migrations
                     b.Property<DateTime>("CreatedDateTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("DeletedByUserID")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("DeletedDateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
                     b.Property<int>("RowID")
                         .HasColumnType("int");
-
-                    b.Property<int?>("UpdatedByUserID")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedDateTime")
-                        .HasColumnType("datetime2");
 
                     b.HasKey("ID");
 
                     b.HasIndex("CreatedByUserID");
 
-                    b.HasIndex("DeletedByUserID");
-
                     b.HasIndex("RowID");
-
-                    b.HasIndex("UpdatedByUserID");
 
                     b.ToTable("Columns");
                 });
@@ -443,31 +424,12 @@ namespace TRSAppUpdated.Migrations
                     b.Property<DateTime>("CreatedDateTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("DeletedByUserID")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("DeletedDateTime")
-                        .HasColumnType("datetime2");
-
                     b.Property<int>("EventID")
                         .HasColumnType("int");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int?>("UpdatedByUserID")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedDateTime")
-                        .HasColumnType("datetime2");
 
                     b.HasKey("ID");
 
                     b.HasIndex("CreatedByUserID");
-
-                    b.HasIndex("DeletedByUserID");
-
-                    b.HasIndex("UpdatedByUserID");
 
                     b.ToTable("EventCategories");
                 });
@@ -809,35 +771,16 @@ namespace TRSAppUpdated.Migrations
                     b.Property<DateTime>("CreatedDateTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("DeletedByUserID")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("DeletedDateTime")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("ImagePath")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
                     b.Property<int>("ReservationID")
                         .HasColumnType("int");
-
-                    b.Property<int?>("UpdatedByUserID")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedDateTime")
-                        .HasColumnType("datetime2");
 
                     b.HasKey("ID");
 
                     b.HasIndex("CreatedByUserID");
-
-                    b.HasIndex("DeletedByUserID");
-
-                    b.HasIndex("UpdatedByUserID");
 
                     b.ToTable("ReservationImages");
                 });
@@ -900,34 +843,15 @@ namespace TRSAppUpdated.Migrations
                     b.Property<DateTime>("CreatedDateTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("DeletedByUserID")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("DeletedDateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
                     b.Property<int>("ReservationID")
                         .HasColumnType("int");
 
                     b.Property<int>("TicketID")
                         .HasColumnType("int");
 
-                    b.Property<int?>("UpdatedByUserID")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedDateTime")
-                        .HasColumnType("datetime2");
-
                     b.HasKey("ID");
 
                     b.HasIndex("CreatedByUserID");
-
-                    b.HasIndex("DeletedByUserID");
-
-                    b.HasIndex("UpdatedByUserID");
 
                     b.ToTable("ReservationTickets");
                 });
@@ -995,34 +919,15 @@ namespace TRSAppUpdated.Migrations
                     b.Property<DateTime>("CreatedDateTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("DeletedByUserID")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("DeletedDateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
                     b.Property<string>("RowLabel")
                         .IsRequired()
                         .HasColumnType("varchar(1)");
-
-                    b.Property<int?>("UpdatedByUserID")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedDateTime")
-                        .HasColumnType("datetime2");
 
                     b.HasKey("ID");
 
                     b.HasIndex("AuditoriumID");
 
                     b.HasIndex("CreatedByUserID");
-
-                    b.HasIndex("DeletedByUserID");
-
-                    b.HasIndex("UpdatedByUserID");
 
                     b.ToTable("Rows");
                 });
@@ -1044,33 +949,14 @@ namespace TRSAppUpdated.Migrations
                     b.Property<DateTime>("CreatedDateTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("DeletedByUserID")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("DeletedDateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
                     b.Property<int>("SeatNumber")
                         .HasColumnType("int");
-
-                    b.Property<int?>("UpdatedByUserID")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedDateTime")
-                        .HasColumnType("datetime2");
 
                     b.HasKey("ID");
 
                     b.HasIndex("ColumnID");
 
                     b.HasIndex("CreatedByUserID");
-
-                    b.HasIndex("DeletedByUserID");
-
-                    b.HasIndex("UpdatedByUserID");
 
                     b.ToTable("Seats");
                 });
@@ -1334,7 +1220,7 @@ namespace TRSAppUpdated.Migrations
                         {
                             ID = 1,
                             ContactNumber = "+923312541767",
-                            CreatedDateTime = new DateTime(2025, 7, 5, 18, 57, 13, 730, DateTimeKind.Utc).AddTicks(6659),
+                            CreatedDateTime = new DateTime(2025, 7, 6, 8, 3, 38, 570, DateTimeKind.Utc).AddTicks(8368),
                             Email = "sa@eventland.pk",
                             FirstName = "Super",
                             IsActive = true,
@@ -1535,17 +1421,17 @@ namespace TRSAppUpdated.Migrations
                         .IsRequired();
 
                     b.HasOne("TRSAppUpdated.Models.User", "CreatedByUser")
-                        .WithMany()
+                        .WithMany("CitiesCreated")
                         .HasForeignKey("CreatedByUserID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("TRSAppUpdated.Models.User", "DeletedByUser")
-                        .WithMany()
+                        .WithMany("CitiesDeleted")
                         .HasForeignKey("DeletedByUserID");
 
                     b.HasOne("TRSAppUpdated.Models.User", "UpdatedByUser")
-                        .WithMany()
+                        .WithMany("CitiesUpdated")
                         .HasForeignKey("UpdatedByUserID");
 
                     b.Navigation("Country");
@@ -1560,14 +1446,10 @@ namespace TRSAppUpdated.Migrations
             modelBuilder.Entity("TRSAppUpdated.Models.Column", b =>
                 {
                     b.HasOne("TRSAppUpdated.Models.User", "CreatedByUser")
-                        .WithMany()
+                        .WithMany("ColumnsCreated")
                         .HasForeignKey("CreatedByUserID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("TRSAppUpdated.Models.User", "DeletedByUser")
-                        .WithMany()
-                        .HasForeignKey("DeletedByUserID");
 
                     b.HasOne("TRSAppUpdated.Models.Row", "Row")
                         .WithMany("Columns")
@@ -1575,33 +1457,25 @@ namespace TRSAppUpdated.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TRSAppUpdated.Models.User", "UpdatedByUser")
-                        .WithMany()
-                        .HasForeignKey("UpdatedByUserID");
-
                     b.Navigation("CreatedByUser");
 
-                    b.Navigation("DeletedByUser");
-
                     b.Navigation("Row");
-
-                    b.Navigation("UpdatedByUser");
                 });
 
             modelBuilder.Entity("TRSAppUpdated.Models.Country", b =>
                 {
                     b.HasOne("TRSAppUpdated.Models.User", "CreatedByUser")
-                        .WithMany()
+                        .WithMany("CountriesCreated")
                         .HasForeignKey("CreatedByUserID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("TRSAppUpdated.Models.User", "DeletedByUser")
-                        .WithMany()
+                        .WithMany("CountriesDeleted")
                         .HasForeignKey("DeletedByUserID");
 
                     b.HasOne("TRSAppUpdated.Models.User", "UpdatedByUser")
-                        .WithMany()
+                        .WithMany("CountriesUpdated")
                         .HasForeignKey("UpdatedByUserID");
 
                     b.Navigation("CreatedByUser");
@@ -1666,35 +1540,23 @@ namespace TRSAppUpdated.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TRSAppUpdated.Models.User", "DeletedByUser")
-                        .WithMany("EventCategoriesDeleted")
-                        .HasForeignKey("DeletedByUserID");
-
-                    b.HasOne("TRSAppUpdated.Models.User", "UpdatedByUser")
-                        .WithMany("EventCategoriesUpdated")
-                        .HasForeignKey("UpdatedByUserID");
-
                     b.Navigation("CreatedByUser");
-
-                    b.Navigation("DeletedByUser");
-
-                    b.Navigation("UpdatedByUser");
                 });
 
             modelBuilder.Entity("TRSAppUpdated.Models.EventStatus", b =>
                 {
                     b.HasOne("TRSAppUpdated.Models.User", "CreatedByUser")
-                        .WithMany()
+                        .WithMany("EventStatusesCreated")
                         .HasForeignKey("CreatedByUserID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("TRSAppUpdated.Models.User", "DeletedByUser")
-                        .WithMany()
+                        .WithMany("EventStatusesDeleted")
                         .HasForeignKey("DeletedByUserID");
 
                     b.HasOne("TRSAppUpdated.Models.User", "UpdatedByUser")
-                        .WithMany()
+                        .WithMany("EventStatusesUpdated")
                         .HasForeignKey("UpdatedByUserID");
 
                     b.Navigation("CreatedByUser");
@@ -1730,13 +1592,13 @@ namespace TRSAppUpdated.Migrations
             modelBuilder.Entity("TRSAppUpdated.Models.Note", b =>
                 {
                     b.HasOne("TRSAppUpdated.Models.User", "CreatedByUser")
-                        .WithMany()
+                        .WithMany("NotesCreated")
                         .HasForeignKey("CreatedByUserID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("TRSAppUpdated.Models.User", "DeletedByUser")
-                        .WithMany()
+                        .WithMany("NotesDeleted")
                         .HasForeignKey("DeletedByUserID");
 
                     b.HasOne("TRSAppUpdated.Models.NoteType", "NoteType")
@@ -1746,7 +1608,7 @@ namespace TRSAppUpdated.Migrations
                         .IsRequired();
 
                     b.HasOne("TRSAppUpdated.Models.User", "UpdatedByUser")
-                        .WithMany()
+                        .WithMany("NotesUpdated")
                         .HasForeignKey("UpdatedByUserID");
 
                     b.Navigation("CreatedByUser");
@@ -1761,17 +1623,17 @@ namespace TRSAppUpdated.Migrations
             modelBuilder.Entity("TRSAppUpdated.Models.NoteType", b =>
                 {
                     b.HasOne("TRSAppUpdated.Models.User", "CreatedByUser")
-                        .WithMany()
+                        .WithMany("NoteTypesCreated")
                         .HasForeignKey("CreatedByUserID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("TRSAppUpdated.Models.User", "DeletedByUser")
-                        .WithMany()
+                        .WithMany("NoteTypesDeleted")
                         .HasForeignKey("DeletedByUserID");
 
                     b.HasOne("TRSAppUpdated.Models.User", "UpdatedByUser")
-                        .WithMany()
+                        .WithMany("NoteTypesUpdated")
                         .HasForeignKey("UpdatedByUserID");
 
                     b.Navigation("CreatedByUser");
@@ -1859,19 +1721,7 @@ namespace TRSAppUpdated.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TRSAppUpdated.Models.User", "DeletedByUser")
-                        .WithMany("ReservationImagesDeleted")
-                        .HasForeignKey("DeletedByUserID");
-
-                    b.HasOne("TRSAppUpdated.Models.User", "UpdatedByUser")
-                        .WithMany("ReservationImagesUpdated")
-                        .HasForeignKey("UpdatedByUserID");
-
                     b.Navigation("CreatedByUser");
-
-                    b.Navigation("DeletedByUser");
-
-                    b.Navigation("UpdatedByUser");
                 });
 
             modelBuilder.Entity("TRSAppUpdated.Models.ReservationStatus", b =>
@@ -1905,19 +1755,7 @@ namespace TRSAppUpdated.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TRSAppUpdated.Models.User", "DeletedByUser")
-                        .WithMany("ReservationTicketsDeleted")
-                        .HasForeignKey("DeletedByUserID");
-
-                    b.HasOne("TRSAppUpdated.Models.User", "UpdatedByUser")
-                        .WithMany("ReservationTicketsUpdated")
-                        .HasForeignKey("UpdatedByUserID");
-
                     b.Navigation("CreatedByUser");
-
-                    b.Navigation("DeletedByUser");
-
-                    b.Navigation("UpdatedByUser");
                 });
 
             modelBuilder.Entity("TRSAppUpdated.Models.Row", b =>
@@ -1934,21 +1772,9 @@ namespace TRSAppUpdated.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TRSAppUpdated.Models.User", "DeletedByUser")
-                        .WithMany("RowsDeleted")
-                        .HasForeignKey("DeletedByUserID");
-
-                    b.HasOne("TRSAppUpdated.Models.User", "UpdatedByUser")
-                        .WithMany("RowsUpdated")
-                        .HasForeignKey("UpdatedByUserID");
-
                     b.Navigation("Auditorium");
 
                     b.Navigation("CreatedByUser");
-
-                    b.Navigation("DeletedByUser");
-
-                    b.Navigation("UpdatedByUser");
                 });
 
             modelBuilder.Entity("TRSAppUpdated.Models.Seat", b =>
@@ -1965,21 +1791,9 @@ namespace TRSAppUpdated.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TRSAppUpdated.Models.User", "DeletedByUser")
-                        .WithMany("SeatsDeleted")
-                        .HasForeignKey("DeletedByUserID");
-
-                    b.HasOne("TRSAppUpdated.Models.User", "UpdatedByUser")
-                        .WithMany("SeatsUpdated")
-                        .HasForeignKey("UpdatedByUserID");
-
                     b.Navigation("Column");
 
                     b.Navigation("CreatedByUser");
-
-                    b.Navigation("DeletedByUser");
-
-                    b.Navigation("UpdatedByUser");
                 });
 
             modelBuilder.Entity("TRSAppUpdated.Models.Show", b =>
@@ -2243,11 +2057,27 @@ namespace TRSAppUpdated.Migrations
 
                     b.Navigation("CategoriesUpdated");
 
+                    b.Navigation("CitiesCreated");
+
+                    b.Navigation("CitiesDeleted");
+
+                    b.Navigation("CitiesUpdated");
+
+                    b.Navigation("ColumnsCreated");
+
+                    b.Navigation("CountriesCreated");
+
+                    b.Navigation("CountriesDeleted");
+
+                    b.Navigation("CountriesUpdated");
+
                     b.Navigation("EventCategoriesCreated");
 
-                    b.Navigation("EventCategoriesDeleted");
+                    b.Navigation("EventStatusesCreated");
 
-                    b.Navigation("EventCategoriesUpdated");
+                    b.Navigation("EventStatusesDeleted");
+
+                    b.Navigation("EventStatusesUpdated");
 
                     b.Navigation("EventsCreated");
 
@@ -2261,6 +2091,18 @@ namespace TRSAppUpdated.Migrations
 
                     b.Navigation("ExpensesUpdated");
 
+                    b.Navigation("NoteTypesCreated");
+
+                    b.Navigation("NoteTypesDeleted");
+
+                    b.Navigation("NoteTypesUpdated");
+
+                    b.Navigation("NotesCreated");
+
+                    b.Navigation("NotesDeleted");
+
+                    b.Navigation("NotesUpdated");
+
                     b.Navigation("PaymentModesCreated");
 
                     b.Navigation("PaymentModesDeleted");
@@ -2269,15 +2111,7 @@ namespace TRSAppUpdated.Migrations
 
                     b.Navigation("ReservationImagesCreated");
 
-                    b.Navigation("ReservationImagesDeleted");
-
-                    b.Navigation("ReservationImagesUpdated");
-
                     b.Navigation("ReservationTicketsCreated");
-
-                    b.Navigation("ReservationTicketsDeleted");
-
-                    b.Navigation("ReservationTicketsUpdated");
 
                     b.Navigation("ReservationsCreated");
 
@@ -2287,15 +2121,7 @@ namespace TRSAppUpdated.Migrations
 
                     b.Navigation("RowsCreated");
 
-                    b.Navigation("RowsDeleted");
-
-                    b.Navigation("RowsUpdated");
-
                     b.Navigation("SeatsCreated");
-
-                    b.Navigation("SeatsDeleted");
-
-                    b.Navigation("SeatsUpdated");
 
                     b.Navigation("ShowExpensesCreated");
 

@@ -1,0 +1,67 @@
+﻿@model List<NoteTypeVM>
+@{
+    string _PageTitle = "Note Type";
+    int _TotalRecords = ViewBag.TotalRecords;
+    int _PageNo = ViewBag.PageNo;
+    int _PageSize = ViewBag.PageSize;
+    string _searchedTerm = ViewBag.SearchedTerm != null ? ViewBag.SearchedTerm as string : string.Empty;
+    int _TotalPages = (int)Math.Ceiling((double)_TotalRecords / _PageSize);
+    int _startRecord = (_PageNo - 1) * _PageSize + 1;
+    int _endRecord = Math.Min(_PageNo * _PageSize, _TotalRecords);
+}
+<table id="@(_PageTitle)" class="table table-striped table-bordered dt-responsive nowrap" style="width:100%">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Count > 0)
+        {
+            foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @(item.Title)
+                    </td>
+                    <td>
+                        <a asp-action="AddOrEdit" asp-route-ID="@(item.ID)" class="btn btn-primary sm-btn">Edit</a>
+                        <button type="button" class="btn btn-danger sm-btn deleteBtn" data-id="@(item.ID)">Delete</button>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="2" class="text-center">
+                    <img class="error_img" src="~/assets/images/no-data.png" />
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<div class="d-flex">
+    <div class="dataTables_info w-50" id="buttons-datatable_info" role="status" aria-live="polite">
+        Showing @(_startRecord) to @(_endRecord) of @(_TotalRecords) entries
+    </div>
+    <div class="dataTables_paginate paging_simple_numbers w-50" id="buttons-datatable_paginate">
+        <nav aria-label="Page navigation" class="float-right">
+            <ul class="pagination justify-content-center">
+                <li class="page-item @(_PageNo == 1 ? "disabled" : "")">
+                    <a class="page-link" href="#" data-page="@(_PageNo - 1)">Prev</a>
+                </li>
+                @for (int i = 1; i <= _TotalPages; i++)
+                {
+                    <li class="page-item @(i == _PageNo ? "active" : "")">
+                        <a class="page-link" href="#" data-page="@i">@i</a>
+                    </li>
+                }
+                <li class="page-item @(_PageNo == _TotalPages ? "disabled" : "")">
+                    <a class="page-link" href="#" data-page="@(_PageNo + 1)">Next</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>

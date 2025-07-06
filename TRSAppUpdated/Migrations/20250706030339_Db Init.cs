@@ -159,13 +159,8 @@ namespace TRSAppUpdated.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     CategoryID = table.Column<int>(type: "int", nullable: false),
                     EventID = table.Column<int>(type: "int", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     CreatedByUserID = table.Column<int>(type: "int", nullable: false),
-                    UpdatedByUserID = table.Column<int>(type: "int", nullable: true),
-                    DeletedByUserID = table.Column<int>(type: "int", nullable: true),
-                    CreatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    CreatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -176,16 +171,6 @@ namespace TRSAppUpdated.Migrations
                         principalTable: "Users",
                         principalColumn: "ID",
                         onDelete: ReferentialAction.NoAction);
-                    table.ForeignKey(
-                        name: "FK_EventCategories_Users_DeletedByUserID",
-                        column: x => x.DeletedByUserID,
-                        principalTable: "Users",
-                        principalColumn: "ID");
-                    table.ForeignKey(
-                        name: "FK_EventCategories_Users_UpdatedByUserID",
-                        column: x => x.UpdatedByUserID,
-                        principalTable: "Users",
-                        principalColumn: "ID");
                 });
 
             migrationBuilder.CreateTable(
@@ -340,13 +325,8 @@ namespace TRSAppUpdated.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ReservationID = table.Column<int>(type: "int", nullable: false),
                     ImagePath = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     CreatedByUserID = table.Column<int>(type: "int", nullable: false),
-                    UpdatedByUserID = table.Column<int>(type: "int", nullable: true),
-                    DeletedByUserID = table.Column<int>(type: "int", nullable: true),
-                    CreatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    CreatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -357,16 +337,6 @@ namespace TRSAppUpdated.Migrations
                         principalTable: "Users",
                         principalColumn: "ID",
                         onDelete: ReferentialAction.NoAction);
-                    table.ForeignKey(
-                        name: "FK_ReservationImages_Users_DeletedByUserID",
-                        column: x => x.DeletedByUserID,
-                        principalTable: "Users",
-                        principalColumn: "ID");
-                    table.ForeignKey(
-                        name: "FK_ReservationImages_Users_UpdatedByUserID",
-                        column: x => x.UpdatedByUserID,
-                        principalTable: "Users",
-                        principalColumn: "ID");
                 });
 
             migrationBuilder.CreateTable(
@@ -413,13 +383,8 @@ namespace TRSAppUpdated.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     TicketID = table.Column<int>(type: "int", nullable: false),
                     ReservationID = table.Column<int>(type: "int", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     CreatedByUserID = table.Column<int>(type: "int", nullable: false),
-                    UpdatedByUserID = table.Column<int>(type: "int", nullable: true),
-                    DeletedByUserID = table.Column<int>(type: "int", nullable: true),
-                    CreatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    CreatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -430,16 +395,6 @@ namespace TRSAppUpdated.Migrations
                         principalTable: "Users",
                         principalColumn: "ID",
                         onDelete: ReferentialAction.NoAction);
-                    table.ForeignKey(
-                        name: "FK_ReservationTickets_Users_DeletedByUserID",
-                        column: x => x.DeletedByUserID,
-                        principalTable: "Users",
-                        principalColumn: "ID");
-                    table.ForeignKey(
-                        name: "FK_ReservationTickets_Users_UpdatedByUserID",
-                        column: x => x.UpdatedByUserID,
-                        principalTable: "Users",
-                        principalColumn: "ID");
                 });
 
             migrationBuilder.CreateTable(
@@ -708,13 +663,8 @@ namespace TRSAppUpdated.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     RowLabel = table.Column<string>(type: "varchar(1)", nullable: false),
                     AuditoriumID = table.Column<int>(type: "int", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     CreatedByUserID = table.Column<int>(type: "int", nullable: false),
-                    UpdatedByUserID = table.Column<int>(type: "int", nullable: true),
-                    DeletedByUserID = table.Column<int>(type: "int", nullable: true),
-                    CreatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    CreatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -731,16 +681,6 @@ namespace TRSAppUpdated.Migrations
                         principalTable: "Users",
                         principalColumn: "ID",
                         onDelete: ReferentialAction.NoAction);
-                    table.ForeignKey(
-                        name: "FK_Rows_Users_DeletedByUserID",
-                        column: x => x.DeletedByUserID,
-                        principalTable: "Users",
-                        principalColumn: "ID");
-                    table.ForeignKey(
-                        name: "FK_Rows_Users_UpdatedByUserID",
-                        column: x => x.UpdatedByUserID,
-                        principalTable: "Users",
-                        principalColumn: "ID");
                 });
 
             migrationBuilder.CreateTable(
@@ -820,13 +760,8 @@ namespace TRSAppUpdated.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ColumnNumber = table.Column<int>(type: "int", nullable: false),
                     RowID = table.Column<int>(type: "int", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     CreatedByUserID = table.Column<int>(type: "int", nullable: false),
-                    UpdatedByUserID = table.Column<int>(type: "int", nullable: true),
-                    DeletedByUserID = table.Column<int>(type: "int", nullable: true),
-                    CreatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    CreatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -843,16 +778,6 @@ namespace TRSAppUpdated.Migrations
                         principalTable: "Users",
                         principalColumn: "ID",
                         onDelete: ReferentialAction.NoAction);
-                    table.ForeignKey(
-                        name: "FK_Columns_Users_DeletedByUserID",
-                        column: x => x.DeletedByUserID,
-                        principalTable: "Users",
-                        principalColumn: "ID");
-                    table.ForeignKey(
-                        name: "FK_Columns_Users_UpdatedByUserID",
-                        column: x => x.UpdatedByUserID,
-                        principalTable: "Users",
-                        principalColumn: "ID");
                 });
 
             migrationBuilder.CreateTable(
@@ -989,13 +914,8 @@ namespace TRSAppUpdated.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     SeatNumber = table.Column<int>(type: "int", nullable: false),
                     ColumnID = table.Column<int>(type: "int", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     CreatedByUserID = table.Column<int>(type: "int", nullable: false),
-                    UpdatedByUserID = table.Column<int>(type: "int", nullable: true),
-                    DeletedByUserID = table.Column<int>(type: "int", nullable: true),
-                    CreatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    CreatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1012,16 +932,6 @@ namespace TRSAppUpdated.Migrations
                         principalTable: "Users",
                         principalColumn: "ID",
                         onDelete: ReferentialAction.NoAction);
-                    table.ForeignKey(
-                        name: "FK_Seats_Users_DeletedByUserID",
-                        column: x => x.DeletedByUserID,
-                        principalTable: "Users",
-                        principalColumn: "ID");
-                    table.ForeignKey(
-                        name: "FK_Seats_Users_UpdatedByUserID",
-                        column: x => x.UpdatedByUserID,
-                        principalTable: "Users",
-                        principalColumn: "ID");
                 });
 
             migrationBuilder.CreateTable(
@@ -1162,7 +1072,7 @@ namespace TRSAppUpdated.Migrations
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "ID", "ContactNumber", "CreatedByUserID", "CreatedDateTime", "DeletedByUserID", "DeletedDateTime", "Email", "FirstName", "ImagePath", "IsActive", "IsDeleted", "IsVerified", "LastName", "Password", "RoleID", "UpdatedByUserID", "UpdatedDateTime", "UserToken" },
-                values: new object[] { 1, "+923312541767", null, new DateTime(2025, 7, 5, 18, 57, 13, 730, DateTimeKind.Utc).AddTicks(6659), null, null, "sa@eventland.pk", "Super", null, true, false, true, "Admin", "6FkLTXY5CrK8ccZIBV6HAibnMhfq44wfgPMuzSxJjQ4=", 1, null, null, null });
+                values: new object[] { 1, "+923312541767", null, new DateTime(2025, 7, 6, 8, 3, 38, 570, DateTimeKind.Utc).AddTicks(8368), null, null, "sa@eventland.pk", "Super", null, true, false, true, "Admin", "6FkLTXY5CrK8ccZIBV6HAibnMhfq44wfgPMuzSxJjQ4=", 1, null, null, null });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Auditoriums_CreatedByUserID",
@@ -1230,19 +1140,9 @@ namespace TRSAppUpdated.Migrations
                 column: "CreatedByUserID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Columns_DeletedByUserID",
-                table: "Columns",
-                column: "DeletedByUserID");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Columns_RowID",
                 table: "Columns",
                 column: "RowID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Columns_UpdatedByUserID",
-                table: "Columns",
-                column: "UpdatedByUserID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Countries_CreatedByUserID",
@@ -1263,16 +1163,6 @@ namespace TRSAppUpdated.Migrations
                 name: "IX_EventCategories_CreatedByUserID",
                 table: "EventCategories",
                 column: "CreatedByUserID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_EventCategories_DeletedByUserID",
-                table: "EventCategories",
-                column: "DeletedByUserID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_EventCategories_UpdatedByUserID",
-                table: "EventCategories",
-                column: "UpdatedByUserID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_EventEventCategory_EventsID",
@@ -1395,16 +1285,6 @@ namespace TRSAppUpdated.Migrations
                 column: "CreatedByUserID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ReservationImages_DeletedByUserID",
-                table: "ReservationImages",
-                column: "DeletedByUserID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ReservationImages_UpdatedByUserID",
-                table: "ReservationImages",
-                column: "UpdatedByUserID");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_ReservationReservationImage_ReservationsID",
                 table: "ReservationReservationImage",
                 column: "ReservationsID");
@@ -1465,16 +1345,6 @@ namespace TRSAppUpdated.Migrations
                 column: "CreatedByUserID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ReservationTickets_DeletedByUserID",
-                table: "ReservationTickets",
-                column: "DeletedByUserID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ReservationTickets_UpdatedByUserID",
-                table: "ReservationTickets",
-                column: "UpdatedByUserID");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_ReservationTicketTicket_TicketsID",
                 table: "ReservationTicketTicket",
                 column: "TicketsID");
@@ -1490,16 +1360,6 @@ namespace TRSAppUpdated.Migrations
                 column: "CreatedByUserID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Rows_DeletedByUserID",
-                table: "Rows",
-                column: "DeletedByUserID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Rows_UpdatedByUserID",
-                table: "Rows",
-                column: "UpdatedByUserID");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Seats_ColumnID",
                 table: "Seats",
                 column: "ColumnID");
@@ -1508,16 +1368,6 @@ namespace TRSAppUpdated.Migrations
                 name: "IX_Seats_CreatedByUserID",
                 table: "Seats",
                 column: "CreatedByUserID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Seats_DeletedByUserID",
-                table: "Seats",
-                column: "DeletedByUserID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Seats_UpdatedByUserID",
-                table: "Seats",
-                column: "UpdatedByUserID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ShowExpenses_CreatedByUserID",

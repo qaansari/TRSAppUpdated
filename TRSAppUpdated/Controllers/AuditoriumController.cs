@@ -62,7 +62,7 @@ namespace TRSAppUpdated.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error occured at GetAuditoriumsPartial in {_Title} Controller due to {ex}");
+                _logger.LogError($"Error occured at GetPartial in {_Title} Controller due to {ex}");
             }
             return PartialView($"_{_partialViewName}TablePartial", new List<AuditoriumVM>());
         }
@@ -126,8 +126,7 @@ namespace TRSAppUpdated.Controllers
                             {
                                 var _rows = _context.Rows.Include(x => x.Columns)
                                     .ThenInclude(x => x.Seats)
-                                    .Where(x => !x.IsDeleted
-                                    && x.AuditoriumID == _item.ID).ToList();
+                                    .Where(x => x.AuditoriumID == _item.ID).ToList();
                                 if (_rows.Count > 0)
                                 {
                                     var _columns = _rows.SelectMany(r => r.Columns).ToList();
@@ -313,12 +312,12 @@ namespace TRSAppUpdated.Controllers
             try
             {
                 var _rows = _context.Rows
-                        .Where(x => !x.IsDeleted && x.AuditoriumID == AuditoriumId)
+                        .Where(x =>x.AuditoriumID == AuditoriumId)
                         .Select(x => new RowWithColumnVM
                         {
                             RowID = x.ID,
                             RowLabel = x.RowLabel,
-                            ColumnCount = _context.Columns.Count(y => !y.IsDeleted && y.RowID == x.ID)
+                            ColumnCount = _context.Columns.Count(y => y.RowID == x.ID)
                         })
                         .ToList();
                 return View(_rows ?? new List<RowWithColumnVM>());
@@ -338,13 +337,13 @@ namespace TRSAppUpdated.Controllers
                 foreach (var item in model)
                 {
                     // Get the row object including its label
-                    var row = _context.Rows.FirstOrDefault(r => !r.IsDeleted && r.ID == item.RowID);
+                    var row = _context.Rows.FirstOrDefault(r => r.ID == item.RowID);
                     if (row == null)
                     {
                         continue;
                     }
                     var existingColumns = _context.Columns
-                        .Where(c => !c.IsDeleted && c.RowID == row.ID)
+                        .Where(c => c.RowID == row.ID)
                         .OrderBy(c => c.ColumnNumber)
                         .ToList();
                     int existingCount = existingColumns.Count;
@@ -392,14 +391,14 @@ namespace TRSAppUpdated.Controllers
                     {
                         AuditoriumName = x.Title.Trim(),
                         VenueName = x.Venue.Title.Trim(),
-                        Rows = x.Rows.Where(y => !y.IsDeleted).Select(y => new RowVM()
+                        Rows = x.Rows.Select(y => new RowVM()
                         {
                             RowLabel = y.RowLabel,
-                            Columns = y.Columns.Where(z => !z.IsDeleted).Select(c => new ColumnVM()
+                            Columns = y.Columns.Select(c => new ColumnVM()
                             {
                                 ID = c.ID,
                                 ColumnNumber = c.ColumnNumber,
-                                Seats = c.Seats.Where(s => !s.IsDeleted).Select(s => s.SeatNumber).ToList()
+                                Seats = c.Seats.Select(s => s.SeatNumber).ToList()
                             }).ToList()
                         }).ToList()
                     }).FirstOrDefault();
@@ -417,8 +416,8 @@ namespace TRSAppUpdated.Controllers
             // Get all rows with their columns from database
             try
             {
-                var rows = _context.Rows.Include(r => r.Columns).ThenInclude(x => x.Seats).Where(r => !r.IsDeleted
-                && r.AuditoriumID == AuditoriumId).ToList();
+                var rows = _context.Rows.Include(r => r.Columns).ThenInclude(x => x.Seats)
+                    .Where(r => r.AuditoriumID == AuditoriumId).ToList();
                 var _list = rows.Select(r => new RowSeatInputVM
                 {
                     RowID = r.ID,
@@ -428,7 +427,7 @@ namespace TRSAppUpdated.Controllers
                                       {
                                           ColumnID = c.ID,
                                           ColumnNumber = c.ColumnNumber,
-                                          SeatCount = c.Seats.Where(x => !x.IsDeleted).Count()
+                                          SeatCount = c.Seats.Count
                                       }).ToList()
                 }).ToList();
                 return View(_list);
@@ -452,7 +451,7 @@ namespace TRSAppUpdated.Controllers
                     {
                         // Fetch existing seats for the column
                         var existingSeats = _context.Seats
-                            .Where(s => s.ColumnID == column.ColumnID && !s.IsDeleted)
+                            .Where(s => s.ColumnID == column.ColumnID)
                             .ToList();
                         if (existingSeats.Count > 0)
                         {

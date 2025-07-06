@@ -23,6 +23,13 @@ namespace TRSAppUpdated
             builder.Services.AddSession();
             builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             builder.Services.AddScoped<IVenueService, VenueService>();
+            builder.Services.AddScoped<IAuditoriumService, AuditoriumService>();
+            builder.Services.AddScoped<ICategoryService, CategoryService>();
+            builder.Services.AddScoped<ICountryService, CountryService>();
+            builder.Services.AddScoped<ICityService, CityService>();
+            builder.Services.AddScoped<IEventStatusService, EventStatusService>();
+            builder.Services.AddScoped<IPaymentModeService, PaymentModeService>();
+            builder.Services.AddScoped<IReservationStatusService, ReservationStatusService>();
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
             {
 

@@ -58,7 +58,7 @@ namespace TRSAppUpdated.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error occured at GetCategoriesPartial in {_Title} Controller due to {ex}");
+                _logger.LogError($"Error occured at GetPartial in {_Title} Controller due to {ex}");
             }
             return PartialView($"_{_partialViewName}TablePartial", new List<CategoryVM>());
         }

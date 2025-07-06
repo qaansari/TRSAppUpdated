@@ -68,6 +68,20 @@ namespace TRSAppUpdated.Models
         [InverseProperty("DeletedByUser")]
         public ICollection<Category> CategoriesDeleted { get; set; }
         [InverseProperty("CreatedByUser")]
+        public ICollection<City> CitiesCreated { get; set; }
+        [InverseProperty("UpdatedByUser")]
+        public ICollection<City> CitiesUpdated { get; set; }
+        [InverseProperty("DeletedByUser")]
+        public ICollection<City> CitiesDeleted { get; set; }
+        [InverseProperty("CreatedByUser")]
+        public ICollection<Column> ColumnsCreated { get; set; }
+        [InverseProperty("CreatedByUser")]
+        public ICollection<Country> CountriesCreated { get; set; }
+        [InverseProperty("UpdatedByUser")]
+        public ICollection<Country> CountriesUpdated { get; set; }
+        [InverseProperty("DeletedByUser")]
+        public ICollection<Country> CountriesDeleted { get; set; }
+        [InverseProperty("CreatedByUser")]
         public ICollection<Event> EventsCreated { get; set; }
         [InverseProperty("UpdatedByUser")]
         public ICollection<Event> EventsUpdated { get; set; }
@@ -75,16 +89,30 @@ namespace TRSAppUpdated.Models
         public ICollection<Event> EventsDeleted { get; set; }
         [InverseProperty("CreatedByUser")]
         public ICollection<EventCategory> EventCategoriesCreated { get; set; }
+        [InverseProperty("CreatedByUser")]
+        public ICollection<EventStatus> EventStatusesCreated { get; set; }
         [InverseProperty("UpdatedByUser")]
-        public ICollection<EventCategory> EventCategoriesUpdated { get; set; }
+        public ICollection<EventStatus> EventStatusesUpdated { get; set; }
         [InverseProperty("DeletedByUser")]
-        public ICollection<EventCategory> EventCategoriesDeleted { get; set; }
+        public ICollection<EventStatus> EventStatusesDeleted { get; set; }
         [InverseProperty("CreatedByUser")]
         public ICollection<Expense> ExpensesCreated { get; set; }
         [InverseProperty("UpdatedByUser")]
         public ICollection<Expense> ExpensesUpdated { get; set; }
         [InverseProperty("DeletedByUser")]
         public ICollection<Expense> ExpensesDeleted { get; set; }
+        [InverseProperty("CreatedByUser")]
+        public ICollection<Note> NotesCreated { get; set; }
+        [InverseProperty("UpdatedByUser")]
+        public ICollection<Note> NotesUpdated { get; set; }
+        [InverseProperty("DeletedByUser")]
+        public ICollection<Note> NotesDeleted { get; set; }
+        [InverseProperty("CreatedByUser")]
+        public ICollection<NoteType> NoteTypesCreated { get; set; }
+        [InverseProperty("UpdatedByUser")]
+        public ICollection<NoteType> NoteTypesUpdated { get; set; }
+        [InverseProperty("DeletedByUser")]
+        public ICollection<NoteType> NoteTypesDeleted { get; set; }
         [InverseProperty("CreatedByUser")]
         public ICollection<PaymentMode> PaymentModesCreated { get; set; }
         [InverseProperty("UpdatedByUser")]
@@ -99,28 +127,12 @@ namespace TRSAppUpdated.Models
         public ICollection<Reservation> ReservationsDeleted { get; set; }
         [InverseProperty("CreatedByUser")]
         public ICollection<ReservationImage> ReservationImagesCreated { get; set; }
-        [InverseProperty("UpdatedByUser")]
-        public ICollection<ReservationImage> ReservationImagesUpdated { get; set; }
-        [InverseProperty("DeletedByUser")]
-        public ICollection<ReservationImage> ReservationImagesDeleted { get; set; }
         [InverseProperty("CreatedByUser")]
         public ICollection<ReservationTicket> ReservationTicketsCreated { get; set; }
-        [InverseProperty("UpdatedByUser")]
-        public ICollection<ReservationTicket> ReservationTicketsUpdated { get; set; }
-        [InverseProperty("DeletedByUser")]
-        public ICollection<ReservationTicket> ReservationTicketsDeleted { get; set; }
         [InverseProperty("CreatedByUser")]
         public ICollection<Row> RowsCreated { get; set; }
-        [InverseProperty("UpdatedByUser")]
-        public ICollection<Row> RowsUpdated { get; set; }
-        [InverseProperty("DeletedByUser")]
-        public ICollection<Row> RowsDeleted { get; set; }
         [InverseProperty("CreatedByUser")]
         public ICollection<Seat> SeatsCreated { get; set; }
-        [InverseProperty("UpdatedByUser")]
-        public ICollection<Seat> SeatsUpdated { get; set; }
-        [InverseProperty("DeletedByUser")]
-        public ICollection<Seat> SeatsDeleted { get; set; }
         [InverseProperty("CreatedByUser")]
         public ICollection<Show> ShowsCreated { get; set; }
         [InverseProperty("UpdatedByUser")]
