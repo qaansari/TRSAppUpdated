@@ -83,14 +83,14 @@
         $('#searchInput').on('input', function() {
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(function() {
-                loadCountries(1); // Always reset to page 1 when search term changes
+                loadData(1); // Always reset to page 1 when search term changes
             }, 500); // 500ms delay after typing stops
         });
 
         $('#searchInput').keypress(function(e) {
             if(e.which == 13) { // Enter key
                 clearTimeout(searchTimeout);
-                loadCountries(1);
+                loadData(1);
             }
         });
             // Delete functionality
@@ -106,15 +106,15 @@
 
             // Search functionality with AJAX
             $('#searchBtn').click(function() {
-                loadCountries(1);
+                loadData(1);
             });
                  $('#pageSizeDropdown').change(function() {
             // Reset to page 1 when changing page size
-            loadCountries(1);
+            loadData(1);
         });
             $('#searchInput').keypress(function(e) {
                 if(e.which == 13) { // Enter key
-                    loadCountries(1);
+                    loadData(1);
                 }
             });
 
@@ -122,11 +122,11 @@
             $(document).on('click', '.page-link', function(e) {
                 e.preventDefault();
                 var pageNo = $(this).data('page');
-                loadCountries(pageNo);
+                loadData(pageNo);
             });
 
             // Function to load Countries via AJAX
-                 function loadCountries(pageNo) {
+                 function loadData(pageNo) {
             var searchedTerm = $('#searchInput').val();
             var pageSize = $('#pageSizeDropdown').val(); // Get selected page size
 

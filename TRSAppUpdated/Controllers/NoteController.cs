@@ -82,11 +82,20 @@ namespace TRSAppUpdated.Controllers
                             ID = x.ID,
                             EnTitle = x.EnTitle,
                             UrduTitle = x.UrduTitle,
+                            Seq = x.Seq,
                             NoteTypeID = x.NoteTypeID,
                             CreatedByUserID = x.CreatedByUserID,
                             CreatedDateTime = x.CreatedDateTime,
                         })
                         .AsNoTracking().FirstOrDefault();
+                }
+                else
+                {
+                    _item.Seq = 1;
+                    if (_context.Notes.Where(x => !x.IsDeleted).AsNoTracking().Any())
+                    {
+                        _item.Seq = (_context.Notes.Max(x => x.Seq)) + 1;
+                    }
                 }
             }
             catch (Exception ex)
@@ -109,8 +118,7 @@ namespace TRSAppUpdated.Controllers
                     {
                         var isExists = _context.Notes.Where(x => !x.IsDeleted
                             && x.ID != Model.ID
-                            && (x.EnTitle.Trim().ToLower() == Model.EnTitle.Trim().ToLower()
-                            || x.UrduTitle.Trim() == Model.UrduTitle.Trim()))
+                            && x.Seq == Model.Seq)
                         .Any();
                         if (isExists)
                         {
@@ -121,8 +129,10 @@ namespace TRSAppUpdated.Controllers
                             .AsNoTracking().FirstOrDefault();
                         if (_item != null)
                         {
-                            _item.Title = Model.Title.Trim();
-                            _item.CountryID = Model.CountryID;
+                            _item.Seq = Model.Seq;
+                            _item.EnTitle = Model.EnTitle.Trim();
+                            _item.UrduTitle = Model.UrduTitle.Trim();
+                            _item.NoteTypeID = Model.NoteTypeID;
                             _item.UpdatedByUserID = _UserID;
                             _item.UpdatedDateTime = DateTime.UtcNow.AddHours(5);
                             _context.ChangeTracker.Clear();
@@ -134,15 +144,16 @@ namespace TRSAppUpdated.Controllers
                     else
                     {
                         var isExists = _context.Notes.Where(x => !x.IsDeleted
-                             && (x.EnTitle.Trim().ToLower() == Model.EnTitle.Trim().ToLower()
-                             || x.UrduTitle.Trim() == Model.UrduTitle.Trim())).Any();
+                              && x.Seq == Model.Seq).Any();
                         if (isExists)
                         {
                             TempData["Message"] = $"0,{_Title} Already Exists";
                             return View(Model);
                         }
-                        _item.Title = Model.Title.Trim();
-                        _item.CountryID = Model.CountryID;
+                        _item.Seq = Model.Seq;
+                        _item.EnTitle = Model.EnTitle.Trim();
+                        _item.UrduTitle = Model.UrduTitle.Trim();
+                        _item.NoteTypeID = Model.NoteTypeID;
                         _item.CreatedByUserID = _UserID;
                         _item.CreatedDateTime = DateTime.UtcNow.AddHours(5);
                         _context.Notes.Add(_item);
@@ -197,25 +208,29 @@ namespace TRSAppUpdated.Controllers
             try
             {
                 // For AJAX calls
-                var _query = _context.Notes.Include(x => x.Country).Where(x => !x.IsDeleted)
+                var _query = _context.Notes.Include(x => x.NoteType).Where(x => !x.IsDeleted)
                            .Select(x => new NoteVM()
                            {
                                ID = x.ID,
-                               Title = x.Title,
-                               CountryTitle = x.Country.Title
+                               EnTitle = x.EnTitle,
+                               Seq = x.Seq,
+                               UrduTitle = x.UrduTitle,
+                               NoteTypeTitle = x.NoteType.Title
                            })
                            .AsNoTracking()
                            .AsQueryable();
                 if (!string.IsNullOrEmpty(_searchedTerm))
                 {
                     _query = _query
-                        .Where(x => x.Title.Trim().ToLower().Contains(_searchedTerm.Trim().ToLower())
-                        || x.CountryTitle.Trim().ToLower().Contains(_searchedTerm.Trim().ToLower()));
+                        .Where(x => x.NoteTypeTitle.Trim().ToLower().Contains(_searchedTerm.Trim().ToLower())
+                        || x.EnTitle.Trim().ToLower().Contains(_searchedTerm.Trim().ToLower())
+                        || x.UrduTitle.Trim().ToLower().Contains(_searchedTerm.Trim().ToLower())
+                        || x.Seq.ToString().Trim().ToLower().Contains(_searchedTerm.Trim().ToLower()));
                 }
                 int _skip = (_pageNo - 1) * _pageSize;
                 totalRecords = await _query.CountAsync();
                 _query = _query.Skip(_skip).Take(_pageSize);
-                _result = await _query.OrderByDescending(x => x.ID).ToListAsync();
+                _result = await _query.OrderBy(x => x.Seq).ToListAsync();
             }
             catch (Exception ex)
             {

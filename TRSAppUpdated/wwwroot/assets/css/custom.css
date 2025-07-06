@@ -162,3 +162,6 @@ span.e-input-group.e-control-wrapper.form-control.form-control-sm.e-ddl.e-lib.e-
 .column-gap {
     width: 10px; /* Space between columns */
 }
+.w-5per{
+    width:5%;
+}

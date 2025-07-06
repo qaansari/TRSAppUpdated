@@ -83,14 +83,14 @@
         $('#searchInput').on('input', function() {
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(function() {
-                loadPaymentModes(1); // Always reset to page 1 when search term changes
+                loadData(1); // Always reset to page 1 when search term changes
             }, 500); // 500ms delay after typing stops
         });
 
         $('#searchInput').keypress(function(e) {
             if(e.which == 13) { // Enter key
                 clearTimeout(searchTimeout);
-                loadPaymentModes(1);
+                loadData(1);
             }
         });
             // Delete functionality
@@ -106,15 +106,15 @@
 
             // Search functionality with AJAX
             $('#searchBtn').click(function() {
-                loadPaymentModes(1);
+                loadData(1);
             });
                  $('#pageSizeDropdown').change(function() {
             // Reset to page 1 when changing page size
-            loadPaymentModes(1);
+            loadData(1);
         });
             $('#searchInput').keypress(function(e) {
                 if(e.which == 13) { // Enter key
-                    loadPaymentModes(1);
+                    loadData(1);
                 }
             });
 
@@ -122,11 +122,11 @@
             $(document).on('click', '.page-link', function(e) {
                 e.preventDefault();
                 var pageNo = $(this).data('page');
-                loadPaymentModes(pageNo);
+                loadData(pageNo);
             });
 
             // Function to load PaymentModes via AJAX
-                 function loadPaymentModes(pageNo) {
+                 function loadData(pageNo) {
             var searchedTerm = $('#searchInput').val();
             var pageSize = $('#pageSizeDropdown').val(); // Get selected page size
 
