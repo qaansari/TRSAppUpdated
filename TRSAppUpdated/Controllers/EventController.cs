@@ -16,17 +16,27 @@ namespace TRSAppUpdated.Controllers
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly ILogger<EventController> _logger;
         private readonly ICountryService _countryService;
+        private readonly ICityService _cityService;
+        private readonly IVenueService _venueService;
+        private readonly IAuditoriumService _auditoriumService;
+        private readonly IEventStatusService _eventStatusService;
         private readonly string _Title = "Event";
         private readonly int _UserID;
         public EventController(AppDbContext context, IHttpContextAccessor httpContextAccessor,
             IWebHostEnvironment webHostEnvironment, ILogger<EventController> logger,
-            ICountryService countryService)
+            ICountryService countryService, ICityService cityService,
+            IVenueService venueService, IAuditoriumService auditoriumService,
+            IEventStatusService eventStatusService)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;
             _webHostEnvironment = webHostEnvironment;
             _logger = logger;
             _countryService = countryService;
+            _cityService = cityService;
+            _venueService = venueService;
+            _auditoriumService = auditoriumService;
+            _eventStatusService = eventStatusService;
             _UserID = Convert.ToInt32(_httpContextAccessor.HttpContext.User.FindFirstValue("UserID"));
         }
         //Index (Get All)
@@ -74,16 +84,26 @@ namespace TRSAppUpdated.Controllers
             try
             {
                 ViewData["CountryList"] = _countryService.GetAll();
+                ViewData["CityList"] = _cityService.GetAll();
+                ViewData["VenueList"] = _venueService.GetAll();
+                ViewData["AuditoriumList"] = _auditoriumService.GetAll();
+                ViewData["EventStatusList"] = _eventStatusService.GetAll();
                 if (ID != 0)
                 {
-                    _item = _context.Events.Include(x=>x.Auditorium).Include(x=>x.City).Where(x => !x.IsDeleted && x.ID == ID)
+                    _item = _context.Events.Include(x => x.Auditorium).Include(x => x.City).Where(x => !x.IsDeleted && x.ID == ID)
                         .Select(x => new EventVM()
                         {
                             ID = x.ID,
                             Title = x.Title,
+                            StartDate = x.StartDate,
+                            EndDate = x.EndDate,
+                            Description = x.Description,
+                            IsGeneral = x.IsGeneral,
+                            ImagePath = x.ImagePath,
+                            EventStatusID = x.EventStatusID,
                             CountryID = x.City.CountryID,
-                            VenueID = x.Auditorium.VenueID,
                             CityID = x.CityID,
+                            VenueID = x.Auditorium.VenueID,
                             AuditoriumID = x.AuditoriumID,
                             CreatedByUserID = x.CreatedByUserID,
                             CreatedDateTime = x.CreatedDateTime,
@@ -104,16 +124,36 @@ namespace TRSAppUpdated.Controllers
             try
             {
                 ViewData["CountryList"] = _countryService.GetAll();
+                ViewData["CityList"] = _cityService.GetAll();
+                ViewData["VenueList"] = _venueService.GetAll();
+                ViewData["AuditoriumList"] = _auditoriumService.GetAll();
+                ViewData["EventStatusList"] = _eventStatusService.GetAll();
                 if (ModelState.IsValid)
                 {
                     var _item = new Event();
                     if (Model.ID != 0)
                     {
-                        var isExists = _context.Events.Where(x => !x.IsDeleted
-                            && x.ID != Model.ID
-                            && x.CountryID == Model.CountryID
-                            && x.Title.Trim().ToLower() == Model.Title.Trim().ToLower())
-                        .Any();
+                        var isExists = await _context.Events
+                        .Where(x => !x.IsDeleted
+                        && x.ID != Model.ID
+                        && x.CityID == Model.CityID
+                        && x.AuditoriumID == Model.AuditoriumID
+                        && x.Title.Trim().ToLower() == Model.Title.Trim().ToLower()
+                        && (
+                                (x.EndDate.HasValue && Model.EndDate.HasValue &&
+                                 x.StartDate <= Model.EndDate.Value &&
+                                 Model.StartDate.Value <= x.EndDate.Value)
+                                 || (!x.EndDate.HasValue && Model.EndDate.HasValue &&
+                                 x.StartDate <= Model.EndDate.Value &&
+                                 Model.StartDate.Value <= x.StartDate)
+                                 || (x.EndDate.HasValue && !Model.EndDate.HasValue &&
+                                 Model.StartDate.Value <= x.EndDate.Value &&
+                                 x.StartDate <= Model.StartDate.Value)
+                                 || (!x.EndDate.HasValue && !Model.EndDate.HasValue &&
+                                    x.StartDate == Model.StartDate.Value)
+                            )
+                            )
+                        .AnyAsync();
                         if (isExists)
                         {
                             TempData["Message"] = $"0,{_Title} Already Exists";
@@ -135,22 +175,61 @@ namespace TRSAppUpdated.Controllers
                     }
                     else
                     {
-                        var isExists = _context.Events.Where(x => !x.IsDeleted
-                            && x.CountryID == Model.CountryID
-                            && x.Title.Trim().ToLower() == Model.Title.Trim().ToLower())
-                        .Any();
+                        var isExists = await _context.Events
+                         .Where(x => !x.IsDeleted
+                         && x.CityID == Model.CityID
+                         && x.AuditoriumID == Model.AuditoriumID
+                         && x.Title.Trim().ToLower() == Model.Title.Trim().ToLower()
+                         && (
+                                 (x.EndDate.HasValue && Model.EndDate.HasValue &&
+                                  x.StartDate <= Model.EndDate.Value &&
+                                  Model.StartDate.Value <= x.EndDate.Value)
+                                  || (!x.EndDate.HasValue && Model.EndDate.HasValue &&
+                                  x.StartDate <= Model.EndDate.Value &&
+                                  Model.StartDate.Value <= x.StartDate)
+                                  || (x.EndDate.HasValue && !Model.EndDate.HasValue &&
+                                  Model.StartDate.Value <= x.EndDate.Value &&
+                                  x.StartDate <= Model.StartDate.Value)
+                                  || (!x.EndDate.HasValue && !Model.EndDate.HasValue &&
+                                     x.StartDate == Model.StartDate.Value)
+                             )
+                             )
+                         .AnyAsync();
                         if (isExists)
                         {
                             TempData["Message"] = $"0,{_Title} Already Exists";
                             return View(Model);
                         }
                         _item.Title = Model.Title.Trim();
-                        _item.CountryID = Model.CountryID;
+                        _item.StartDate = Model.StartDate.Value;
+                        _item.EndDate = Model.EndDate;
+                        _item.Description = !string.IsNullOrEmpty(Model.Description)? Model.Description.Trim(): Model.Description;
+                        _item.IsGeneral = Model.IsGeneral;
+                        _item.CityID = Model.CityID;
+                        _item.AuditoriumID = Model.AuditoriumID;
                         _item.CreatedByUserID = _UserID;
                         _item.CreatedDateTime = DateTime.UtcNow.AddHours(5);
                         _context.Events.Add(_item);
                         await _context.SaveChangesAsync();
                         TempData["Message"] = $"1,{_Title} Successfully Added";
+                    }
+                    if (_item != null && Model.ImageFile != null)
+                    {
+                        var folderPath = Path.Combine(_webHostEnvironment.WebRootPath, "assets", "images", "auditoriums");
+                        if (!Directory.Exists(folderPath))
+                        {
+                            Directory.CreateDirectory(folderPath);
+                        }
+                        var _fileName = $"auditorium" + "_" + _item.CreatedDateTime.ToString("yyyyddMMhhmmss") + Path.GetExtension(Model.ImageFile.FileName);
+                        _item.ImagePath = _fileName.Trim();
+                        var _filePath = Path.Combine(folderPath, _fileName);
+                        using (var _stream = new FileStream(_filePath, FileMode.Create))
+                        {
+                            await Model.ImageFile.CopyToAsync(_stream);
+                        }
+                        _context.ChangeTracker.Clear();
+                        _context.Entry(_item).State = EntityState.Modified;
+                        await _context.SaveChangesAsync();
                     }
                     return RedirectToAction("Index");
                 }

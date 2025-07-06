@@ -11,8 +11,10 @@ namespace TRSAppUpdated.Models
         public string Title { get; set; }
         [Column(TypeName = "varchar(300)")]
         public string Address { get; set; }
+        [ForeignKey("City")]
+        public int CityID { get; set; }
         [Column(TypeName = "varchar(300)")]
         public string? ImagePath { get; set; }
-        public ICollection<Auditorium> Auditoriums { get; set; }
+        public City City { get; set; }
     }
 }

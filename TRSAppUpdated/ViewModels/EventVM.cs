@@ -13,10 +13,11 @@ namespace TRSAppUpdated.ViewModels
         [StringLength(50, ErrorMessage = "Please fill out maximum 50 characters")]
         public string Title { get; set; }
         [Required(ErrorMessage = "Please fill out this field")]
-        public DateTime StartDate { get; set; }
+        public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
         public string? Description { get; set; }
         public bool IsGeneral { get; set; } = false;
+        public IFormFile? ImageFile { get; set; }
         public string? ImagePath { get; set; }
         [Range(1, int.MaxValue, ErrorMessage = "Please fill out this field")]
         public int CountryID { get; set; }
