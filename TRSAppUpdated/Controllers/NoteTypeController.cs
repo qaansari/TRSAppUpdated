@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Syncfusion.EJ2.Layouts;
 using System.Security.Claims;
+using TRSAppUpdated.Interfaces;
 using TRSAppUpdated.Models;
 using TRSAppUpdated.ViewModels;
 
@@ -12,16 +14,16 @@ namespace TRSAppUpdated.Controllers
     {
         private readonly AppDbContext _context;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly ILogger<NoteTypeController> _logger;
+        private readonly INoteService _noteService;
         private readonly string _Title = "Note Type";
         private readonly int _UserID;
-        public NoteTypeController(AppDbContext context, IHttpContextAccessor httpContextAccessor, IWebHostEnvironment webHostEnvironment, ILogger<NoteTypeController> logger)
+        public NoteTypeController(AppDbContext context, IHttpContextAccessor httpContextAccessor,ILogger<NoteTypeController> logger,INoteService noteService)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;
-            _webHostEnvironment = webHostEnvironment;
             _logger = logger;
+            _noteService = noteService;
             _UserID = Convert.ToInt32(_httpContextAccessor.HttpContext.User.FindFirstValue("UserID"));
         }
         //Index (Get All)
@@ -208,6 +210,45 @@ namespace TRSAppUpdated.Controllers
                 _logger.LogError($"Error occured at GetList in {_Title} Controller due to {ex}");
             }
             return (_result, totalRecords);
+        }
+        //Update Notes (GET)
+        public IActionResult UpdateNotes(int noteTypeID)
+        {
+            try
+            {
+                var _notes = _noteService.GetNotesByNoteTypeID(noteTypeID);
+                return View(_notes ?? new List<NoteVM>());
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error occured at UpdateNotes in {_Title} Controller due to {ex}");
+            }
+            return View(new List<NoteVM>());
+        }
+        [HttpPost]
+        public async Task<IActionResult> UpdateNotes(List<Note> notes)
+        {
+            try
+            {
+                foreach (var note in notes)
+                {
+                    var existingNote = await _context.Notes.Where(x => !x.IsDeleted && x.ID == note.ID).FirstOrDefaultAsync();
+                    if (existingNote != null)
+                    {
+                        existingNote.Seq = note.Seq;
+                        existingNote.UpdatedByUserID = _UserID;
+                        existingNote.UpdatedDateTime = DateTime.UtcNow.AddHours(5);
+                        _context.Entry(existingNote).State = EntityState.Modified;
+                    }
+                }
+                await _context.SaveChangesAsync();
+                TempData["Message"]="1,Notes Sequence Updated Successfully";
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error occured at UpdateNotes (POST) in {_Title} Controller due to {ex}");
+            }
+            return RedirectToAction("Index");
         }
     }
 }

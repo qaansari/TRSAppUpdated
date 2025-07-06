@@ -26,6 +26,7 @@
                         @(item.Title)
                     </td>
                     <td>
+                        <a asp-action="UpdateNotes" asp-route-noteTypeID="@(item.ID)" class="btn btn-primary sm-btn">Update Notes</a>
                         <a asp-action="AddOrEdit" asp-route-ID="@(item.ID)" class="btn btn-primary sm-btn">Edit</a>
                         <button type="button" class="btn btn-danger sm-btn deleteBtn" data-id="@(item.ID)">Delete</button>
                     </td>

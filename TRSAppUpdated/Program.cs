@@ -29,6 +29,7 @@ namespace TRSAppUpdated
             builder.Services.AddScoped<ICityService, CityService>();
             builder.Services.AddScoped<IEventStatusService, EventStatusService>();
             builder.Services.AddScoped<INoteTypeService, NoteTypeService>();
+            builder.Services.AddScoped<INoteService, NoteService>();
             builder.Services.AddScoped<IPaymentModeService, PaymentModeService>();
             builder.Services.AddScoped<IReservationStatusService, ReservationStatusService>();
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
