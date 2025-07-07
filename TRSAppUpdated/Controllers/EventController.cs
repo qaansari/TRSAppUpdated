@@ -8,7 +8,6 @@ using TRSAppUpdated.ViewModels;
 
 namespace TRSAppUpdated.Controllers
 {
-    [Authorize(Roles = "Super Admin")]
     public class EventController : Controller
     {
         private readonly AppDbContext _context;
@@ -20,13 +19,14 @@ namespace TRSAppUpdated.Controllers
         private readonly IVenueService _venueService;
         private readonly IAuditoriumService _auditoriumService;
         private readonly IEventStatusService _eventStatusService;
+        private readonly ICategoryService _categoryService;
         private readonly string _Title = "Event";
         private readonly int _UserID;
         public EventController(AppDbContext context, IHttpContextAccessor httpContextAccessor,
             IWebHostEnvironment webHostEnvironment, ILogger<EventController> logger,
             ICountryService countryService, ICityService cityService,
             IVenueService venueService, IAuditoriumService auditoriumService,
-            IEventStatusService eventStatusService)
+            IEventStatusService eventStatusService, ICategoryService categoryService)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;
@@ -37,8 +37,10 @@ namespace TRSAppUpdated.Controllers
             _venueService = venueService;
             _auditoriumService = auditoriumService;
             _eventStatusService = eventStatusService;
+            _categoryService = categoryService;
             _UserID = Convert.ToInt32(_httpContextAccessor.HttpContext.User.FindFirstValue("UserID"));
         }
+        [Authorize(Roles = "Super Admin,Admin,Moderator,User")]
         //Index (Get All)
         public async Task<IActionResult> Index(int _pageNo = 1, int _pageSize = 10, string _searchedTerm = "")
         {
@@ -77,7 +79,56 @@ namespace TRSAppUpdated.Controllers
             }
             return PartialView($"_{_partialViewName}TablePartial", new List<EventVM>());
         }
+        //Get List
+        [NonAction]
+        public async Task<(List<EventVM> _result, int totalRecords)> GetList(int _pageNo, int _pageSize, string _searchedTerm)
+        {
+
+            var _result = new List<EventVM>();
+            int totalRecords = 0;
+            try
+            {
+                // For AJAX calls
+                var _query = _context.Events
+                    .Include(x => x.EventStatus)
+                    .Include(x => x.Auditorium)
+                    .ThenInclude(x => x.Venue)
+                    .ThenInclude(x => x.City)
+                    .ThenInclude(x => x.Country)
+                    .Where(x => !x.IsDeleted)
+                           .Select(x => new EventVM()
+                           {
+                               ID = x.ID,
+                               Title = x.Title,
+                               CityTitle = x.Auditorium.Venue.City.Title,
+                               VenueTitle = x.Auditorium.Venue.Title,
+                               AuditoriumTitle = x.Auditorium.Title,
+                               EventStatusTitle = x.EventStatus.Title,
+                           })
+                           .AsNoTracking()
+                           .AsQueryable();
+                if (!string.IsNullOrEmpty(_searchedTerm))
+                {
+                    _query = _query
+                        .Where(x => x.Title.Trim().ToLower().Contains(_searchedTerm.Trim().ToLower())
+                        || x.CityTitle.Trim().ToLower().Contains(_searchedTerm.Trim().ToLower())
+                        || x.VenueTitle.Trim().ToLower().Contains(_searchedTerm.Trim().ToLower())
+                        || x.AuditoriumTitle.Trim().ToLower().Contains(_searchedTerm.Trim().ToLower())
+                        || x.EventStatusTitle.Trim().ToLower().Contains(_searchedTerm.Trim().ToLower()));
+                }
+                int _skip = (_pageNo - 1) * _pageSize;
+                totalRecords = await _query.CountAsync();
+                _query = _query.Skip(_skip).Take(_pageSize);
+                _result = await _query.OrderByDescending(x => x.ID).ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error occured at GetList in {_Title} Controller due to {ex}");
+            }
+            return (_result, totalRecords);
+        }
         //AddOrEdit (GET)
+        [Authorize(Roles = "Super Admin,Admin")]
         public IActionResult AddOrEdit(int ID = 0)
         {
             var _item = new EventVM();
@@ -90,7 +141,11 @@ namespace TRSAppUpdated.Controllers
                 ViewData["EventStatusList"] = _eventStatusService.GetAll();
                 if (ID != 0)
                 {
-                    _item = _context.Events.Include(x => x.Auditorium).Include(x => x.City).Where(x => !x.IsDeleted && x.ID == ID)
+                    _item = _context.Events.Include(x => x.Auditorium)
+                        .ThenInclude(x => x.Venue)
+                        .ThenInclude(x => x.City)
+                        .ThenInclude(x => x.Country)
+                        .Where(x => !x.IsDeleted && x.ID == ID)
                         .Select(x => new EventVM()
                         {
                             ID = x.ID,
@@ -101,8 +156,8 @@ namespace TRSAppUpdated.Controllers
                             IsGeneral = x.IsGeneral,
                             ImagePath = x.ImagePath,
                             EventStatusID = x.EventStatusID,
-                            CountryID = x.City.CountryID,
-                            CityID = x.CityID,
+                            CountryID = x.Auditorium.Venue.City.CountryID,
+                            CityID = x.Auditorium.Venue.CityID,
                             VenueID = x.Auditorium.VenueID,
                             AuditoriumID = x.AuditoriumID,
                             CreatedByUserID = x.CreatedByUserID,
@@ -118,6 +173,7 @@ namespace TRSAppUpdated.Controllers
             return View(_item);
         }
         //AddOrEdit (POST)
+        [Authorize(Roles = "Super Admin,Admin")]
         [HttpPost]
         public async Task<IActionResult> AddOrEdit(EventVM Model)
         {
@@ -127,6 +183,7 @@ namespace TRSAppUpdated.Controllers
                 ViewData["CityList"] = _cityService.GetAll();
                 ViewData["VenueList"] = _venueService.GetAll();
                 ViewData["AuditoriumList"] = _auditoriumService.GetAll();
+                ViewData["CategoryList"] = _categoryService.GetAll();
                 ViewData["EventStatusList"] = _eventStatusService.GetAll();
                 if (ModelState.IsValid)
                 {
@@ -136,7 +193,6 @@ namespace TRSAppUpdated.Controllers
                         var isExists = await _context.Events
                         .Where(x => !x.IsDeleted
                         && x.ID != Model.ID
-                        && x.CityID == Model.CityID
                         && x.AuditoriumID == Model.AuditoriumID
                         && x.Title.Trim().ToLower() == Model.Title.Trim().ToLower()
                         && (
@@ -163,8 +219,8 @@ namespace TRSAppUpdated.Controllers
                             .AsNoTracking().FirstOrDefault();
                         if (_item != null)
                         {
+
                             _item.Title = Model.Title.Trim();
-                            _item.CountryID = Model.CountryID;
                             _item.UpdatedByUserID = _UserID;
                             _item.UpdatedDateTime = DateTime.UtcNow.AddHours(5);
                             _context.ChangeTracker.Clear();
@@ -177,7 +233,6 @@ namespace TRSAppUpdated.Controllers
                     {
                         var isExists = await _context.Events
                          .Where(x => !x.IsDeleted
-                         && x.CityID == Model.CityID
                          && x.AuditoriumID == Model.AuditoriumID
                          && x.Title.Trim().ToLower() == Model.Title.Trim().ToLower()
                          && (
@@ -203,33 +258,56 @@ namespace TRSAppUpdated.Controllers
                         _item.Title = Model.Title.Trim();
                         _item.StartDate = Model.StartDate.Value;
                         _item.EndDate = Model.EndDate;
-                        _item.Description = !string.IsNullOrEmpty(Model.Description)? Model.Description.Trim(): Model.Description;
+                        _item.Description = !string.IsNullOrEmpty(Model.Description) ? Model.Description.Trim() : Model.Description;
                         _item.IsGeneral = Model.IsGeneral;
-                        _item.CityID = Model.CityID;
                         _item.AuditoriumID = Model.AuditoriumID;
+                        _item.EventStatusID = Model.EventStatusID;
                         _item.CreatedByUserID = _UserID;
                         _item.CreatedDateTime = DateTime.UtcNow.AddHours(5);
                         _context.Events.Add(_item);
                         await _context.SaveChangesAsync();
                         TempData["Message"] = $"1,{_Title} Successfully Added";
                     }
-                    if (_item != null && Model.ImageFile != null)
+                    if (_item != null)
                     {
-                        var folderPath = Path.Combine(_webHostEnvironment.WebRootPath, "assets", "images", "auditoriums");
-                        if (!Directory.Exists(folderPath))
+                        if (Model.ImageFile != null)
                         {
-                            Directory.CreateDirectory(folderPath);
+                            var folderPath = Path.Combine(_webHostEnvironment.WebRootPath, "assets", "images", "events");
+                            if (!Directory.Exists(folderPath))
+                            {
+                                Directory.CreateDirectory(folderPath);
+                            }
+                            var _fileName = $"auditorium" + "_" + _item.CreatedDateTime.ToString("yyyyddMMhhmmss") + Path.GetExtension(Model.ImageFile.FileName);
+                            _item.ImagePath = _fileName.Trim();
+                            var _filePath = Path.Combine(folderPath, _fileName);
+                            using (var _stream = new FileStream(_filePath, FileMode.Create))
+                            {
+                                await Model.ImageFile.CopyToAsync(_stream);
+                            }
+                            _context.ChangeTracker.Clear();
+                            _context.Entry(_item).State = EntityState.Modified;
+                            await _context.SaveChangesAsync();
                         }
-                        var _fileName = $"auditorium" + "_" + _item.CreatedDateTime.ToString("yyyyddMMhhmmss") + Path.GetExtension(Model.ImageFile.FileName);
-                        _item.ImagePath = _fileName.Trim();
-                        var _filePath = Path.Combine(folderPath, _fileName);
-                        using (var _stream = new FileStream(_filePath, FileMode.Create))
+                        if (Model.EventCategoryIDs != null && Model.EventCategoryIDs.Count > 0)
                         {
-                            await Model.ImageFile.CopyToAsync(_stream);
+                            foreach (var categoryID in Model.EventCategoryIDs)
+                            {
+                                var _existingCategory = _context.EventCategories.Where(x => x.CategoryID == categoryID
+                                && x.EventID == _item.ID).AsNoTracking().Any();
+                                if (_existingCategory)
+                                {
+                                    continue;
+                                }
+                                _context.EventCategories.Add(new EventCategory()
+                                {
+                                    CategoryID = categoryID,
+                                    EventID = _item.ID,
+                                    CreatedByUserID = _UserID,
+                                    CreatedDateTime = DateTime.UtcNow.AddHours(5),
+                                });
+                            }
+                            await _context.SaveChangesAsync();
                         }
-                        _context.ChangeTracker.Clear();
-                        _context.Entry(_item).State = EntityState.Modified;
-                        await _context.SaveChangesAsync();
                     }
                     return RedirectToAction("Index");
                 }
@@ -241,6 +319,7 @@ namespace TRSAppUpdated.Controllers
             }
             return View(Model);
         }
+        [Authorize(Roles = "Super Admin")]
         [HttpPost]
         public async Task<IActionResult> Delete(int ID)
         {
@@ -269,40 +348,6 @@ namespace TRSAppUpdated.Controllers
             }
             return RedirectToAction("Index");
         }
-        //Get List
-        [NonAction]
-        public async Task<(List<EventVM> _result, int totalRecords)> GetList(int _pageNo, int _pageSize, string _searchedTerm)
-        {
-
-            var _result = new List<EventVM>();
-            int totalRecords = 0;
-            try
-            {
-                // For AJAX calls
-                var _query = _context.Events.Include(x => x.Country).Where(x => !x.IsDeleted)
-                           .Select(x => new EventVM()
-                           {
-                               ID = x.ID,
-                               Title = x.Title,
-                               CountryTitle = x.Country.Title
-                           })
-                           .AsNoTracking()
-                           .AsQueryable();
-                if (!string.IsNullOrEmpty(_searchedTerm))
-                {
-                    _query = _query
-                        .Where(x => x.Title.Trim().ToLower().Contains(_searchedTerm.Trim().ToLower())
-                        || x.CountryTitle.Trim().ToLower().Contains(_searchedTerm.Trim().ToLower()));
-                }
-                int _skip = (_pageNo - 1) * _pageSize;
-                totalRecords = await _query.CountAsync();
-                _query = _query.Skip(_skip).Take(_pageSize);
-                _result = await _query.OrderByDescending(x => x.ID).ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error occured at GetList in {_Title} Controller due to {ex}");
-            }
-            return (_result, totalRecords);
-        }
+        
     }
+}

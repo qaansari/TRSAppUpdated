@@ -12,7 +12,7 @@ using TRSAppUpdated.Models;
 namespace TRSAppUpdated.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250706030339_Db Init")]
+    [Migration("20250707064852_Db Init")]
     partial class DbInit
     {
         /// <inheritdoc />
@@ -344,9 +344,6 @@ namespace TRSAppUpdated.Migrations
                     b.Property<int>("AuditoriumID")
                         .HasColumnType("int");
 
-                    b.Property<int>("CityID")
-                        .HasColumnType("int");
-
                     b.Property<int>("CreatedByUserID")
                         .HasColumnType("int");
 
@@ -393,8 +390,6 @@ namespace TRSAppUpdated.Migrations
                     b.HasKey("ID");
 
                     b.HasIndex("AuditoriumID");
-
-                    b.HasIndex("CityID");
 
                     b.HasIndex("CreatedByUserID");
 
@@ -1220,7 +1215,7 @@ namespace TRSAppUpdated.Migrations
                         {
                             ID = 1,
                             ContactNumber = "+923312541767",
-                            CreatedDateTime = new DateTime(2025, 7, 6, 8, 3, 38, 570, DateTimeKind.Utc).AddTicks(8368),
+                            CreatedDateTime = new DateTime(2025, 7, 7, 11, 48, 52, 5, DateTimeKind.Utc).AddTicks(1428),
                             Email = "sa@eventland.pk",
                             FirstName = "Super",
                             IsActive = true,
@@ -1243,6 +1238,9 @@ namespace TRSAppUpdated.Migrations
                     b.Property<string>("Address")
                         .IsRequired()
                         .HasColumnType("varchar(300)");
+
+                    b.Property<int>("CityID")
+                        .HasColumnType("int");
 
                     b.Property<int>("CreatedByUserID")
                         .HasColumnType("int");
@@ -1273,6 +1271,8 @@ namespace TRSAppUpdated.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("ID");
+
+                    b.HasIndex("CityID");
 
                     b.HasIndex("CreatedByUserID");
 
@@ -1375,7 +1375,7 @@ namespace TRSAppUpdated.Migrations
                         .HasForeignKey("UpdatedByUserID");
 
                     b.HasOne("TRSAppUpdated.Models.Venue", "Venue")
-                        .WithMany("Auditoriums")
+                        .WithMany()
                         .HasForeignKey("VenueID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1493,12 +1493,6 @@ namespace TRSAppUpdated.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TRSAppUpdated.Models.City", "City")
-                        .WithMany("Events")
-                        .HasForeignKey("CityID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("TRSAppUpdated.Models.User", "CreatedByUser")
                         .WithMany("EventsCreated")
                         .HasForeignKey("CreatedByUserID")
@@ -1520,8 +1514,6 @@ namespace TRSAppUpdated.Migrations
                         .HasForeignKey("UpdatedByUserID");
 
                     b.Navigation("Auditorium");
-
-                    b.Navigation("City");
 
                     b.Navigation("CreatedByUser");
 
@@ -1944,6 +1936,12 @@ namespace TRSAppUpdated.Migrations
 
             modelBuilder.Entity("TRSAppUpdated.Models.Venue", b =>
                 {
+                    b.HasOne("TRSAppUpdated.Models.City", "City")
+                        .WithMany("Venues")
+                        .HasForeignKey("CityID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("TRSAppUpdated.Models.User", "CreatedByUser")
                         .WithMany("VenuesCreated")
                         .HasForeignKey("CreatedByUserID")
@@ -1957,6 +1955,8 @@ namespace TRSAppUpdated.Migrations
                     b.HasOne("TRSAppUpdated.Models.User", "UpdatedByUser")
                         .WithMany("VenuesUpdated")
                         .HasForeignKey("UpdatedByUserID");
+
+                    b.Navigation("City");
 
                     b.Navigation("CreatedByUser");
 
@@ -1974,7 +1974,7 @@ namespace TRSAppUpdated.Migrations
 
             modelBuilder.Entity("TRSAppUpdated.Models.City", b =>
                 {
-                    b.Navigation("Events");
+                    b.Navigation("Venues");
                 });
 
             modelBuilder.Entity("TRSAppUpdated.Models.Column", b =>
@@ -2152,11 +2152,6 @@ namespace TRSAppUpdated.Migrations
                     b.Navigation("VenuesDeleted");
 
                     b.Navigation("VenuesUpdated");
-                });
-
-            modelBuilder.Entity("TRSAppUpdated.Models.Venue", b =>
-                {
-                    b.Navigation("Auditoriums");
                 });
 #pragma warning restore 612, 618
         }

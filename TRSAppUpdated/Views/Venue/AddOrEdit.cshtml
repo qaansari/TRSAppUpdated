@@ -25,6 +25,26 @@
                         <div class="row">
                             <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
                                 <div class="form-group">
+                                    <label class="col-form-label">Country <span class="text-danger">*</span></label>
+                                    <ejs-dropdownlist cssClass="form-control form-control-sm" dataSource="@(ViewData["CountryList"])" placeholder="Select a country"
+                                                      allowFiltering="true" ejs-for="CountryID" popupHeight="220px" change="countryChange">
+                                        <e-dropdownlist-fields value="ID" text="Title"></e-dropdownlist-fields>
+                                    </ejs-dropdownlist>
+                                    <span asp-validation-for="CountryID"></span>
+                                </div>
+                            </div>
+                            <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                                <div class="form-group">
+                                    <label class="col-form-label">City <span class="text-danger">*</span></label>
+                                    <ejs-dropdownlist cssClass="form-control form-control-sm" dataSource="@(ViewData["CityList"])" placeholder="Select a city"
+                                                      allowFiltering="true" ejs-for="CityID" popupHeight="220px" enabled="false">
+                                        <e-dropdownlist-fields value="ID" text="Title"></e-dropdownlist-fields>
+                                    </ejs-dropdownlist>
+                                    <span asp-validation-for="CityID"></span>
+                                </div>
+                            </div>
+                            <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                                <div class="form-group">
                                     <label class="col-form-label">Title <span class="text-danger">*</span></label>
                                     <input class="form-control" type="text" placeholder="Enter @_PageTitle Title" asp-for="Title">
                                     <span asp-validation-for="Title"></span>

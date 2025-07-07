@@ -18,7 +18,8 @@ namespace TRSAppUpdated.Controllers
         private readonly INoteService _noteService;
         private readonly string _Title = "Note Type";
         private readonly int _UserID;
-        public NoteTypeController(AppDbContext context, IHttpContextAccessor httpContextAccessor,ILogger<NoteTypeController> logger,INoteService noteService)
+        public NoteTypeController(AppDbContext context, IHttpContextAccessor httpContextAccessor,
+            ILogger<NoteTypeController> logger,INoteService noteService)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;

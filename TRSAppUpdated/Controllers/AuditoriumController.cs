@@ -19,7 +19,9 @@ namespace TRSAppUpdated.Controllers
         private readonly IVenueService _venueService;
         private readonly string _Title = "Auditorium";
         private readonly int _UserID;
-        public AuditoriumController(AppDbContext context, IHttpContextAccessor httpContextAccessor, IWebHostEnvironment webHostEnvironment, ILogger<AuditoriumController> logger, IVenueService venueService)
+        public AuditoriumController(AppDbContext context, IHttpContextAccessor httpContextAccessor, 
+            IWebHostEnvironment webHostEnvironment, ILogger<AuditoriumController> logger, 
+            IVenueService venueService)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;

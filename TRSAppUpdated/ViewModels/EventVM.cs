@@ -17,11 +17,9 @@ namespace TRSAppUpdated.ViewModels
         public DateTime? EndDate { get; set; }
         public string? Description { get; set; }
         public bool IsGeneral { get; set; } = false;
-        public IFormFile? ImageFile { get; set; }
-        public string? ImagePath { get; set; }
         [Range(1, int.MaxValue, ErrorMessage = "Please fill out this field")]
         public int CountryID { get; set; }
-        [Range(1,int.MaxValue,ErrorMessage = "Please fill out this field")]
+        [Range(1, int.MaxValue, ErrorMessage = "Please fill out this field")]
         public int CityID { get; set; }
         [Range(1, int.MaxValue, ErrorMessage = "Please fill out this field")]
         public int VenueID { get; set; }
@@ -29,5 +27,14 @@ namespace TRSAppUpdated.ViewModels
         public int AuditoriumID { get; set; }
         [Range(1, int.MaxValue, ErrorMessage = "Please fill out this field")]
         public int EventStatusID { get; set; }
+        public List<int>? EventCategoryIDs { get; set; }
+        public IFormFile? ImageFile { get; set; }
+        public string? ImagePath { get; set; }
+        public string? CountryTitle { get; set; }
+        public string? CityTitle { get; set; }
+        public string? VenueTitle { get; set; }
+        public string? AuditoriumTitle { get; set; }
+        public string? EventStatusTitle { get; set; }
+        public string? EventTypeTitle { get; set; }
     }
 }

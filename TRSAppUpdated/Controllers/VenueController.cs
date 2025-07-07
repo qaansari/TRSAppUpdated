@@ -6,6 +6,7 @@ using Syncfusion.EJ2.FileManager.Base;
 using Syncfusion.EJ2.Layouts;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using TRSAppUpdated.Interfaces;
 using TRSAppUpdated.Models;
 using TRSAppUpdated.ViewModels;
 
@@ -18,14 +19,20 @@ namespace TRSAppUpdated.Controllers
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly ILogger<VenueController> _logger;
+        private readonly ICityService _cityService;
+        private readonly ICountryService _countryService;
         private readonly string _Title = "Venue";
         private readonly int _UserID;
-        public VenueController(AppDbContext context, IHttpContextAccessor httpContextAccessor, IWebHostEnvironment webHostEnvironment, ILogger<VenueController> logger)
+        public VenueController(AppDbContext context, IHttpContextAccessor httpContextAccessor, 
+            IWebHostEnvironment webHostEnvironment, ILogger<VenueController> logger,ICityService cityService,
+            ICountryService countryService)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;
             _webHostEnvironment = webHostEnvironment;
             _logger = logger;
+            _countryService = countryService;
+            _cityService = cityService;
             _UserID = Convert.ToInt32(_httpContextAccessor.HttpContext.User.FindFirstValue("UserID"));
         }
         //Index (Get All)
@@ -72,14 +79,18 @@ namespace TRSAppUpdated.Controllers
             var _item = new VenueVM();
             try
             {
+                ViewData["CountryList"] = _countryService.GetAll();
+                ViewData["CityList"] = _cityService.GetAll();
                 if (ID != 0)
                 {
-                    _item = _context.Venues.Where(x => !x.IsDeleted && x.ID == ID)
+                    _item = _context.Venues.Include(x=>x.City).Where(x => !x.IsDeleted && x.ID == ID)
                         .Select(x => new VenueVM()
                         {
                             ID = x.ID,
                             Title = x.Title,
                             Address = x.Address,
+                            CountryID=x.City.CountryID,
+                            CityID=x.CityID,
                             ImagePath = x.ImagePath,
                             CreatedByUserID = x.CreatedByUserID,
                             CreatedDateTime = x.CreatedDateTime,
@@ -99,6 +110,8 @@ namespace TRSAppUpdated.Controllers
         {
             try
             {
+                ViewData["CountryList"] = _countryService.GetAll();
+                ViewData["CityList"] = _cityService.GetAll();
                 if (ModelState.IsValid)
                 {
                     var _item = new Venue();
@@ -106,6 +119,7 @@ namespace TRSAppUpdated.Controllers
                     {
                         var isExists = _context.Venues.Where(x => !x.IsDeleted
                             && x.ID != Model.ID
+                            && x.CityID == Model.CityID
                             && x.Title.Trim().ToLower() == Model.Title.Trim().ToLower())
                         .Any();
                         if (isExists)
@@ -119,6 +133,7 @@ namespace TRSAppUpdated.Controllers
                         {
                             _item.Title = Model.Title.Trim();
                             _item.Address = Model.Address.Trim();
+                            _item.CityID = Model.CityID;
                             _item.UpdatedByUserID = _UserID;
                             _item.UpdatedDateTime = DateTime.UtcNow.AddHours(5);
                             _context.ChangeTracker.Clear();
@@ -130,7 +145,8 @@ namespace TRSAppUpdated.Controllers
                     else
                     {
                         var isExists = _context.Venues.Where(x => !x.IsDeleted
-                            && x.Title.Trim().ToLower() == Model.Title.Trim().ToLower())
+                            && x.Title.Trim().ToLower() == Model.Title.Trim().ToLower()
+                            && x.CityID == Model.CityID)
                         .Any();
                         if (isExists)
                         {
@@ -139,6 +155,7 @@ namespace TRSAppUpdated.Controllers
                         }
                         _item.Title = Model.Title.Trim();
                         _item.Address = Model.Address.Trim();
+                        _item.CityID = Model.CityID;
                         _item.CreatedByUserID = _UserID;
                         _item.CreatedDateTime = DateTime.UtcNow.AddHours(5);
                         _context.Venues.Add(_item);
@@ -211,11 +228,14 @@ namespace TRSAppUpdated.Controllers
             try
             {
                 // For AJAX calls
-                var _query = _context.Venues.Where(x => !x.IsDeleted)
+                var _query = _context.Venues
+                    .Include(x=>x.City)
+                    .Where(x => !x.IsDeleted)
                            .Select(x => new VenueVM()
                            {
                                ID = x.ID,
                                Title = x.Title,
+                               CityTitle=x.City.Title,
                                Address = x.Address,
                                ImagePath = x.ImagePath,
                            })

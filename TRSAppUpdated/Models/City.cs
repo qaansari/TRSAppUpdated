@@ -14,6 +14,5 @@ namespace TRSAppUpdated.Models
         public int CountryID { get; set; }
         public Country Country { get; set; }
         public ICollection<Venue> Venues { get; set; }
-        public ICollection<Event> Events { get; set; }
     }
 }

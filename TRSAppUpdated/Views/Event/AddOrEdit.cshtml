@@ -1,0 +1,226 @@
+﻿@model EventVM
+@{
+    string _fn = "Add";
+    if (Model.ID != 0)
+    {
+        _fn = "Edit";
+    }
+    string _PageTitle = "Event";
+    ViewData["Title"] = $"{_fn} {_PageTitle}";
+    var _Message = TempData["Message"] as string;
+}
+<div class="row">
+    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+        <div class="card">
+            <div class="card-header">
+                <h4>@(ViewData["Title"])</h4>
+            </div>
+            <div class="card-body">
+                <form class="separate-form" enctype="multipart/form-data" method="post" asp-action="AddOrEdit">
+                    <input type="hidden" asp-for="ID" />
+                    <input type="hidden" asp-for="CreatedByUserID" />
+                    <input type="hidden" asp-for="CreatedDateTime" />
+                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                        <div class="row">
+                            <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                                <div class="form-group">
+                                    <label class="col-form-label">Country <span class="text-danger">*</span></label>
+                                    <ejs-dropdownlist cssClass="form-control form-control-sm" dataSource="@(ViewData["CountryList"])" placeholder="Select a country"
+                                                      allowFiltering="true" ejs-for="CountryID" popupHeight="220px" change="countryChange">
+                                        <e-dropdownlist-fields value="ID" text="Title"></e-dropdownlist-fields>
+                                    </ejs-dropdownlist>
+                                    <span asp-validation-for="CountryID"></span>
+                                </div>
+                            </div>
+                            <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                                <div class="form-group">
+                                    <label class="col-form-label">City <span class="text-danger">*</span></label>
+                                    <ejs-dropdownlist cssClass="form-control form-control-sm" dataSource="@(ViewData["CityList"])" placeholder="Select a city"
+                                                      allowFiltering="true" ejs-for="CityID" popupHeight="220px" enabled="false">
+                                        <e-dropdownlist-fields value="ID" text="Title"></e-dropdownlist-fields>
+                                    </ejs-dropdownlist>
+                                    <span asp-validation-for="CityID"></span>
+                                </div>
+                            </div>
+                            <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                                <div class="form-group">
+                                    <label class="col-form-label">Venue <span class="text-danger">*</span></label>
+                                    <ejs-dropdownlist cssClass="form-control form-control-sm" dataSource="@(ViewData["VenueList"])" placeholder="Select a venue"
+                                                      allowFiltering="true" ejs-for="VenueID" popupHeight="220px" enabled="false">
+                                        <e-dropdownlist-fields value="ID" text="Title"></e-dropdownlist-fields>
+                                    </ejs-dropdownlist>
+                                    <span asp-validation-for="VenueID"></span>
+                                </div>
+                            </div>
+                            <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                                <div class="form-group">
+                                    <label class="col-form-label">Auditorium <span class="text-danger">*</span></label>
+                                    <ejs-dropdownlist cssClass="form-control form-control-sm" dataSource="@(ViewData["AuditoriumList"])" placeholder="Select an auditorium"
+                                                      allowFiltering="true" ejs-for="VenueID" popupHeight="220px" enabled="false">
+                                        <e-dropdownlist-fields value="ID" text="Title"></e-dropdownlist-fields>
+                                    </ejs-dropdownlist>
+                                    <span asp-validation-for="VenueID"></span>
+                                </div>
+                            </div>
+                            <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                                <div class="form-group">
+                                    <label class="col-form-label">Categories <span class="text-danger">*</span></label>
+                                    <ejs-multiselect cssClass="form-control form-control-sm" dataSource="@(ViewData["CategoryList"])" placeholder="Select categories"
+                                                     allowFiltering="true" ejs-for="EventCategoryIDs" popupHeight="220px" enabled="false">
+                                        <e-multiselect-fields value="ID" text="Title"></e-multiselect-fields>
+                                    </ejs-multiselect>
+                                    <span asp-validation-for="EventCategoryIDs"></span>
+                                </div>
+                            </div>
+                            <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                                <div class="form-group">
+                                    <label class="col-form-label">Event Status <span class="text-danger">*</span></label>
+                                    <ejs-dropdownlist cssClass="form-control form-control-sm" dataSource="@(ViewData["EventStatusList"])" placeholder="Select an auditorium"
+                                                      allowFiltering="true" ejs-for="EventStatusID" popupHeight="220px" enabled="false">
+                                        <e-dropdownlist-fields value="ID" text="Title"></e-dropdownlist-fields>
+                                    </ejs-dropdownlist>
+                                    <span asp-validation-for="EventStatusID"></span>
+                                </div>
+                            </div>
+                            <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                                <div class="form-group">
+                                    <label class="col-form-label">Title <span class="text-danger">*</span></label>
+                                    <input class="form-control" type="text" placeholder="Enter @_PageTitle Title" asp-for="Title">
+                                    <span asp-validation-for="Title"></span>
+                                </div>
+                            </div>
+                            <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                                <div class="form-group">
+                                    <label class="col-form-label">Start Date <span class="text-danger">*</span></label>
+                                    <ejs-datepicker cssClass="form-control" type="text" placeholder="Enter Start Date" ejs-for="StartDate"></ejs-datepicker>
+                                    <span asp-validation-for="StartDate"></span>
+                                </div>
+                            </div>
+                            <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                                <div class="form-group">
+                                    <label class="col-form-label">End Date</label>
+                                    <ejs-datepicker cssClass="form-control" type="text" placeholder="Enter End Date" ejs-for="EndDate"></ejs-datepicker>
+                                    <span asp-validation-for="EndDate"></span>
+                                </div>
+                            </div>
+                            <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                                <div class="form-group">
+                                    <label class="col-form-label">Photo</label>
+                                    <input class="form-control" type="file" asp-for="ImageFile" id="imgSelector">
+                                    <span asp-validation-for="EndDate"></span>
+                                </div>
+                            </div>
+                            <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                                <div class="form-group mb-0">
+                                    @{
+                                        string _src = "no-image-found.png";
+                                        if (!string.IsNullOrEmpty(Model.ImagePath))
+                                        {
+                                            _src = $"events/{Model.ImagePath}";
+                                        }
+                                    }
+                                    <img src="~/assets/images/@(_src)" class="preview_auditorium_img" id="imgPreview">
+                                </div>
+                            </div>
+                            <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6 col-6">
+                                <div class="checkbox">
+                                    <input id="isGenChk" type="checkbox" asp-for="IsGeneral">
+                                    <label for="isGenChk">General</label>
+                                </div>
+                            </div>
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                <div class="form-group mb-0">
+                                    <input class="btn btn-primary" type="submit">
+                                    <a class="btn btn-danger" href="@(Url.Action("Index"))">Back</a>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function countryChange() {
+        // disable the state DropDownList
+        var countryObj = document.getElementById('CountryID').ej2_instances[0];
+        var city = document.getElementById('CityID').ej2_instances[0];
+        city.enabled = true;
+        //frame the query based on selected value in country DropDownList.
+        var tempQuery = new ej.data.Query().where('CountryID', 'equal', countryObj.value);
+        // set the framed query based on selected value in country DropDownList.
+        city.query = tempQuery;
+        // set null value to state DropDownList text property
+        city.text = null;
+        //  bind the property changes to state DropDownList
+        city.dataBind();
+    }
+    function cityChange() {
+        // disable the state DropDownList
+        var cityObj = document.getElementById('CityID').ej2_instances[0];
+        var venue = document.getElementById('VenueID').ej2_instances[0];
+        venue.enabled = true;
+        //frame the query based on selected value in country DropDownList.
+        var tempQuery = new ej.data.Query().where('CityID', 'equal', cityObj.value);
+        // set the framed query based on selected value in country DropDownList.
+        city.query = tempQuery;
+        // set null value to state DropDownList text property
+        city.text = null;
+        //  bind the property changes to state DropDownList
+        city.dataBind();
+    }
+</script>
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $("#imgSelector").change(
+                function PreviewSelectedImage() {
+                    var imageFile = document.getElementById("imgSelector");
+                    var imagePreview = document.getElementById("imgPreview");
+                    var imageReader = new FileReader();
+                    imageReader.onload = function (e) {
+                        imagePreview.src = e.target.result;
+                        imagePreview.style.display = "block";
+                    };
+                    imageReader.readAsDataURL(imageFile.files[0]);
+                });
+        });
+    </script>
+    @if (_Message != null)
+    {
+        if (_Message.StartsWith("1"))
+        {
+            <script>
+                $(document).ready(function () {
+                    Lobibox.notify('success', {
+                        pauseDelayOnHover: true,
+                        size: 'mini',
+                        icon: 'bx bx-info-circle',
+                        continueDelayOnInactiveTab: false,
+                        position: 'bottom right',
+                        msg: '@(_Message.Substring(2))',
+                        soundPath: '/assets/sounds/'
+                    });
+                });
+            </script>
+        }
+        else
+        {
+            <script>
+                $(document).ready(function () {
+                    Lobibox.notify('error', {
+                        pauseDelayOnHover: true,
+                        size: 'mini',
+                        icon: 'bx bx-info-circle',
+                        continueDelayOnInactiveTab: false,
+                        position: 'bottom right',
+                        msg: '@(_Message.Substring(2))',
+                        soundPath: '/assets/sounds/'
+                    });
+                });
+            </script>
+        }
+    }
+}

@@ -12,15 +12,14 @@ namespace TRSAppUpdated.Controllers
     {
         private readonly AppDbContext _context;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly ILogger<PaymentModeController> _logger;
         private readonly string _Title = "Payment Mode";
         private readonly int _UserID;
-        public PaymentModeController(AppDbContext context, IHttpContextAccessor httpContextAccessor, IWebHostEnvironment webHostEnvironment, ILogger<PaymentModeController> logger)
+        public PaymentModeController(AppDbContext context, IHttpContextAccessor httpContextAccessor,
+            ILogger<PaymentModeController> logger)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;
-            _webHostEnvironment = webHostEnvironment;
             _logger = logger;
             _UserID = Convert.ToInt32(_httpContextAccessor.HttpContext.User.FindFirstValue("UserID"));
         }

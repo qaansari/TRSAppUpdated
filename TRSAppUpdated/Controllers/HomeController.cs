@@ -15,7 +15,8 @@ namespace TRSAppUpdated.Controllers
         private readonly AppDbContext _context;
         private readonly ILogger<HomeController> _logger;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        public HomeController(AppDbContext context, ILogger<HomeController> logger, IHttpContextAccessor httpContextAccessor)
+        public HomeController(AppDbContext context, ILogger<HomeController> logger, 
+            IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
             _logger = logger;

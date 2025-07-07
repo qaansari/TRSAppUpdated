@@ -13,18 +13,16 @@ namespace TRSAppUpdated.Controllers
     {
         private readonly AppDbContext _context;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly ILogger<NoteController> _logger;
         private readonly INoteTypeService _noteTypeService;
         private readonly string _Title = "Note";
         private readonly int _UserID;
         public NoteController(AppDbContext context, IHttpContextAccessor httpContextAccessor,
-            IWebHostEnvironment webHostEnvironment, ILogger<NoteController> logger,
+            ILogger<NoteController> logger,
             INoteTypeService noteTypeService)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;
-            _webHostEnvironment = webHostEnvironment;
             _logger = logger;
             _noteTypeService = noteTypeService;
             _UserID = Convert.ToInt32(_httpContextAccessor.HttpContext.User.FindFirstValue("UserID"));

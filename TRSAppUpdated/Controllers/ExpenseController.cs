@@ -10,15 +10,14 @@ namespace TRSAppUpdated.Controllers
     {
         private readonly AppDbContext _context;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly ILogger<ExpenseController> _logger;
         private readonly string _Title = "Expense";
         private readonly int _UserID;
-        public ExpenseController(AppDbContext context, IHttpContextAccessor httpContextAccessor, IWebHostEnvironment webHostEnvironment, ILogger<ExpenseController> logger)
+        public ExpenseController(AppDbContext context, IHttpContextAccessor httpContextAccessor,
+            ILogger<ExpenseController> logger)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;
-            _webHostEnvironment = webHostEnvironment;
             _logger = logger;
             _UserID = Convert.ToInt32(_httpContextAccessor.HttpContext.User.FindFirstValue("UserID"));
         }

@@ -14,18 +14,15 @@ namespace TRSAppUpdated.Controllers
     {
         private readonly AppDbContext _context;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly ILogger<CityController> _logger;
         private readonly ICountryService _countryService;
         private readonly string _Title = "City";
         private readonly int _UserID;
         public CityController(AppDbContext context, IHttpContextAccessor httpContextAccessor, 
-            IWebHostEnvironment webHostEnvironment, ILogger<CityController> logger,
-            ICountryService countryService)
+           ILogger<CityController> logger,ICountryService countryService)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;
-            _webHostEnvironment = webHostEnvironment;
             _logger = logger;
             _countryService = countryService;
             _UserID = Convert.ToInt32(_httpContextAccessor.HttpContext.User.FindFirstValue("UserID"));

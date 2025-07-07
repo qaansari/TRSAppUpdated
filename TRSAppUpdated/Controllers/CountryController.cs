@@ -12,15 +12,14 @@ namespace TRSAppUpdated.Controllers
     {
         private readonly AppDbContext _context;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly ILogger<CountryController> _logger;
         private readonly string _Title = "Country";
         private readonly int _UserID;
-        public CountryController(AppDbContext context, IHttpContextAccessor httpContextAccessor, IWebHostEnvironment webHostEnvironment, ILogger<CountryController> logger)
+        public CountryController(AppDbContext context, IHttpContextAccessor httpContextAccessor,
+            ILogger<CountryController> logger)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;
-            _webHostEnvironment = webHostEnvironment;
             _logger = logger;
             _UserID = Convert.ToInt32(_httpContextAccessor.HttpContext.User.FindFirstValue("UserID"));
         }
@@ -197,7 +196,7 @@ namespace TRSAppUpdated.Controllers
                                ID = x.ID,
                                Title = x.Title,
                                Flag = x.Flag,
-                               DialingCode=x.DialingCode
+                               DialingCode = x.DialingCode
                            })
                            .AsNoTracking()
                            .AsQueryable();

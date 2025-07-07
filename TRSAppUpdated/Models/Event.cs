@@ -15,13 +15,10 @@ namespace TRSAppUpdated.Models
         public string? Description { get; set; }
         public bool IsGeneral { get; set; }
         public string? ImagePath { get; set; }
-        [ForeignKey("City")]
-        public int CityID { get; set; }
         [ForeignKey("Auditorium")]
         public int AuditoriumID { get; set; }
         [ForeignKey("EventStatus")]
         public int EventStatusID { get; set; }
-        public City City { get; set; }
         public Auditorium Auditorium { get; set; }
         public EventStatus EventStatus { get; set; }
         public ICollection<EventCategory> EventCategories { get; set; }

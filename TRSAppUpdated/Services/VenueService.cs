@@ -25,7 +25,8 @@ namespace TRSAppUpdated.Services
                              .Select(x => new VenueVM()
                              {
                                  ID = x.ID,
-                                 Title = x.Title
+                                 Title = x.Title,
+                                 CityID= x.CityID,
                              })
                              .AsNoTracking()
                              .OrderBy(x => x.Title)

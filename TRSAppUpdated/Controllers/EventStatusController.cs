@@ -7,20 +7,19 @@ using TRSAppUpdated.ViewModels;
 
 namespace TRSAppUpdated.Controllers
 {
-        [Authorize(Roles = "Super Admin")]
+    [Authorize(Roles = "Super Admin")]
     public class EventStatusController : Controller
     {
         private readonly AppDbContext _context;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly ILogger<EventStatusController> _logger;
         private readonly string _Title = "Event Status";
         private readonly int _UserID;
-        public EventStatusController(AppDbContext context, IHttpContextAccessor httpContextAccessor, IWebHostEnvironment webHostEnvironment, ILogger<EventStatusController> logger)
+        public EventStatusController(AppDbContext context, IHttpContextAccessor httpContextAccessor,
+            ILogger<EventStatusController> logger)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;
-            _webHostEnvironment = webHostEnvironment;
             _logger = logger;
             _UserID = Convert.ToInt32(_httpContextAccessor.HttpContext.User.FindFirstValue("UserID"));
         }
