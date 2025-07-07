@@ -152,28 +152,6 @@ namespace TRSAppUpdated.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "EventCategories",
-                columns: table => new
-                {
-                    ID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    CategoryID = table.Column<int>(type: "int", nullable: false),
-                    EventID = table.Column<int>(type: "int", nullable: false),
-                    CreatedByUserID = table.Column<int>(type: "int", nullable: false),
-                    CreatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_EventCategories", x => x.ID);
-                    table.ForeignKey(
-                        name: "FK_EventCategories_Users_CreatedByUserID",
-                        column: x => x.CreatedByUserID,
-                        principalTable: "Users",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.NoAction);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "EventStatuses",
                 columns: table => new
                 {
@@ -441,30 +419,6 @@ namespace TRSAppUpdated.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CategoryEventCategory",
-                columns: table => new
-                {
-                    CategoriesID = table.Column<int>(type: "int", nullable: false),
-                    EventCategoriesListID = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CategoryEventCategory", x => new { x.CategoriesID, x.EventCategoriesListID });
-                    table.ForeignKey(
-                        name: "FK_CategoryEventCategory_Categories_CategoriesID",
-                        column: x => x.CategoriesID,
-                        principalTable: "Categories",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.NoAction);
-                    table.ForeignKey(
-                        name: "FK_CategoryEventCategory_EventCategories_EventCategoriesListID",
-                        column: x => x.EventCategoriesListID,
-                        principalTable: "EventCategories",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.NoAction);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Notes",
                 columns: table => new
                 {
@@ -684,25 +638,35 @@ namespace TRSAppUpdated.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "EventEventCategory",
+                name: "EventCategories",
                 columns: table => new
                 {
-                    EventCategoriesID = table.Column<int>(type: "int", nullable: false),
-                    EventsID = table.Column<int>(type: "int", nullable: false)
+                    ID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CategoryID = table.Column<int>(type: "int", nullable: false),
+                    EventID = table.Column<int>(type: "int", nullable: false),
+                    CreatedByUserID = table.Column<int>(type: "int", nullable: false),
+                    CreatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_EventEventCategory", x => new { x.EventCategoriesID, x.EventsID });
+                    table.PrimaryKey("PK_EventCategories", x => x.ID);
                     table.ForeignKey(
-                        name: "FK_EventEventCategory_EventCategories_EventCategoriesID",
-                        column: x => x.EventCategoriesID,
-                        principalTable: "EventCategories",
+                        name: "FK_EventCategories_Categories_CategoryID",
+                        column: x => x.CategoryID,
+                        principalTable: "Categories",
                         principalColumn: "ID",
                         onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
-                        name: "FK_EventEventCategory_Events_EventsID",
-                        column: x => x.EventsID,
+                        name: "FK_EventCategories_Events_EventID",
+                        column: x => x.EventID,
                         principalTable: "Events",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.NoAction);
+                    table.ForeignKey(
+                        name: "FK_EventCategories_Users_CreatedByUserID",
+                        column: x => x.CreatedByUserID,
+                        principalTable: "Users",
                         principalColumn: "ID",
                         onDelete: ReferentialAction.NoAction);
                 });
@@ -1072,7 +1036,7 @@ namespace TRSAppUpdated.Migrations
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "ID", "ContactNumber", "CreatedByUserID", "CreatedDateTime", "DeletedByUserID", "DeletedDateTime", "Email", "FirstName", "ImagePath", "IsActive", "IsDeleted", "IsVerified", "LastName", "Password", "RoleID", "UpdatedByUserID", "UpdatedDateTime", "UserToken" },
-                values: new object[] { 1, "+923312541767", null, new DateTime(2025, 7, 7, 17, 41, 58, 79, DateTimeKind.Utc).AddTicks(9999), null, null, "sa@eventland.pk", "Super", null, true, false, true, "Admin", "6FkLTXY5CrK8ccZIBV6HAibnMhfq44wfgPMuzSxJjQ4=", 1, null, null, null });
+                values: new object[] { 1, "+923312541767", null, new DateTime(2025, 7, 7, 17, 54, 9, 440, DateTimeKind.Utc).AddTicks(2308), null, null, "sa@eventland.pk", "Super", null, true, false, true, "Admin", "6FkLTXY5CrK8ccZIBV6HAibnMhfq44wfgPMuzSxJjQ4=", 1, null, null, null });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Auditoriums_CreatedByUserID",
@@ -1108,11 +1072,6 @@ namespace TRSAppUpdated.Migrations
                 name: "IX_Categories_UpdatedByUserID",
                 table: "Categories",
                 column: "UpdatedByUserID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_CategoryEventCategory_EventCategoriesListID",
-                table: "CategoryEventCategory",
-                column: "EventCategoriesListID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Cities_CountryID",
@@ -1160,14 +1119,19 @@ namespace TRSAppUpdated.Migrations
                 column: "UpdatedByUserID");
 
             migrationBuilder.CreateIndex(
+                name: "IX_EventCategories_CategoryID",
+                table: "EventCategories",
+                column: "CategoryID");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_EventCategories_CreatedByUserID",
                 table: "EventCategories",
                 column: "CreatedByUserID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_EventEventCategory_EventsID",
-                table: "EventEventCategory",
-                column: "EventsID");
+                name: "IX_EventCategories_EventID",
+                table: "EventCategories",
+                column: "EventID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Events_AuditoriumID",
@@ -1484,10 +1448,7 @@ namespace TRSAppUpdated.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "CategoryEventCategory");
-
-            migrationBuilder.DropTable(
-                name: "EventEventCategory");
+                name: "EventCategories");
 
             migrationBuilder.DropTable(
                 name: "Notes");
@@ -1506,9 +1467,6 @@ namespace TRSAppUpdated.Migrations
 
             migrationBuilder.DropTable(
                 name: "Categories");
-
-            migrationBuilder.DropTable(
-                name: "EventCategories");
 
             migrationBuilder.DropTable(
                 name: "NoteTypes");

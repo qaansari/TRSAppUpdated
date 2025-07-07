@@ -9,7 +9,6 @@ namespace TRSAppUpdated.Models
         public int ID { get; set; }
         [Column(TypeName = "varchar(20)")]
         public string Title { get; set; }
-        [InverseProperty("Categories")]
         public ICollection<EventCategory> EventCategories { get; set; }
     }
 }

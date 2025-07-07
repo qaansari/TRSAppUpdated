@@ -226,6 +226,12 @@ namespace TRSAppUpdated.Controllers
                         {
 
                             _item.Title = Model.Title.Trim();
+                            _item.StartDate = Model.StartDate.Value;
+                            _item.EndDate = Model.EndDate;
+                            _item.Description = !string.IsNullOrEmpty(Model.Description) ? Model.Description.Trim() : Model.Description;
+                            _item.IsGeneral = Model.IsGeneral;
+                            _item.AuditoriumID = Model.AuditoriumID;
+                            _item.EventStatusID = Model.EventStatusID;
                             _item.UpdatedByUserID = _UserID;
                             _item.UpdatedDateTime = DateTime.UtcNow.AddHours(5);
                             _context.ChangeTracker.Clear();
@@ -293,16 +299,18 @@ namespace TRSAppUpdated.Controllers
                             _context.Entry(_item).State = EntityState.Modified;
                             await _context.SaveChangesAsync();
                         }
+                        var _existingEventCategories = _context.EventCategories
+                            .Where(x => x.EventID == _item.ID)
+                            .AsNoTracking()
+                            .ToList();
+                        if (_existingEventCategories.Count > 0)
+                        {
+                            _context.EventCategories.RemoveRange(_existingEventCategories);
+                        }
                         if (Model.EventCategoryIDs != null && Model.EventCategoryIDs.Count > 0)
                         {
                             foreach (var categoryID in Model.EventCategoryIDs)
                             {
-                                var _existingCategory = _context.EventCategories.Where(x => x.CategoryID == categoryID
-                                && x.EventID == _item.ID).AsNoTracking().Any();
-                                if (_existingCategory)
-                                {
-                                    continue;
-                                }
                                 _context.EventCategories.Add(new EventCategory()
                                 {
                                     CategoryID = categoryID,
@@ -311,8 +319,8 @@ namespace TRSAppUpdated.Controllers
                                     CreatedDateTime = DateTime.UtcNow.AddHours(5),
                                 });
                             }
-                            await _context.SaveChangesAsync();
                         }
+                        await _context.SaveChangesAsync();
                     }
                     return RedirectToAction("Index");
                 }

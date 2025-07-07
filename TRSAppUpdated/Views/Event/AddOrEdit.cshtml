@@ -105,6 +105,13 @@
                             </div>
                             <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
                                 <div class="form-group">
+                                    <label class="col-form-label">Description</label>
+                                    <textarea class="form-control" type="text" placeholder="Enter @_PageTitle Description" 
+                                    rows="3" asp-for="Description"></textarea>
+                                </div>
+                            </div>
+                            <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                                <div class="form-group">
                                     <label class="col-form-label">Photo</label>
                                     <input class="form-control" type="file" asp-for="ImageFile" id="imgSelector">
                                     <span asp-validation-for="EndDate"></span>
@@ -129,7 +136,7 @@
                                 </div>
                             </div>
                             <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-                                <div class="form-group mb-0">
+                                <div class="form-group mb-0 mt-2">
                                     <input class="btn btn-primary" type="submit">
                                     <a class="btn btn-danger" href="@(Url.Action("Index"))">Back</a>
                                 </div>

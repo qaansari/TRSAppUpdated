@@ -22,36 +22,6 @@ namespace TRSAppUpdated.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("CategoryEventCategory", b =>
-                {
-                    b.Property<int>("CategoriesID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("EventCategoriesListID")
-                        .HasColumnType("int");
-
-                    b.HasKey("CategoriesID", "EventCategoriesListID");
-
-                    b.HasIndex("EventCategoriesListID");
-
-                    b.ToTable("CategoryEventCategory");
-                });
-
-            modelBuilder.Entity("EventEventCategory", b =>
-                {
-                    b.Property<int>("EventCategoriesID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("EventsID")
-                        .HasColumnType("int");
-
-                    b.HasKey("EventCategoriesID", "EventsID");
-
-                    b.HasIndex("EventsID");
-
-                    b.ToTable("EventEventCategory");
-                });
-
             modelBuilder.Entity("ReservationReservationImage", b =>
                 {
                     b.Property<int>("ReservationImagesID")
@@ -421,7 +391,11 @@ namespace TRSAppUpdated.Migrations
 
                     b.HasKey("ID");
 
+                    b.HasIndex("CategoryID");
+
                     b.HasIndex("CreatedByUserID");
+
+                    b.HasIndex("EventID");
 
                     b.ToTable("EventCategories");
                 });
@@ -1212,7 +1186,7 @@ namespace TRSAppUpdated.Migrations
                         {
                             ID = 1,
                             ContactNumber = "+923312541767",
-                            CreatedDateTime = new DateTime(2025, 7, 7, 17, 41, 58, 79, DateTimeKind.Utc).AddTicks(9999),
+                            CreatedDateTime = new DateTime(2025, 7, 7, 17, 54, 9, 440, DateTimeKind.Utc).AddTicks(2308),
                             Email = "sa@eventland.pk",
                             FirstName = "Super",
                             IsActive = true,
@@ -1278,36 +1252,6 @@ namespace TRSAppUpdated.Migrations
                     b.HasIndex("UpdatedByUserID");
 
                     b.ToTable("Venues");
-                });
-
-            modelBuilder.Entity("CategoryEventCategory", b =>
-                {
-                    b.HasOne("TRSAppUpdated.Models.Category", null)
-                        .WithMany()
-                        .HasForeignKey("CategoriesID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("TRSAppUpdated.Models.EventCategory", null)
-                        .WithMany()
-                        .HasForeignKey("EventCategoriesListID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("EventEventCategory", b =>
-                {
-                    b.HasOne("TRSAppUpdated.Models.EventCategory", null)
-                        .WithMany()
-                        .HasForeignKey("EventCategoriesID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("TRSAppUpdated.Models.Event", null)
-                        .WithMany()
-                        .HasForeignKey("EventsID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("ReservationReservationImage", b =>
@@ -1523,9 +1467,21 @@ namespace TRSAppUpdated.Migrations
 
             modelBuilder.Entity("TRSAppUpdated.Models.EventCategory", b =>
                 {
+                    b.HasOne("TRSAppUpdated.Models.Category", null)
+                        .WithMany("EventCategories")
+                        .HasForeignKey("CategoryID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("TRSAppUpdated.Models.User", "CreatedByUser")
                         .WithMany("EventCategoriesCreated")
                         .HasForeignKey("CreatedByUserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TRSAppUpdated.Models.Event", null)
+                        .WithMany("EventCategories")
+                        .HasForeignKey("EventID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1969,6 +1925,11 @@ namespace TRSAppUpdated.Migrations
                     b.Navigation("Rows");
                 });
 
+            modelBuilder.Entity("TRSAppUpdated.Models.Category", b =>
+                {
+                    b.Navigation("EventCategories");
+                });
+
             modelBuilder.Entity("TRSAppUpdated.Models.City", b =>
                 {
                     b.Navigation("Venues");
@@ -1986,6 +1947,8 @@ namespace TRSAppUpdated.Migrations
 
             modelBuilder.Entity("TRSAppUpdated.Models.Event", b =>
                 {
+                    b.Navigation("EventCategories");
+
                     b.Navigation("ShowExpenses");
 
                     b.Navigation("Shows");
