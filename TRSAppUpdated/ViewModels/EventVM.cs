@@ -27,6 +27,7 @@ namespace TRSAppUpdated.ViewModels
         public int AuditoriumID { get; set; }
         [Range(1, int.MaxValue, ErrorMessage = "Please fill out this field")]
         public int EventStatusID { get; set; }
+        [Required(ErrorMessage = "Please fill out this field")]
         public List<int>? EventCategoryIDs { get; set; }
         public IFormFile? ImageFile { get; set; }
         public string? ImagePath { get; set; }

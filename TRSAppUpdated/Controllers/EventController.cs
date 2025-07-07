@@ -299,16 +299,16 @@ namespace TRSAppUpdated.Controllers
                             _context.Entry(_item).State = EntityState.Modified;
                             await _context.SaveChangesAsync();
                         }
-                        var _existingEventCategories = _context.EventCategories
+                        if (Model.EventCategoryIDs != null && Model.EventCategoryIDs.Count > 0)
+                        {
+                            var _existingEventCategories = _context.EventCategories
                             .Where(x => x.EventID == _item.ID)
                             .AsNoTracking()
                             .ToList();
-                        if (_existingEventCategories.Count > 0)
-                        {
-                            _context.EventCategories.RemoveRange(_existingEventCategories);
-                        }
-                        if (Model.EventCategoryIDs != null && Model.EventCategoryIDs.Count > 0)
-                        {
+                            if (_existingEventCategories.Count > 0)
+                            {
+                                _context.EventCategories.RemoveRange(_existingEventCategories);
+                            }
                             foreach (var categoryID in Model.EventCategoryIDs)
                             {
                                 _context.EventCategories.Add(new EventCategory()
