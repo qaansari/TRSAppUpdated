@@ -104,6 +104,7 @@ namespace TRSAppUpdated.Controllers
                                VenueTitle = x.Auditorium.Venue.Title,
                                AuditoriumTitle = x.Auditorium.Title,
                                EventStatusTitle = x.EventStatus.Title,
+                               ImagePath = x.ImagePath
                            })
                            .AsNoTracking()
                            .AsQueryable();
@@ -138,10 +139,13 @@ namespace TRSAppUpdated.Controllers
                 ViewData["CityList"] = _cityService.GetAll();
                 ViewData["VenueList"] = _venueService.GetAll();
                 ViewData["AuditoriumList"] = _auditoriumService.GetAll();
+                ViewData["CategoryList"] = _categoryService.GetAll();
                 ViewData["EventStatusList"] = _eventStatusService.GetAll();
                 if (ID != 0)
                 {
-                    _item = _context.Events.Include(x => x.Auditorium)
+                    _item = _context.Events
+                        .Include(x => x.EventCategories)
+                        .Include(x => x.Auditorium)
                         .ThenInclude(x => x.Venue)
                         .ThenInclude(x => x.City)
                         .ThenInclude(x => x.Country)
@@ -160,6 +164,7 @@ namespace TRSAppUpdated.Controllers
                             CityID = x.Auditorium.Venue.CityID,
                             VenueID = x.Auditorium.VenueID,
                             AuditoriumID = x.AuditoriumID,
+                            EventCategoryIDs = x.EventCategories.Select(x => x.CategoryID).ToList(),
                             CreatedByUserID = x.CreatedByUserID,
                             CreatedDateTime = x.CreatedDateTime,
                         })
@@ -277,7 +282,7 @@ namespace TRSAppUpdated.Controllers
                             {
                                 Directory.CreateDirectory(folderPath);
                             }
-                            var _fileName = $"auditorium" + "_" + _item.CreatedDateTime.ToString("yyyyddMMhhmmss") + Path.GetExtension(Model.ImageFile.FileName);
+                            var _fileName = $"event" + "_" + _item.CreatedDateTime.ToString("yyyyddMMhhmmss") + Path.GetExtension(Model.ImageFile.FileName);
                             _item.ImagePath = _fileName.Trim();
                             var _filePath = Path.Combine(folderPath, _fileName);
                             using (var _stream = new FileStream(_filePath, FileMode.Create))
@@ -348,6 +353,6 @@ namespace TRSAppUpdated.Controllers
             }
             return RedirectToAction("Index");
         }
-        
+
     }
 }

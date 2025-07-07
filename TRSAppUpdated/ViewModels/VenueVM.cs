@@ -23,5 +23,6 @@ namespace TRSAppUpdated.ViewModels
         public IFormFile? ImageFile { get; set; }
         public string? ImagePath { get; set; }
         public string? CityTitle { get; set; }
+        public string? CountryTitle { get; set; }
     }
 }

@@ -21,6 +21,7 @@ namespace TRSAppUpdated.Models
         public int EventStatusID { get; set; }
         public Auditorium Auditorium { get; set; }
         public EventStatus EventStatus { get; set; }
+        [InverseProperty("Events")]
         public ICollection<EventCategory> EventCategories { get; set; }
         public ICollection<Show> Shows { get; set; }
         public ICollection<ShowExpense> ShowExpenses { get; set; }

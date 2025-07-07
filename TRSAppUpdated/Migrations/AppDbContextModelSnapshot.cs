@@ -1212,7 +1212,7 @@ namespace TRSAppUpdated.Migrations
                         {
                             ID = 1,
                             ContactNumber = "+923312541767",
-                            CreatedDateTime = new DateTime(2025, 7, 7, 11, 48, 52, 5, DateTimeKind.Utc).AddTicks(1428),
+                            CreatedDateTime = new DateTime(2025, 7, 7, 17, 41, 58, 79, DateTimeKind.Utc).AddTicks(9999),
                             Email = "sa@eventland.pk",
                             FirstName = "Super",
                             IsActive = true,

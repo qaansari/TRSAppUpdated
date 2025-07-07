@@ -230,11 +230,13 @@ namespace TRSAppUpdated.Controllers
                 // For AJAX calls
                 var _query = _context.Venues
                     .Include(x=>x.City)
+                    .ThenInclude(x=>x.Country)
                     .Where(x => !x.IsDeleted)
                            .Select(x => new VenueVM()
                            {
                                ID = x.ID,
                                Title = x.Title,
+                               CountryTitle=x.City.Country.Title,
                                CityTitle=x.City.Title,
                                Address = x.Address,
                                ImagePath = x.ImagePath,
@@ -245,7 +247,9 @@ namespace TRSAppUpdated.Controllers
                 {
                     _query = _query
                         .Where(x => x.Title.Trim().ToLower().Contains(_searchedTerm.Trim().ToLower())
-                    || x.Address.Trim().ToLower().Contains(_searchedTerm.Trim().ToLower()));
+                    || x.Address.Trim().ToLower().Contains(_searchedTerm.Trim().ToLower())
+                    || x.CountryTitle.Trim().ToLower().Contains(_searchedTerm.Trim().ToLower())
+                    || x.CountryTitle.Trim().ToLower().Contains(_searchedTerm.Trim().ToLower()));
                 }
                 int _skip = (_pageNo - 1) * _pageSize;
                 totalRecords = await _query.CountAsync();

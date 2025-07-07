@@ -89,6 +89,17 @@
         </div>
     </div>
 </div>
+<script>
+    function countryChange() {
+        var countryObj = document.getElementById('CountryID').ej2_instances[0];
+        var city = document.getElementById('CityID').ej2_instances[0];
+        city.enabled = true;
+        var tempQuery = new ej.data.Query().where('CountryID', 'equal', countryObj.value);
+        city.query = tempQuery;
+        city.text = null;
+        city.dataBind();
+    }
+</script>
 @section Scripts {
     <script>
         $(document).ready(function () {

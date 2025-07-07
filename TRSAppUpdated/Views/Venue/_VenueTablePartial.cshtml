@@ -14,6 +14,8 @@
         <tr>
             <th>Name</th>
             <th>Address</th>
+            <th>City</th>
+            <th>Country</th>
             <th>Action</th>
         </tr>
     </thead>
@@ -35,6 +37,8 @@
                         <span>@(item.Title)</span>
                     </td>
                     <td>@(item.Address)</td>
+                    <td>@(item.CityTitle)</td>
+                    <td>@(item.CountryTitle)</td>
                     <td>
                         <a asp-action="AddOrEdit" asp-route-ID="@(item.ID)" class="btn btn-primary sm-btn">Edit</a>
                         <button type="button" class="btn btn-danger sm-btn deleteBtn" data-id="@(item.ID)">Delete</button>
@@ -45,7 +49,7 @@
         else
         {
             <tr>
-                <td colspan="3" class="text-center">
+                <td colspan="5" class="text-center">
                     <img class="error_img" src="~/assets/images/no-data.png" />
                 </td>
             </tr>

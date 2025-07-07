@@ -36,7 +36,7 @@
                                 <div class="form-group">
                                     <label class="col-form-label">City <span class="text-danger">*</span></label>
                                     <ejs-dropdownlist cssClass="form-control form-control-sm" dataSource="@(ViewData["CityList"])" placeholder="Select a city"
-                                                      allowFiltering="true" ejs-for="CityID" popupHeight="220px" enabled="false">
+                                                      allowFiltering="true" ejs-for="CityID" popupHeight="220px" change="cityChange" enabled="false">
                                         <e-dropdownlist-fields value="ID" text="Title"></e-dropdownlist-fields>
                                     </ejs-dropdownlist>
                                     <span asp-validation-for="CityID"></span>
@@ -46,7 +46,7 @@
                                 <div class="form-group">
                                     <label class="col-form-label">Venue <span class="text-danger">*</span></label>
                                     <ejs-dropdownlist cssClass="form-control form-control-sm" dataSource="@(ViewData["VenueList"])" placeholder="Select a venue"
-                                                      allowFiltering="true" ejs-for="VenueID" popupHeight="220px" enabled="false">
+                                                      allowFiltering="true" ejs-for="VenueID" popupHeight="220px" change="venueChange" enabled="false">
                                         <e-dropdownlist-fields value="ID" text="Title"></e-dropdownlist-fields>
                                     </ejs-dropdownlist>
                                     <span asp-validation-for="VenueID"></span>
@@ -56,17 +56,17 @@
                                 <div class="form-group">
                                     <label class="col-form-label">Auditorium <span class="text-danger">*</span></label>
                                     <ejs-dropdownlist cssClass="form-control form-control-sm" dataSource="@(ViewData["AuditoriumList"])" placeholder="Select an auditorium"
-                                                      allowFiltering="true" ejs-for="VenueID" popupHeight="220px" enabled="false">
+                                                      allowFiltering="true" ejs-for="AuditoriumID" popupHeight="220px" enabled="false">
                                         <e-dropdownlist-fields value="ID" text="Title"></e-dropdownlist-fields>
                                     </ejs-dropdownlist>
-                                    <span asp-validation-for="VenueID"></span>
+                                    <span asp-validation-for="AuditoriumID"></span>
                                 </div>
                             </div>
                             <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
                                 <div class="form-group">
                                     <label class="col-form-label">Categories <span class="text-danger">*</span></label>
                                     <ejs-multiselect cssClass="form-control form-control-sm" dataSource="@(ViewData["CategoryList"])" placeholder="Select categories"
-                                                     allowFiltering="true" ejs-for="EventCategoryIDs" popupHeight="220px" enabled="false">
+                                                     allowFiltering="true" ejs-for="EventCategoryIDs" popupHeight="220px">
                                         <e-multiselect-fields value="ID" text="Title"></e-multiselect-fields>
                                     </ejs-multiselect>
                                     <span asp-validation-for="EventCategoryIDs"></span>
@@ -75,8 +75,8 @@
                             <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
                                 <div class="form-group">
                                     <label class="col-form-label">Event Status <span class="text-danger">*</span></label>
-                                    <ejs-dropdownlist cssClass="form-control form-control-sm" dataSource="@(ViewData["EventStatusList"])" placeholder="Select an auditorium"
-                                                      allowFiltering="true" ejs-for="EventStatusID" popupHeight="220px" enabled="false">
+                                    <ejs-dropdownlist cssClass="form-control form-control-sm" dataSource="@(ViewData["EventStatusList"])" placeholder="Select an event status"
+                                                      allowFiltering="true" ejs-for="EventStatusID" popupHeight="220px">
                                         <e-dropdownlist-fields value="ID" text="Title"></e-dropdownlist-fields>
                                     </ejs-dropdownlist>
                                     <span asp-validation-for="EventStatusID"></span>
@@ -110,6 +110,12 @@
                                     <span asp-validation-for="EndDate"></span>
                                 </div>
                             </div>
+                            <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6 col-6">
+                                <div class="checkbox">
+                                    <input id="isGenChk" type="checkbox" asp-for="IsGeneral">
+                                    <label for="isGenChk">General</label>
+                                </div>
+                            </div>
                             <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
                                 <div class="form-group mb-0">
                                     @{
@@ -120,12 +126,6 @@
                                         }
                                     }
                                     <img src="~/assets/images/@(_src)" class="preview_auditorium_img" id="imgPreview">
-                                </div>
-                            </div>
-                            <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6 col-6">
-                                <div class="checkbox">
-                                    <input id="isGenChk" type="checkbox" asp-for="IsGeneral">
-                                    <label for="isGenChk">General</label>
                                 </div>
                             </div>
                             <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
@@ -144,32 +144,31 @@
 </div>
 <script>
     function countryChange() {
-        // disable the state DropDownList
         var countryObj = document.getElementById('CountryID').ej2_instances[0];
         var city = document.getElementById('CityID').ej2_instances[0];
         city.enabled = true;
-        //frame the query based on selected value in country DropDownList.
         var tempQuery = new ej.data.Query().where('CountryID', 'equal', countryObj.value);
-        // set the framed query based on selected value in country DropDownList.
         city.query = tempQuery;
-        // set null value to state DropDownList text property
         city.text = null;
-        //  bind the property changes to state DropDownList
         city.dataBind();
     }
     function cityChange() {
-        // disable the state DropDownList
         var cityObj = document.getElementById('CityID').ej2_instances[0];
         var venue = document.getElementById('VenueID').ej2_instances[0];
         venue.enabled = true;
-        //frame the query based on selected value in country DropDownList.
         var tempQuery = new ej.data.Query().where('CityID', 'equal', cityObj.value);
-        // set the framed query based on selected value in country DropDownList.
-        city.query = tempQuery;
-        // set null value to state DropDownList text property
-        city.text = null;
-        //  bind the property changes to state DropDownList
-        city.dataBind();
+        venue.query = tempQuery;
+        venue.text = null;
+        venue.dataBind();
+    }
+    function venueChange() {
+        var venueObj = document.getElementById('VenueID').ej2_instances[0];
+        var auditorium = document.getElementById('AuditoriumID').ej2_instances[0];
+        auditorium.enabled = true;
+        var tempQuery = new ej.data.Query().where('VenueID', 'equal', cityObj.value);
+        auditorium.query = tempQuery;
+        auditorium.text = null;
+        auditorium.dataBind();
     }
 </script>
 @section Scripts {

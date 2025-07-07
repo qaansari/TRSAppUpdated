@@ -12,7 +12,7 @@ using TRSAppUpdated.Models;
 namespace TRSAppUpdated.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250707064852_Db Init")]
+    [Migration("20250707124158_Db Init")]
     partial class DbInit
     {
         /// <inheritdoc />
@@ -1215,7 +1215,7 @@ namespace TRSAppUpdated.Migrations
                         {
                             ID = 1,
                             ContactNumber = "+923312541767",
-                            CreatedDateTime = new DateTime(2025, 7, 7, 11, 48, 52, 5, DateTimeKind.Utc).AddTicks(1428),
+                            CreatedDateTime = new DateTime(2025, 7, 7, 17, 41, 58, 79, DateTimeKind.Utc).AddTicks(9999),
                             Email = "sa@eventland.pk",
                             FirstName = "Super",
                             IsActive = true,
