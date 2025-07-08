@@ -42,26 +42,29 @@
         }
     </tbody>
 </table>
-<div class="d-flex">
-    <div class="dataTables_info w-50" id="buttons-datatable_info" role="status" aria-live="polite">
-        Showing @(_startRecord) to @(_endRecord) of @(_TotalRecords) entries
-    </div>
-    <div class="dataTables_paginate paging_simple_numbers w-50" id="buttons-datatable_paginate">
-        <nav aria-label="Page navigation" class="float-right">
-            <ul class="pagination justify-content-center">
-                <li class="page-item @(_PageNo == 1 ? "disabled" : "")">
-                    <a class="page-link" href="#" data-page="@(_PageNo - 1)">Prev</a>
-                </li>
-                @for (int i = 1; i <= _TotalPages; i++)
-                {
-                    <li class="page-item @(i == _PageNo ? "active" : "")">
-                        <a class="page-link" href="#" data-page="@i">@i</a>
+@if (Model.Count > 0)
+{
+    <div class="d-flex">
+        <div class="dataTables_info w-50" id="buttons-datatable_info" role="status" aria-live="polite">
+            Showing @(_startRecord) to @(_endRecord) of @(_TotalRecords) entries
+        </div>
+        <div class="dataTables_paginate paging_simple_numbers w-50" id="buttons-datatable_paginate">
+            <nav aria-label="Page navigation" class="float-right">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item @(_PageNo == 1 ? "disabled" : "")">
+                        <a class="page-link" href="#" data-page="@(_PageNo - 1)">Prev</a>
                     </li>
-                }
-                <li class="page-item @(_PageNo == _TotalPages ? "disabled" : "")">
-                    <a class="page-link" href="#" data-page="@(_PageNo + 1)">Next</a>
-                </li>
-            </ul>
-        </nav>
+                    @for (int i = 1; i <= _TotalPages; i++)
+                    {
+                        <li class="page-item @(i == _PageNo ? "active" : "")">
+                            <a class="page-link" href="#" data-page="@i">@i</a>
+                        </li>
+                    }
+                    <li class="page-item @(_PageNo == _TotalPages ? "disabled" : "")">
+                        <a class="page-link" href="#" data-page="@(_PageNo + 1)">Next</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
     </div>
-</div>
+}

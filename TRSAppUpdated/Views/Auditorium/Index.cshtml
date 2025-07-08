@@ -22,23 +22,26 @@
                 </h4>
             </div>
             <div class="card-body">
-                <div class="row mb-2">
-                    <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
-                        show
-                        <select id="pageSizeDropdown" class="w-20 form-control form-control-sm">
-                            <option value="10" selected="@(_PageSize == 10)">10</option>
-                            <option value="20" selected="@(_PageSize == 20)">20</option>
-                            <option value="50" selected="@(_PageSize == 50)">50</option>
-                            <option value="100" selected="@(_PageSize == 100)">100</option>
-                        </select>
-                        entries
-                    </div>
-                    <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
-                        <div class="d-flex form-inline mb-3">
-                            <span class="search_span">Search</span> <input type="text" id="searchInput" class="form-control mr-2" placeholder="Search..." />
+                @if (Model.Count > 0)
+                {
+                    <div class="row mb-2">
+                        <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                            show
+                            <select id="pageSizeDropdown" class="w-20 form-control form-control-sm">
+                                <option value="10" selected="@(_PageSize == 10)">10</option>
+                                <option value="20" selected="@(_PageSize == 20)">20</option>
+                                <option value="50" selected="@(_PageSize == 50)">50</option>
+                                <option value="100" selected="@(_PageSize == 100)">100</option>
+                            </select>
+                            entries
+                        </div>
+                        <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                            <div class="d-flex form-inline mb-3">
+                                <span class="search_span">Search</span> <input type="text" id="searchInput" class="form-control mr-2" placeholder="Search..." />
+                            </div>
                         </div>
                     </div>
-                </div>
+                }
                 <!-- Table container that will be updated via AJAX -->
                 <div id="tableContainer">
                     @await Html.PartialAsync($"_{_PartialViewName}TablePartial", Model)
