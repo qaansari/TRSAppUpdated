@@ -12,7 +12,7 @@ using TRSAppUpdated.Models;
 namespace TRSAppUpdated.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250707125410_Db Init")]
+    [Migration("20250708070242_Db Init")]
     partial class DbInit
     {
         /// <inheritdoc />
@@ -220,6 +220,35 @@ namespace TRSAppUpdated.Migrations
                     b.HasIndex("UpdatedByUserID");
 
                     b.ToTable("Cities");
+
+                    b.HasData(
+                        new
+                        {
+                            ID = 1,
+                            CountryID = 1,
+                            CreatedByUserID = 1,
+                            CreatedDateTime = new DateTime(2025, 7, 8, 12, 2, 41, 836, DateTimeKind.Utc).AddTicks(7555),
+                            IsDeleted = false,
+                            Title = "Karachi"
+                        },
+                        new
+                        {
+                            ID = 2,
+                            CountryID = 1,
+                            CreatedByUserID = 1,
+                            CreatedDateTime = new DateTime(2025, 7, 8, 12, 2, 41, 836, DateTimeKind.Utc).AddTicks(7557),
+                            IsDeleted = false,
+                            Title = "Lahore"
+                        },
+                        new
+                        {
+                            ID = 3,
+                            CountryID = 1,
+                            CreatedByUserID = 1,
+                            CreatedDateTime = new DateTime(2025, 7, 8, 12, 2, 41, 836, DateTimeKind.Utc).AddTicks(7559),
+                            IsDeleted = false,
+                            Title = "Islamabad"
+                        });
                 });
 
             modelBuilder.Entity("TRSAppUpdated.Models.Column", b =>
@@ -301,6 +330,18 @@ namespace TRSAppUpdated.Migrations
                     b.HasIndex("UpdatedByUserID");
 
                     b.ToTable("Countries");
+
+                    b.HasData(
+                        new
+                        {
+                            ID = 1,
+                            CreatedByUserID = 1,
+                            CreatedDateTime = new DateTime(2025, 7, 8, 12, 2, 41, 836, DateTimeKind.Utc).AddTicks(7511),
+                            DialingCode = "+92",
+                            Flag = "🇵🇰",
+                            IsDeleted = false,
+                            Title = "Pakistan"
+                        });
                 });
 
             modelBuilder.Entity("TRSAppUpdated.Models.Event", b =>
@@ -445,6 +486,32 @@ namespace TRSAppUpdated.Migrations
                     b.HasIndex("UpdatedByUserID");
 
                     b.ToTable("EventStatuses");
+
+                    b.HasData(
+                        new
+                        {
+                            ID = 1,
+                            CreatedByUserID = 1,
+                            CreatedDateTime = new DateTime(2025, 7, 8, 12, 2, 41, 836, DateTimeKind.Utc).AddTicks(7441),
+                            IsDeleted = false,
+                            Title = "Active"
+                        },
+                        new
+                        {
+                            ID = 2,
+                            CreatedByUserID = 1,
+                            CreatedDateTime = new DateTime(2025, 7, 8, 12, 2, 41, 836, DateTimeKind.Utc).AddTicks(7445),
+                            IsDeleted = false,
+                            Title = "Ended"
+                        },
+                        new
+                        {
+                            ID = 3,
+                            CreatedByUserID = 1,
+                            CreatedDateTime = new DateTime(2025, 7, 8, 12, 2, 41, 836, DateTimeKind.Utc).AddTicks(7446),
+                            IsDeleted = false,
+                            Title = "Postponed"
+                        });
                 });
 
             modelBuilder.Entity("TRSAppUpdated.Models.Expense", b =>
@@ -1120,6 +1187,9 @@ namespace TRSAppUpdated.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(20)");
 
+                    b.Property<int?>("CountryID")
+                        .HasColumnType("int");
+
                     b.Property<int?>("CreatedByUserID")
                         .HasColumnType("int");
 
@@ -1149,6 +1219,9 @@ namespace TRSAppUpdated.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsTokenExpired")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsVerified")
                         .HasColumnType("bit");
 
@@ -1174,6 +1247,8 @@ namespace TRSAppUpdated.Migrations
 
                     b.HasKey("ID");
 
+                    b.HasIndex("CountryID");
+
                     b.HasIndex("CreatedByUserID");
 
                     b.HasIndex("DeletedByUserID");
@@ -1189,11 +1264,12 @@ namespace TRSAppUpdated.Migrations
                         {
                             ID = 1,
                             ContactNumber = "+923312541767",
-                            CreatedDateTime = new DateTime(2025, 7, 7, 17, 54, 9, 440, DateTimeKind.Utc).AddTicks(2308),
+                            CreatedDateTime = new DateTime(2025, 7, 8, 12, 2, 41, 836, DateTimeKind.Utc).AddTicks(6977),
                             Email = "sa@eventland.pk",
                             FirstName = "Super",
                             IsActive = true,
                             IsDeleted = false,
+                            IsTokenExpired = false,
                             IsVerified = true,
                             LastName = "Admin",
                             Password = "6FkLTXY5CrK8ccZIBV6HAibnMhfq44wfgPMuzSxJjQ4=",
@@ -1863,6 +1939,10 @@ namespace TRSAppUpdated.Migrations
 
             modelBuilder.Entity("TRSAppUpdated.Models.User", b =>
                 {
+                    b.HasOne("TRSAppUpdated.Models.Country", "Country")
+                        .WithMany("Users")
+                        .HasForeignKey("CountryID");
+
                     b.HasOne("TRSAppUpdated.Models.User", "UserCreatedByUser")
                         .WithMany("UsersCreated")
                         .HasForeignKey("CreatedByUserID");
@@ -1880,6 +1960,8 @@ namespace TRSAppUpdated.Migrations
                     b.HasOne("TRSAppUpdated.Models.User", "UserUpdatedByUser")
                         .WithMany("UsersUpdated")
                         .HasForeignKey("UpdatedByUserID");
+
+                    b.Navigation("Country");
 
                     b.Navigation("Role");
 
@@ -1946,6 +2028,8 @@ namespace TRSAppUpdated.Migrations
             modelBuilder.Entity("TRSAppUpdated.Models.Country", b =>
                 {
                     b.Navigation("Cities");
+
+                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("TRSAppUpdated.Models.Event", b =>

@@ -28,11 +28,15 @@ namespace TRSAppUpdated.Models
         public string Password { get; set; }
         [ForeignKey("Role")]
         public int RoleID { get; set; }
+        [ForeignKey("Country")]
+        public int? CountryID { get; set; }
+        public Country? Country { get; set; }
         [Column(TypeName = "varchar(300)")]
         public string? ImagePath { get; set; }
         [Column(TypeName = "varchar(68)")]
         public string? UserToken { get; set; }
         public bool IsActive { get; set; }
+        public bool IsTokenExpired { get; set; }
         public bool IsDeleted { get; set; }
         public bool IsVerified { get; set; }
         [ForeignKey("UserCreatedByUser")]

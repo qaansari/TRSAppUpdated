@@ -14,6 +14,7 @@ namespace TRSAppUpdated.Models
         public string DialingCode { get; set; }
         [Column(TypeName = "nvarchar(max)")]
         public string Flag { get; set; }
+        public ICollection<User>? Users { get; set; }
         public ICollection<City> Cities { get; set; }
     }
 }

@@ -75,6 +75,70 @@ namespace TRSAppUpdated.Models
                    IsDeleted = false,
                    CreatedDateTime = DateTime.UtcNow.AddHours(5),
                });
+            modelBuilder.Entity<EventStatus>().HasData(
+                new EventStatus()
+                {
+                    ID = 1,
+                    Title = "Active",
+                    CreatedByUserID=1,
+                    CreatedDateTime= DateTime.UtcNow.AddHours(5),
+                    IsDeleted = false,
+                },
+                 new EventStatus()
+                 {
+                     ID = 2,
+                     Title = "Ended",
+                     CreatedByUserID = 1,
+                     CreatedDateTime = DateTime.UtcNow.AddHours(5),
+                     IsDeleted = false,
+                 },
+                  new EventStatus()
+                  {
+                      ID = 3,
+                      Title = "Postponed",
+                      CreatedByUserID = 1,
+                      CreatedDateTime = DateTime.UtcNow.AddHours(5),
+                      IsDeleted = false,
+                  });
+            modelBuilder.Entity<Country>().HasData(
+                new Country()
+                {
+                    ID = 1,
+                    Title = "Pakistan",
+                    DialingCode = "+92",
+                    Flag = "🇵🇰",
+                    CreatedByUserID = 1,
+                    CreatedDateTime = DateTime.UtcNow.AddHours(5),
+                    IsDeleted = false,
+                });
+            modelBuilder.Entity<City>().HasData(
+                new City()
+                {
+                    ID = 1,
+                    Title = "Karachi",
+                    CountryID = 1,
+                    CreatedByUserID = 1,
+                    CreatedDateTime = DateTime.UtcNow.AddHours(5),
+                    IsDeleted = false,
+                },
+                new City()
+                {
+                    ID = 2,
+                    Title = "Lahore",
+                    CountryID = 1,
+                    CreatedByUserID = 1,
+                    CreatedDateTime = DateTime.UtcNow.AddHours(5),
+                    IsDeleted = false,
+                },
+                new City()
+                {
+                    ID = 3,
+                    Title = "Islamabad",
+                    CountryID = 1,
+                    CreatedByUserID = 1,
+                    CreatedDateTime = DateTime.UtcNow.AddHours(5),
+                    IsDeleted = false,
+                });
         }
 
     }

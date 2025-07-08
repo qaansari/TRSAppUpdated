@@ -33,31 +33,6 @@
                 <div class="card-body">
                     @if (Model.Count > 0)
                     {
-                        <!-- Filters Row -->
-                        <div class="row mb-3">
-                            <div class="col-md-12 d-flex flex-wrap align-items-end gap-2">
-                                <button class="btn btn-outline-primary filter-btn" data-filter="thisMonth">This Month</button>
-                                <button class="btn btn-outline-primary filter-btn" data-filter="thisWeek">This Week</button>
-                                <div>
-                                    <label class="form-label mb-0">From:</label>
-                                    <input type="date" id="startDate" class="form-control form-control-sm" />
-                                </div>
-                                <div>
-                                    <label class="form-label mb-0">To:</label>
-                                    <input type="date" id="endDate" class="form-control form-control-sm" />
-                                </div>
-                                <button class="btn btn-outline-primary" id="customDateBtn">Apply Date Range</button>
-                                <div>
-                                    <select id="cityFilter" class="form-control form-control-sm">
-                                        <option value="">All Cities</option>
-                                        <option value="Karachi">Karachi</option>
-                                        <option value="Lahore">Lahore</option>
-                                        <option value="Islamabad">Islamabad</option>
-                                        <!-- Add more cities as needed -->
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
                         <div class="row mb-2">
                             <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
                                 show
@@ -163,11 +138,6 @@
                      function loadData(pageNo) {
                 var searchedTerm = $('#searchInput').val();
                 var pageSize = $('#pageSizeDropdown').val(); // Get selected page size
-                var filterType = $('.filter-btn.active').data('filter') || "";
-                var startDate = $('#startDate').val();
-                var endDate = $('#endDate').val();
-                var city = $('#cityFilter').val();
-
                 $.ajax({
                     url: '@Url.Action("GetPartial")',
                     type: 'GET',

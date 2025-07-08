@@ -42,7 +42,8 @@ namespace TRSAppUpdated.Controllers
         }
         [Authorize(Roles = "Super Admin,Admin,Moderator,User")]
         //Index (Get All)
-        public async Task<IActionResult> Index(int _pageNo = 1, int _pageSize = 10, string _searchedTerm = "")
+        public async Task<IActionResult> Index(int _pageNo = 1, int _pageSize = 10, string _searchedTerm = "",
+            string _searchedTerm = "")
         {
             try
             {
