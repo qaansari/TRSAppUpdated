@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Syncfusion.EJ2.Layouts;
 using System.Security.Claims;
 using TRSAppUpdated.Interfaces;
 using TRSAppUpdated.Models;
@@ -20,13 +21,14 @@ namespace TRSAppUpdated.Controllers
         private readonly IAuditoriumService _auditoriumService;
         private readonly IEventStatusService _eventStatusService;
         private readonly ICategoryService _categoryService;
+        private readonly IEventService _service;
         private readonly string _Title = "Event";
         private readonly int _UserID;
         public EventController(AppDbContext context, IHttpContextAccessor httpContextAccessor,
             IWebHostEnvironment webHostEnvironment, ILogger<EventController> logger,
             ICountryService countryService, ICityService cityService,
             IVenueService venueService, IAuditoriumService auditoriumService,
-            IEventStatusService eventStatusService, ICategoryService categoryService)
+            IEventStatusService eventStatusService, ICategoryService categoryService, IEventService service)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;
@@ -38,16 +40,16 @@ namespace TRSAppUpdated.Controllers
             _auditoriumService = auditoriumService;
             _eventStatusService = eventStatusService;
             _categoryService = categoryService;
+            _service = service;
             _UserID = Convert.ToInt32(_httpContextAccessor.HttpContext.User.FindFirstValue("UserID"));
         }
         [Authorize(Roles = "Super Admin,Admin,Moderator,User")]
         //Index (Get All)
-        public async Task<IActionResult> Index(int _pageNo = 1, int _pageSize = 10, string _searchedTerm = "",
-            string _searchedTerm = "")
+        public async Task<IActionResult> Index(int _pageNo = 1, int _pageSize = 10, string _searchedTerm = "")
         {
             try
             {
-                var (_result, totalRecords) = await GetList(_pageNo, _pageSize, _searchedTerm);
+                var (_result, totalRecords) = await _service.GetAllPaginated(_pageNo,_pageSize, _searchedTerm);
                 ViewBag.TotalRecords = totalRecords;
                 ViewBag.PageNo = _pageNo;
                 ViewBag.PageSize = _pageSize;
@@ -67,7 +69,7 @@ namespace TRSAppUpdated.Controllers
             var _partialViewName = _Title.Contains(" ") ? _Title.Replace(" ", "") : _Title;
             try
             {
-                var (_result, totalRecords) = await GetList(_pageNo, _pageSize, _searchedTerm);
+                var (_result, totalRecords) = await _service.GetAllPaginated(_pageNo, _pageSize, _searchedTerm);
                 ViewBag.TotalRecords = totalRecords;
                 ViewBag.PageNo = _pageNo;
                 ViewBag.PageSize = _pageSize;
@@ -79,55 +81,6 @@ namespace TRSAppUpdated.Controllers
                 _logger.LogError($"Error occured at GetPartial in {_Title} Controller due to {ex}");
             }
             return PartialView($"_{_partialViewName}TablePartial", new List<EventVM>());
-        }
-        //Get List
-        [NonAction]
-        public async Task<(List<EventVM> _result, int totalRecords)> GetList(int _pageNo, int _pageSize, string _searchedTerm)
-        {
-
-            var _result = new List<EventVM>();
-            int totalRecords = 0;
-            try
-            {
-                // For AJAX calls
-                var _query = _context.Events
-                    .Include(x => x.EventStatus)
-                    .Include(x => x.Auditorium)
-                    .ThenInclude(x => x.Venue)
-                    .ThenInclude(x => x.City)
-                    .ThenInclude(x => x.Country)
-                    .Where(x => !x.IsDeleted)
-                           .Select(x => new EventVM()
-                           {
-                               ID = x.ID,
-                               Title = x.Title,
-                               CityTitle = x.Auditorium.Venue.City.Title,
-                               VenueTitle = x.Auditorium.Venue.Title,
-                               AuditoriumTitle = x.Auditorium.Title,
-                               EventStatusTitle = x.EventStatus.Title,
-                               ImagePath = x.ImagePath
-                           })
-                           .AsNoTracking()
-                           .AsQueryable();
-                if (!string.IsNullOrEmpty(_searchedTerm))
-                {
-                    _query = _query
-                        .Where(x => x.Title.Trim().ToLower().Contains(_searchedTerm.Trim().ToLower())
-                        || x.CityTitle.Trim().ToLower().Contains(_searchedTerm.Trim().ToLower())
-                        || x.VenueTitle.Trim().ToLower().Contains(_searchedTerm.Trim().ToLower())
-                        || x.AuditoriumTitle.Trim().ToLower().Contains(_searchedTerm.Trim().ToLower())
-                        || x.EventStatusTitle.Trim().ToLower().Contains(_searchedTerm.Trim().ToLower()));
-                }
-                int _skip = (_pageNo - 1) * _pageSize;
-                totalRecords = await _query.CountAsync();
-                _query = _query.Skip(_skip).Take(_pageSize);
-                _result = await _query.OrderByDescending(x => x.ID).ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error occured at GetList in {_Title} Controller due to {ex}");
-            }
-            return (_result, totalRecords);
         }
         //AddOrEdit (GET)
         [Authorize(Roles = "Super Admin,Admin")]
@@ -362,6 +315,21 @@ namespace TRSAppUpdated.Controllers
             }
             return RedirectToAction("Index");
         }
+        //Details
 
+        [Authorize(Roles = "Super Admin,Admin,Moderator,User")]
+        public async Task<IActionResult> Details(int ID)
+        {
+            try
+            {
+                var _item = await _service.GetDetailsByID(ID);
+                return View(_item ?? new EventVM());
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error occured at Details in {_Title} Controller due to {ex}");
+            }
+            return View(new EventVM());
+        }
     }
 }
