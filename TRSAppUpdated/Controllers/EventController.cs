@@ -244,6 +244,8 @@ namespace TRSAppUpdated.Controllers
                             }
                             var _fileName = $"event" + "_" + _item.CreatedDateTime.ToString("yyyyddMMhhmmss") + Path.GetExtension(Model.ImageFile.FileName);
                             _item.ImagePath = _fileName.Trim();
+                            _item.UpdatedByUserID = _UserID;
+                            _item.UpdatedDateTime = DateTime.UtcNow.AddHours(5);
                             var _filePath = Path.Combine(folderPath, _fileName);
                             using (var _stream = new FileStream(_filePath, FileMode.Create))
                             {

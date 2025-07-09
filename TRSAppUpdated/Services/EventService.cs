@@ -110,6 +110,9 @@ namespace TRSAppUpdated.Services
                                {
                                    ID = x.ID,
                                    Title = x.Title,
+                                   StartDate=x.StartDate,
+                                   EndDate=x.EndDate,
+                                   Description=x.Description,
                                    CountryID = x.Auditorium.Venue.City.CountryID,
                                    CountryTitle = x.Auditorium.Venue.City.Country.Title,
                                    CityTitle = x.Auditorium.Venue.City.Title,
@@ -119,6 +122,7 @@ namespace TRSAppUpdated.Services
                                    ShowsList = x.Shows.Where(x => !x.IsDeleted).Select(x => new ShowVM()
                                    {
                                        ID = x.ID,
+                                       EventID = x.EventID,
                                        Date = x.Date,
                                        Time = x.Time,
                                    }).ToList(),

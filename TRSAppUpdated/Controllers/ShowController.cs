@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System.Security.Claims;
+using System.Xml.Linq;
 using TRSAppUpdated.Interfaces;
 using TRSAppUpdated.Models;
 using TRSAppUpdated.ViewModels;
@@ -25,7 +27,10 @@ namespace TRSAppUpdated.Controllers
         public IActionResult AddOrEdit(int ID = 0, int EventID = 0)
         {
             var _item = new ShowVM();
-
+            if (EventID != 0)
+            {
+                ViewBag.EventID = EventID;
+            }
             if (ID != 0)
             {
                 _item = _context.Shows.Where(x => !x.IsDeleted && x.ID == ID)
@@ -33,6 +38,7 @@ namespace TRSAppUpdated.Controllers
                        {
                            ID = x.ID,
                            EventID = x.EventID,
+                           TimeString = x.Time.ToString(@"hh\:mm"),
                            Date = x.Date,
                            Time = x.Time,
                            CreatedByUserID = x.CreatedByUserID,
@@ -52,10 +58,18 @@ namespace TRSAppUpdated.Controllers
         {
             try
             {
+                if (Model.EventID != 0)
+                {
+                    ViewBag.EventID = Model.EventID;
+                }
                 if (ModelState.IsValid)
                 {
                     var _item = new Show();
-                    var _event = _context.Events.Where(x => !x.IsDeleted && x.ID == Model.ID).FirstOrDefault();
+                    if (TimeSpan.TryParse(Model.TimeString, out TimeSpan parsedTimeSpan))
+                    {
+                        Model.Time = parsedTimeSpan;
+                    }
+                    var _event = _context.Events.Where(x => !x.IsDeleted && x.ID == Model.EventID).FirstOrDefault();
                     if (_event != null)
                     {
                         var _isValidDate = Model.Date >= _event.StartDate
@@ -117,7 +131,7 @@ namespace TRSAppUpdated.Controllers
                                 var isTicketExists = _context.Tickets.Where(x => !x.IsDeleted && x.ShowID == _item.ID).Any();
                                 if (!isTicketExists)
                                 {
-                                    var _seatIDs =await _context.Seats.Include(x => x.Column)
+                                    var _seatIDs = await _context.Seats.Include(x => x.Column)
                                      .ThenInclude(x => x.Row)
                                      .ThenInclude(x => x.Auditorium)
                                      .Where(x => x.Column.Row.AuditoriumID == _event.AuditoriumID)
@@ -148,6 +162,40 @@ namespace TRSAppUpdated.Controllers
                 _logger.LogError($"Error occured at AddOrEdit (POST) in {_Title} Controller due to {ex}");
             }
             return View(Model);
+        }
+        //Delete
+        [HttpPost]
+        public async Task<IActionResult> Delete(int ID, int EventID)
+        {
+            try
+            {
+                var _item = _context.Shows.Where(x => !x.IsDeleted && x.ID == ID)
+                                  .AsNoTracking().FirstOrDefault();
+                if (_item != null)
+                {
+                    _item.IsDeleted = true;
+                    _item.DeletedByUserID = _UserID;
+                    _item.DeletedDateTime = DateTime.UtcNow.AddHours(5);
+                    _context.ChangeTracker.Clear();
+                    _context.Entry(_item).State = EntityState.Modified;
+                    var _tickets = _context.Tickets.Where(x => !x.IsDeleted && x.ShowID == ID).ToList();
+                    if (_tickets.Count > 0)
+                    {
+                        _context.Tickets.RemoveRange(_tickets);
+                    }
+                    await _context.SaveChangesAsync();
+                    TempData["Message"] = $"1,{_Title} Successfully Deleted";
+                }
+                else
+                {
+                    TempData["Message"] = $"0,No {_Title} Found";
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error occured at Delete (POST) in {_Title} Controller due to {ex}");
+            }
+            return RedirectToAction("Details", "Event", new { ID = EventID });
         }
     }
 }

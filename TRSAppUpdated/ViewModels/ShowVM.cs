@@ -11,8 +11,9 @@ namespace TRSAppUpdated.ViewModels
         public int EventID { get; set; }
         [Required(ErrorMessage = "Please fill out this field")]
         public DateTime? Date { get; set; }
-        [Required(ErrorMessage = "Please fill out this field")]
         public TimeSpan? Time { get; set; }
+        [Required(ErrorMessage = "Please fill out this field")]
+        public string TimeString { get; set; }
         public bool IsEnded { get; set; } = false;
     }
 }

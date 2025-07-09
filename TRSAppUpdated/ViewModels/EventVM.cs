@@ -38,6 +38,6 @@ namespace TRSAppUpdated.ViewModels
         public string? EventStatusTitle { get; set; }
         public string? EventTypeTitle { get; set; }
         public List<string>? EventCategoriesList { get; set; }
-        public List<ShowVM> ShowsList { get; set; }
+        public List<ShowVM>? ShowsList { get; set; }
     }
 }

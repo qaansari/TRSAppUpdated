@@ -56,7 +56,7 @@
                     <td>
                         @if (!string.IsNullOrEmpty(item.EventStatusTitle))
                         {
-                            string _badgeClass = "primary";
+                            string _badgeClass = "info";
                             if (item.EventStatusTitle.Trim().ToLower() == "ended" || item.EventStatusTitle.Trim().ToLower() == "postponed")
                             {
                                 _badgeClass = "danger";
@@ -64,7 +64,9 @@
                             <span class="badge bg-@(_badgeClass)">@(item.EventStatusTitle)</span>
                         }
                     </td>
+
                     <td>
+                        <a asp-action="Details" asp-route-ID="@(item.ID)" class="btn btn-primary sm-btn">Details</a>
                         @if (isSuperAdmin || isAdmin)
                         {
                             <a asp-action="AddOrEdit" asp-route-ID="@(item.ID)" class="btn btn-primary sm-btn">Edit</a>
@@ -74,13 +76,15 @@
                             <button type="button" class="btn btn-danger sm-btn deleteBtn" data-id="@(item.ID)">Delete</button>
                         }
                     </td>
+                    }
                 </tr>
             }
         }
         else
         {
+            int _colspan = 7;
             <tr>
-                <td colspan="7" class="text-center">
+                <td colspan="@(_colspan)" class="text-center">
                     <img class="error_img" src="~/assets/images/no-data.png" />
                 </td>
             </tr>

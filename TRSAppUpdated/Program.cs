@@ -28,6 +28,7 @@ namespace TRSAppUpdated
             builder.Services.AddScoped<ICountryService, CountryService>();
             builder.Services.AddScoped<ICityService, CityService>();
             builder.Services.AddScoped<IEventStatusService, EventStatusService>();
+            builder.Services.AddScoped<IEventService, EventService>();
             builder.Services.AddScoped<INoteTypeService, NoteTypeService>();
             builder.Services.AddScoped<INoteService, NoteService>();
             builder.Services.AddScoped<IPaymentModeService, PaymentModeService>();

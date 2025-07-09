@@ -1,0 +1,188 @@
+﻿@model EventVM
+@{
+    ViewData["Title"] = $"{Model.Title} Details";
+    bool isSuperAdmin = (await _authorizationService.AuthorizeAsync(User, "SuperAdmin")).Succeeded ? true : false;
+    bool isAdmin = (await _authorizationService.AuthorizeAsync(User, "Admin")).Succeeded ? true : false;
+    bool isModerator = (await _authorizationService.AuthorizeAsync(User, "Moderator")).Succeeded ? true : false;
+    bool isUser = (await _authorizationService.AuthorizeAsync(User, "User")).Succeeded ? true : false;
+}
+<div class="row">
+    <div class="col-xl-12">
+        <h4 class="card-title">@(ViewData["Title"])</h4>
+    </div>
+</div>
+<hr />
+<div class="row">
+    <div class="col-xl-6">
+        <div class="card event_dtl_card">
+            <div class="card-body">
+                @{
+                    string _dateNarration = Model.StartDate.Value.ToString("dddd, dd MMMM yyyy");
+                    if (Model.EndDate.HasValue)
+                    {
+                        _dateNarration += $" till {Model.EndDate.Value.ToString("dddd, dd MMMM yyyy")}";
+                    }
+                }
+                @if (Model.EventCategoriesList != null && Model.EventCategoriesList.Count > 0)
+                {
+                    <h4>
+                        <i class="bx bx-bar-chart"></i>
+                        @foreach (var _category in Model.EventCategoriesList)
+                        {
+                            <span class="badge bg-info">@(_category)</span>
+                        }
+                    </h4>
+                }
+                <h4>
+                    <i class="bx bx bx-calendar-event"></i> @(_dateNarration)
+                </h4>
+                <h4>
+                    <i class="bx bx-location-plus"></i> @(Model.AuditoriumTitle), @(Model.VenueTitle), @(Model.CityTitle), @(Model.CountryTitle)
+                </h4>
+                @if (!string.IsNullOrEmpty(Model.Description))
+                {
+                    <hr />
+                    <p class="event_desc_p"> @Html.Raw(Model.Description.Trim().Replace("\n", "<br>"))</p>
+                }
+                @if (!string.IsNullOrEmpty(Model.ImagePath))
+                {
+                    string _src = "no-image-found.png";
+                    if (!string.IsNullOrEmpty(Model.ImagePath))
+                    {
+                        _src = $"events/{Model.ImagePath}";
+                    }
+                    <img src="~/assets/images/@(_src)" class="event_dtl_img" />
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xl-12">
+        <div class="card">
+            <div class="card-content">
+                <div class="card-body">
+                    <div class="mfh-machine-profile">
+                        <ul class="nav nav-tabs" id="myTab1" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active" id="home-tab1" data-bs-toggle="tab" href="#shows" role="tab" aria-controls="home" aria-selected="true">Shows</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="profile-tab20" data-bs-toggle="tab" href="#reservations" role="tab" aria-controls="profile" aria-selected="false">Reservations</a>
+                            </li>
+                        </ul>
+                        <div class="tab-content ad-content2" id="myTabContent2">
+                            <div class="tab-pane fade show active" id="shows" role="tabpanel">
+                                <h4 class="card-title mb-2">
+                                    Shows For @(Model.Title)
+                                    <span class="float-right mb-2">
+                                        <a asp-action="AddOrEdit" asp-controller="Show" asp-route-ID="0" asp-route-EventID="@(Model.ID)" class="btn btn-primary sm-btn">Add Show</a>
+                                    </span>
+                                </h4>
+                                <table id="showTable" class="table display table-striped table-bordered dt-responsive nowrap mt-2" style="width:100%">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Time</th>
+                                            @if (isSuperAdmin || isAdmin)
+                                            {
+                                                <th>Action</th>
+                                            }
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (Model.ShowsList.Count > 0)
+                                        {
+                                            foreach (var item in Model.ShowsList)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        @(item.Date.Value.ToString("dddd, dd MMMM yyyy"))
+                                                    </td>
+                                                    <td>
+                                                        @(DateTime.Today.Add(item.Time.Value).ToString("hh:mm tt"))
+                                                    </td>
+                                                    @if (isSuperAdmin || isAdmin)
+                                                    {
+                                                        <td>
+                                                            <a asp-action="AddOrEdit" asp-controller="Show" asp-route-ID="@(item.ID)" asp-route-EventID="@(item.EventID)" class="btn btn-primary sm-btn">Edit</a>
+                                                            @if (isSuperAdmin)
+                                                            {
+                                                                <button type="button" class="btn btn-danger sm-btn deleteShowBtn" data-id="@(item.ID)">Delete</button>
+                                                            }
+                                                        </td>
+                                                    }
+                                                </tr>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            int _colspan = 2;
+                                            @if (isSuperAdmin || isAdmin)
+                                            {
+                                                _colspan = 3;
+                                            }
+                                            <tr>
+                                                <td colspan="@(_colspan)" class="text-center">
+                                                    <img class="error_img" src="~/assets/images/no-data.png" />
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="tab-pane fade" id="reservations" role="tabpanel">
+                                <p>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Delete Modal-->
+<div class="modal fade" id="deleteShowModal" tabindex="-1" role="dialog" aria-labelledby="deleteShowModalCenterTitle" aria-hidden="true" style="display:none;">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteShowModalCenterTitle">Delete Show</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <form method="post" asp-action="Delete" asp-controller="Show" class="delete_form">
+                <div class="modal-body">
+                    <input type="hidden" name="ID" class="selectedIdElement" />
+                    <input type="hidden" name="EventID" value="@(Model.ID)" />
+                    <p class="text-muted">Are you sure you want to delete this Show?</p>
+                </div>
+            </form>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger confirmDeleteBtn">Delete</button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script src="~/assets/js/jquery.min.js"></script>
+    <script src="~/assets/js/datatables.min.js"></script>
+    <script src="~/assets/js/dataTables.responsive.min.js"></script>
+    <script>
+        $(document).ready(function(){
+                    $('#showTable').DataTable({
+            responsive: true
+        });
+        $(document).on('click', '.deleteShowBtn', function(){
+                            var selectedID = $(this).data("id");
+                            $("#deleteShowModal .selectedIdElement").val(selectedID);
+                            $("#deleteShowModal").modal("show");
+                        });
+                        $("#deleteShowModal .confirmDeleteBtn").click(function(){
+                            $("#deleteShowModal .delete_form").submit();
+                            $("#deleteShowModal").modal("hide");
+                        });
+        });
+    </script>
+}

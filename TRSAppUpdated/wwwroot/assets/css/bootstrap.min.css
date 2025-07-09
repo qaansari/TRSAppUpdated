@@ -1893,7 +1893,7 @@ progress {
 }
 
 .table-striped > tbody > tr:nth-of-type(odd) {
-    --bs-table-accent-bg: var(--bs-table-striped-bg);
+    --bs-table-accent-bg: rgb(22 25 47);
     color: var(--bs-table-striped-color)
 }
 
