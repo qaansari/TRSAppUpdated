@@ -128,6 +128,8 @@ table.dataTable {
 
     table.dataTable.hover tbody tr:hover, table.dataTable.display tbody tr:hover {
         background-color: #f6f6f6;
+        background: #000;
+        background: #16192f !important;
     }
 
         table.dataTable.hover tbody tr:hover.selected, table.dataTable.display tbody tr:hover.selected {
@@ -175,7 +177,7 @@ table.dataTable {
     }
 
     table.dataTable.display tbody tr.even > .sorting_1, table.dataTable.order-column.stripe tbody tr.even > .sorting_1 {
-        background-color: #fafafa;
+        background-color: #16192f;
     }
 
     table.dataTable.display tbody tr.even > .sorting_2, table.dataTable.order-column.stripe tbody tr.even > .sorting_2 {
@@ -199,7 +201,7 @@ table.dataTable {
     }
 
     table.dataTable.display tbody tr:hover > .sorting_1, table.dataTable.order-column.hover tbody tr:hover > .sorting_1 {
-        background-color: #eaeaea;
+        background-color: #16192f;
     }
 
     table.dataTable.display tbody tr:hover > .sorting_2, table.dataTable.order-column.hover tbody tr:hover > .sorting_2 {

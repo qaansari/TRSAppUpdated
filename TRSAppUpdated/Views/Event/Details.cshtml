@@ -75,19 +75,21 @@
                             <div class="tab-pane fade show active" id="shows" role="tabpanel">
                                 <h4 class="card-title mb-2">
                                     Shows For @(Model.Title)
-                                    <span class="float-right mb-2">
-                                        <a asp-action="AddOrEdit" asp-controller="Show" asp-route-ID="0" asp-route-EventID="@(Model.ID)" class="btn btn-primary sm-btn">Add Show</a>
-                                    </span>
+                                    @if (isSuperAdmin || isAdmin)
+                                    {
+                                        <span class="float-right mb-2">
+                                            <a asp-action="AddOrEdit" asp-controller="Show" asp-route-ID="0" asp-route-EventID="@(Model.ID)" class="btn btn-primary sm-btn">Add Show</a>
+                                        </span>
+                                    }
                                 </h4>
                                 <table id="showTable" class="table display table-striped table-bordered dt-responsive nowrap mt-2" style="width:100%">
                                     <thead>
                                         <tr>
                                             <th>Date</th>
                                             <th>Time</th>
-                                            @if (isSuperAdmin || isAdmin)
-                                            {
+                                            
                                                 <th>Action</th>
-                                            }
+                                            
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -102,10 +104,13 @@
                                                     <td>
                                                         @(DateTime.Today.Add(item.Time.Value).ToString("hh:mm tt"))
                                                     </td>
-                                                    @if (isSuperAdmin || isAdmin)
                                                     {
                                                         <td>
+                                                        @if (isSuperAdmin || isAdmin)
+                                                        {
+                                                            <a asp-action="UpdateTickets" asp-controller="Show" asp-route-ID="@(item.ID)" asp-route-EventID="@(item.EventID)" class="btn btn-primary sm-btn">Update Tickets</a>
                                                             <a asp-action="AddOrEdit" asp-controller="Show" asp-route-ID="@(item.ID)" asp-route-EventID="@(item.EventID)" class="btn btn-primary sm-btn">Edit</a>
+                                                        }
                                                             @if (isSuperAdmin)
                                                             {
                                                                 <button type="button" class="btn btn-danger sm-btn deleteShowBtn" data-id="@(item.ID)">Delete</button>

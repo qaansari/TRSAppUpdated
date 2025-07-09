@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Security.Claims;
@@ -24,6 +25,7 @@ namespace TRSAppUpdated.Controllers
             _logger = logger;
             _UserID = Convert.ToInt32(_httpContextAccessor.HttpContext.User.FindFirstValue("UserID"));
         }
+        [Authorize(Roles = "Super Admin,Admin")]
         public IActionResult AddOrEdit(int ID = 0, int EventID = 0)
         {
             var _item = new ShowVM();
@@ -53,6 +55,7 @@ namespace TRSAppUpdated.Controllers
             return View(_item);
         }
         //AddOrEdit (POST)
+        [Authorize(Roles = "Super Admin,Admin")]
         [HttpPost]
         public async Task<IActionResult> AddOrEdit(ShowVM Model)
         {
@@ -164,6 +167,7 @@ namespace TRSAppUpdated.Controllers
             return View(Model);
         }
         //Delete
+        [Authorize(Roles = "Super Admin")]
         [HttpPost]
         public async Task<IActionResult> Delete(int ID, int EventID)
         {
@@ -195,6 +199,20 @@ namespace TRSAppUpdated.Controllers
             {
                 _logger.LogError($"Error occured at Delete (POST) in {_Title} Controller due to {ex}");
             }
+            return RedirectToAction("Details", "Event", new { ID = EventID });
+        }
+        public async Task<IActionResult> UpdateTickets(int ID, int EventID)
+        {
+            if (ID != 0 && EventID != 0)
+            {
+                ViewBag.ShowID = ID;
+                ViewBag.EventID = EventID;
+            }
+            var _tickets = _context.Tickets.Where(x => !x.IsDeleted && x.ShowID == ID)
+                .AsNoTracking().Select(x => new TicketRowVM()
+                {
+                    Row = x.Seat.Column.Row.RowLabel
+                }).ToList();
             return RedirectToAction("Details", "Event", new { ID = EventID });
         }
     }
