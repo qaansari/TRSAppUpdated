@@ -14,6 +14,8 @@ namespace TRSAppUpdated.Models
         public double CostPrice { get; set; }
         public double Discount { get; set; }
         public double SalePrice { get; set; }
+        public bool IsReserved { get; set; }
+        public DateTime? ReservationDateTime { get; set; }
         public Show Show { get; set; }
         public Seat Seat { get; set; }
         public ICollection<ReservationTicket> ReservationTickets { get; set; }

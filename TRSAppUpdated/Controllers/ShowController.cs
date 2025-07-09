@@ -208,10 +208,17 @@ namespace TRSAppUpdated.Controllers
                 ViewBag.ShowID = ID;
                 ViewBag.EventID = EventID;
             }
-            var _tickets = _context.Tickets.Where(x => !x.IsDeleted && x.ShowID == ID)
-                .AsNoTracking().Select(x => new TicketRowVM()
+            var _tickets = _context.Tickets
+                .Include(x=>x.Seat)
+                .ThenInclude(x=>x.Column)
+                .ThenInclude(x=>x.Row)
+                .Where(x => !x.IsDeleted && x.ShowID == ID)
+                .AsNoTracking()
+                .GroupBy(x=>x.Seat.Column.Row.RowLabel).Select(x => new TicketRowVM()
                 {
-                    Row = x.Seat.Column.Row.RowLabel
+                    Row = x.Key,
+                    Price=x.FirstOrDefault().CostPrice,
+                    IsReserved=x.FirstOrDefault().IsReserved,
                 }).ToList();
             return RedirectToAction("Details", "Event", new { ID = EventID });
         }
