@@ -25,7 +25,7 @@ namespace TRSAppUpdated.Controllers
             _logger = logger;
             _UserID = Convert.ToInt32(_httpContextAccessor.HttpContext.User.FindFirstValue("UserID"));
         }
-        [Authorize(Roles = "Super Admin,Admin")]
+        [Authorize(Roles = "Super Admin,Admin,Moderator,User")]
         public IActionResult AddOrEdit(int ID = 0, int EventID = 0)
         {
             var _item = new ReservationVM();
@@ -37,14 +37,24 @@ namespace TRSAppUpdated.Controllers
                 }
                 if (ID != 0)
                 {
-                    _item = _context.Shows.Where(x => !x.IsDeleted && x.ID == ID)
-                           .Select(x => new ShowVM()
+                    _item = _context.Reservations.Where(x => !x.IsDeleted && x.ID == ID)
+                           .Select(x => new ReservationVM()
                            {
                                ID = x.ID,
-                               EventID = x.EventID,
-                               TimeString = x.Time.ToString(@"hh\:mm"),
-                               Date = x.Date,
-                               Time = x.Time,
+                               TicketNumber = x.TicketNumber,
+                               CustomerName = x.CustomerName,
+                               CustomerPhone= x.CustomerPhone,
+                               CostPrice= x.CostPrice,
+                               Discount= x.Discount,
+                               SalePrice = x.SalePrice,
+                               AmountPaid = x.AmountPaid,
+                               AmountRemaining = x.AmountRemaining,
+                               IsFullyPaid = x.IsFullyPaid,
+                               TransactionID=x.TransactionID,
+                               BookingDateTime=x.BookingDateTime,
+                               ShowID = x.ShowID,
+                               PaymentModeID = x.PaymentModeID,
+                               ReservationStatusID = x.ReservationStatusID,
                                CreatedByUserID = x.CreatedByUserID,
                                CreatedDateTime = x.CreatedDateTime,
                            })

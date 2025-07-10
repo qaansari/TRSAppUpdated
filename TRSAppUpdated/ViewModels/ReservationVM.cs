@@ -1,9 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using TRSAppUpdated.Models;
 
 namespace TRSAppUpdated.ViewModels
 {
-    public class ReservationVM
+    public class ReservationVM : CommonModel
     {
         public int ID { get; set; }
         [Required(ErrorMessage = "Please fill out this field")]
