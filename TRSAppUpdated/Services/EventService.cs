@@ -122,7 +122,6 @@ namespace TRSAppUpdated.Services
                                    ShowsList = x.Shows.Where(x => !x.IsDeleted).Select(x => new ShowVM()
                                    {
                                        ID = x.ID,
-                                       EventID = x.EventID,
                                        Date = x.Date,
                                        Time = x.Time,
                                    }).ToList(),

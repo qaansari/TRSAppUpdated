@@ -201,26 +201,84 @@ namespace TRSAppUpdated.Controllers
             }
             return RedirectToAction("Details", "Event", new { ID = EventID });
         }
+        //Update Tickets (GET)
+        [Authorize(Roles = "Super Admin,Admin")]
         public async Task<IActionResult> UpdateTickets(int ID, int EventID)
         {
-            if (ID != 0 && EventID != 0)
+            var _item = new TicketsBySeatVM();
+            try
             {
-                ViewBag.ShowID = ID;
-                ViewBag.EventID = EventID;
-            }
-            var _tickets = _context.Tickets
-                .Include(x=>x.Seat)
-                .ThenInclude(x=>x.Column)
-                .ThenInclude(x=>x.Row)
-                .Where(x => !x.IsDeleted && x.ShowID == ID)
-                .AsNoTracking()
-                .GroupBy(x=>x.Seat.Column.Row.RowLabel).Select(x => new TicketRowVM()
+                if (ID != 0 && EventID != 0)
                 {
-                    Row = x.Key,
-                    Price=x.FirstOrDefault().CostPrice,
-                    IsReserved=x.FirstOrDefault().IsReserved,
-                }).ToList();
-            return RedirectToAction("Details", "Event", new { ID = EventID });
+                    _item.ShowID = ID;
+                    _item.EventID = EventID;
+                }
+                var _tickets = await _context.Tickets
+                .Where(x => !x.IsDeleted && x.ShowID == ID)
+                .Select(x => new
+                {
+                    x.ID,
+                    x.CostPrice,
+                    RowLabel = x.Seat.Column.Row.RowLabel,
+                    x.IsReserved,
+                })
+                    .AsNoTracking()
+                    .GroupBy(x => x.RowLabel)
+                    .Select(g => new TicketRowVM
+                    {
+                        ID = g.First().ID,
+                        RowLabel = g.Key,
+                        Price = g.First().CostPrice,
+                        IsReserved = g.First().IsReserved
+                    })
+                    .ToListAsync();
+                _item.TicketRowList = _tickets;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error occured at UpdateTickets (GET) in {_Title} Controller due to {ex}");
+            }
+            return View(_item);
+        }
+        //Update Tickets (POST)
+        [Authorize(Roles = "Super Admin,Admin")]
+        [HttpPost]
+        public async Task<IActionResult> UpdateTickets(TicketsBySeatVM Model)
+        {
+            try
+            {
+                // Load all tickets for the given show
+                var tickets = await _context.Tickets
+                    .Include(x => x.Seat)
+                        .ThenInclude(x => x.Column)
+                            .ThenInclude(x => x.Row)
+                    .Where(x => !x.IsDeleted && x.ShowID == Model.ShowID)
+                    .ToListAsync();
+
+                foreach (var row in Model.TicketRowList)
+                {
+                    // Find matching tickets by row label
+                    var matchingTickets = tickets
+                        .Where(t => t.Seat?.Column?.Row?.RowLabel == row.RowLabel)
+                        .ToList();
+                    foreach (var ticket in matchingTickets)
+                    {
+                        // Apply updates
+                        ticket.CostPrice = row.Price;
+                        ticket.IsReserved = ticket.IsReserved;
+                        ticket.UpdatedByUserID = _UserID;
+                        ticket.UpdatedDateTime = DateTime.UtcNow.AddHours(5);
+                        _context.Entry(ticket).State = EntityState.Modified;
+                    }
+                }
+                await _context.SaveChangesAsync();
+                TempData["Message"] = "1,Ticket Prices Successfully Updated";
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error occured at UpdateTickets (POST) in {_Title} Controller due to {ex}");
+            }
+            return RedirectToAction("UpdateTickets", _Title, new { ID = Model.ShowID, EventID = Model.EventID });
         }
     }
 }

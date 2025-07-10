@@ -1,4 +1,6 @@
-﻿namespace TRSAppUpdated.ViewModels
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace TRSAppUpdated.ViewModels
 {
     public class TicketVM
     {
@@ -14,7 +16,9 @@
     //Ticket Row
     public class TicketRowVM
     {
-        public string Row { get; set; }
+        public int ID { get; set; }
+        public string RowLabel { get; set; }
+        [Range(1,double.MaxValue,ErrorMessage= "Please fill out this field")]
         public double Price { get; set; }
         public bool IsReserved { get; set; } = false;
     }

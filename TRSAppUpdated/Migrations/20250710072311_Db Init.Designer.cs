@@ -12,7 +12,7 @@ using TRSAppUpdated.Models;
 namespace TRSAppUpdated.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250708102928_Db Init")]
+    [Migration("20250710072311_Db Init")]
     partial class DbInit
     {
         /// <inheritdoc />
@@ -227,7 +227,7 @@ namespace TRSAppUpdated.Migrations
                             ID = 1,
                             CountryID = 1,
                             CreatedByUserID = 1,
-                            CreatedDateTime = new DateTime(2025, 7, 8, 15, 29, 27, 268, DateTimeKind.Utc).AddTicks(8483),
+                            CreatedDateTime = new DateTime(2025, 7, 10, 12, 23, 10, 879, DateTimeKind.Utc).AddTicks(5747),
                             IsDeleted = false,
                             Title = "Karachi"
                         },
@@ -236,7 +236,7 @@ namespace TRSAppUpdated.Migrations
                             ID = 2,
                             CountryID = 1,
                             CreatedByUserID = 1,
-                            CreatedDateTime = new DateTime(2025, 7, 8, 15, 29, 27, 268, DateTimeKind.Utc).AddTicks(8486),
+                            CreatedDateTime = new DateTime(2025, 7, 10, 12, 23, 10, 879, DateTimeKind.Utc).AddTicks(5749),
                             IsDeleted = false,
                             Title = "Lahore"
                         },
@@ -245,7 +245,7 @@ namespace TRSAppUpdated.Migrations
                             ID = 3,
                             CountryID = 1,
                             CreatedByUserID = 1,
-                            CreatedDateTime = new DateTime(2025, 7, 8, 15, 29, 27, 268, DateTimeKind.Utc).AddTicks(8487),
+                            CreatedDateTime = new DateTime(2025, 7, 10, 12, 23, 10, 879, DateTimeKind.Utc).AddTicks(5751),
                             IsDeleted = false,
                             Title = "Islamabad"
                         });
@@ -336,7 +336,7 @@ namespace TRSAppUpdated.Migrations
                         {
                             ID = 1,
                             CreatedByUserID = 1,
-                            CreatedDateTime = new DateTime(2025, 7, 8, 15, 29, 27, 268, DateTimeKind.Utc).AddTicks(8419),
+                            CreatedDateTime = new DateTime(2025, 7, 10, 12, 23, 10, 879, DateTimeKind.Utc).AddTicks(5709),
                             DialingCode = "+92",
                             Flag = "🇵🇰",
                             IsDeleted = false,
@@ -492,7 +492,7 @@ namespace TRSAppUpdated.Migrations
                         {
                             ID = 1,
                             CreatedByUserID = 1,
-                            CreatedDateTime = new DateTime(2025, 7, 8, 15, 29, 27, 268, DateTimeKind.Utc).AddTicks(8337),
+                            CreatedDateTime = new DateTime(2025, 7, 10, 12, 23, 10, 879, DateTimeKind.Utc).AddTicks(5646),
                             IsDeleted = false,
                             Title = "Active"
                         },
@@ -500,7 +500,7 @@ namespace TRSAppUpdated.Migrations
                         {
                             ID = 2,
                             CreatedByUserID = 1,
-                            CreatedDateTime = new DateTime(2025, 7, 8, 15, 29, 27, 268, DateTimeKind.Utc).AddTicks(8344),
+                            CreatedDateTime = new DateTime(2025, 7, 10, 12, 23, 10, 879, DateTimeKind.Utc).AddTicks(5650),
                             IsDeleted = false,
                             Title = "Ended"
                         },
@@ -508,7 +508,7 @@ namespace TRSAppUpdated.Migrations
                         {
                             ID = 3,
                             CreatedByUserID = 1,
-                            CreatedDateTime = new DateTime(2025, 7, 8, 15, 29, 27, 268, DateTimeKind.Utc).AddTicks(8346),
+                            CreatedDateTime = new DateTime(2025, 7, 10, 12, 23, 10, 879, DateTimeKind.Utc).AddTicks(5651),
                             IsDeleted = false,
                             Title = "Postponed"
                         });
@@ -1145,6 +1145,12 @@ namespace TRSAppUpdated.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsReserved")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("ReservationDateTime")
+                        .HasColumnType("datetime2");
+
                     b.Property<double>("SalePrice")
                         .HasColumnType("float");
 
@@ -1264,7 +1270,7 @@ namespace TRSAppUpdated.Migrations
                         {
                             ID = 1,
                             ContactNumber = "+923312541767",
-                            CreatedDateTime = new DateTime(2025, 7, 8, 15, 29, 27, 268, DateTimeKind.Utc).AddTicks(7578),
+                            CreatedDateTime = new DateTime(2025, 7, 10, 12, 23, 10, 879, DateTimeKind.Utc).AddTicks(5282),
                             Email = "sa@eventland.pk",
                             FirstName = "Super",
                             IsActive = true,

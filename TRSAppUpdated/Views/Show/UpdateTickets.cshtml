@@ -1,89 +1,96 @@
 ﻿@model TicketsBySeatVM
 @{
-    ViewData["Title"] = "Update Columns";
+    ViewData["Title"] = "Update Ticket Prices";
     var _Message = TempData["Message"] as string;
-    int _EventID = ViewBag.EventID != null ? ViewBag.EventID : 0;
-    int _ShowID = ViewBag.ShowID != null ? ViewBag.ShowID : 0;
+    bool isSuperAdmin = (await _authorizationService.AuthorizeAsync(User, "SuperAdmin")).Succeeded ? true : false;
+    bool isAdmin = (await _authorizationService.AuthorizeAsync(User, "Admin")).Succeeded ? true : false;
 }
-<div class="row">
-    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-        <div class="card">
-            <div class="card-header">
-                <h4>
-                    @(ViewData["Title"])
-                    <span class="float-right">
-                        <a href="@(Url.Action("Details", "Event", new { ID = _EventID }))" class="btn btn-danger ml-2">Back</a>
-                    </span>
-                </h4>
-            </div>
-            <div class="card-body">
-                <form asp-action="UpdateColumns" method="post">
-                    <input type="hidden" asp-for="EventID" value="@(_EventID)"/>
-                    <input type="hidden" asp-for="ShowID" value="@(_ShowID)" />
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Row</th>
-                                <th>Price</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @for (int i = 0; i < Model.Count; i++)
-                            {
+@if (isSuperAdmin || isAdmin)
+{
+    <div class="row">
+        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4>
+                        @(ViewData["Title"])
+                        <span class="float-right">
+                            <a href="@(Url.Action("Details", "Event", new { ID = Model.EventID }))" class="btn btn-danger ml-2">Back</a>
+                        </span>
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="UpdateTickets" method="post">
+                        <input type="hidden" asp-for="EventID" value="@(Model.EventID)" />
+                        <input type="hidden" asp-for="ShowID" value="@(Model.ShowID)" />
+                        <table class="table">
+                            <thead>
                                 <tr>
-                                    <td>
-                                        @Model[i].RowLabel
-                                        <input type="hidden" asp-for="@Model[i].RowID" />
-                                        <input type="hidden" asp-for="@Model[i].RowLabel" />
-                                    </td>
-                                    <td>
-                                        <input type="number" asp-for="@Model[i].ColumnCount" class="form-control" />
-                                        <span asp-validation-for="@Model[i].ColumnCount"></span>
-                                    </td>
+                                    <th>Row</th>
+                                    <th>Price</th>
                                 </tr>
-                            }
-                        </tbody>
-                    </table>
-                    <button type="submit" class="btn btn-primary">Save</button>
-                    <a href="@(Url.Action("Details", "Event", new { ID = _EventID }))" class="btn btn-danger ml-2">Back</a>
-                </form>
+                            </thead>
+                            <tbody>
+                                @for (int i = 0; i < Model.TicketRowList.Count; i++)
+                                {
+                                    <input type="hidden" asp-for="@Model.TicketRowList[i].ID" />
+                                    <tr>
+                                        <td>
+                                            @Model.TicketRowList[i].RowLabel
+                                            <input type="hidden" asp-for="@Model.TicketRowList[i].RowLabel" />
+                                        </td>
+                                        <td>
+                                            <input type="number" asp-for="@Model.TicketRowList[i].Price" class="form-control" />
+                                            <span asp-validation-for="@Model.TicketRowList[i].Price"></span>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                        <a href="@(Url.Action("Details", "Event", new { ID = Model.EventID }))" class="btn btn-danger ml-2">Back</a>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
-
+}
+else
+{
+    Layout = "_EmptyLayout";
+    @(await Html.PartialAsync("~/Views/Shared/_NotAuthorizedView.cshtml"))
+}
 @section Scripts {
     <script>
         @if (_Message != null)
         {
-                if (_Message.StartsWith("1"))
-                {
-                        <text>
-                                            Lobibox.notify('success', {
-                                            pauseDelayOnHover: true,
-                                            size: 'mini',
-                                            icon: 'bx bx-info-circle',
-                                            continueDelayOnInactiveTab: false,
-                                            position: 'bottom right',
-                                            msg: '@(_Message.Substring(2))',
-                                            soundPath: '/assets/sounds/'
-                                            });
-                        </text>
-                }
-                else
-                {
-                        <text>
-                                            Lobibox.notify('error', {
-                                            pauseDelayOnHover: true,
-                                            size: 'mini',
-                                            icon: 'bx bx-info-circle',
-                                            continueDelayOnInactiveTab: false,
-                                            position: 'bottom right',
-                                            msg: '@(_Message.Substring(2))',
-                                            soundPath: '/assets/sounds/'
-                                            });
-                        </text>
-                }
+                        if (_Message.StartsWith("1"))
+                        {
+                                        <text>
+                                                            Lobibox.notify('success', {
+                                                            pauseDelayOnHover: true,
+                                                            size: 'mini',
+                                                            icon: 'bx bx-info-circle',
+                                                            continueDelayOnInactiveTab: false,
+                                                            position: 'bottom right',
+                                                            msg: '@(_Message.Substring(2))',
+                                                            soundPath: '/assets/sounds/'
+                                                            });
+                                        </text>
+                        }
+                        else
+                        {
+                                        <text>
+                                                            Lobibox.notify('error', {
+                                                            pauseDelayOnHover: true,
+                                                            size: 'mini',
+                                                            icon: 'bx bx-info-circle',
+                                                            continueDelayOnInactiveTab: false,
+                                                            position: 'bottom right',
+                                                            msg: '@(_Message.Substring(2))',
+                                                            soundPath: '/assets/sounds/'
+                                                            });
+                                        </text>
+                        }
         }
     </script>
 }
