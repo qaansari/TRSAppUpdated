@@ -25,49 +25,32 @@ namespace TRSAppUpdated.Controllers
             _logger = logger;
             _UserID = Convert.ToInt32(_httpContextAccessor.HttpContext.User.FindFirstValue("UserID"));
         }
-        [Authorize(Roles = "Super Admin,Admin,Moderator,User")]
+        [Authorize(Roles = "Super Admin,Admin")]
         public IActionResult AddOrEdit(int ID = 0, int EventID = 0)
         {
-            var _item = new ReservationVM();
-            try
+            var _item = new ShowVM();
+            if (EventID != 0)
             {
-                if (EventID != 0)
-                {
-                    ViewBag.EventID = EventID;
-                }
-                if (ID != 0)
-                {
-                    _item = _context.Reservations.Where(x => !x.IsDeleted && x.ID == ID)
-                           .Select(x => new ReservationVM()
-                           {
-                               ID = x.ID,
-                               TicketNumber = x.TicketNumber,
-                               CustomerName = x.CustomerName,
-                               CustomerPhone= x.CustomerPhone,
-                               CostPrice= x.CostPrice,
-                               Discount= x.Discount,
-                               SalePrice = x.SalePrice,
-                               AmountPaid = x.AmountPaid,
-                               AmountRemaining = x.AmountRemaining,
-                               IsFullyPaid = x.IsFullyPaid,
-                               TransactionID=x.TransactionID,
-                               BookingDateTime=x.BookingDateTime,
-                               ShowID = x.ShowID,
-                               PaymentModeID = x.PaymentModeID,
-                               ReservationStatusID = x.ReservationStatusID,
-                               CreatedByUserID = x.CreatedByUserID,
-                               CreatedDateTime = x.CreatedDateTime,
-                           })
-                           .AsNoTracking().FirstOrDefault();
-                }
-                if (EventID != 0)
-                {
-                    _item.EventID = EventID;
-                }
+                ViewBag.EventID = EventID;
             }
-            catch (Exception ex)
+            if (ID != 0)
             {
-                _logger.LogError($"Error occured at AddOrEdit (GET) in {_Title} Controller due to {ex}");
+                _item = _context.Shows.Where(x => !x.IsDeleted && x.ID == ID)
+                       .Select(x => new ShowVM()
+                       {
+                           ID = x.ID,
+                           EventID = x.EventID,
+                           TimeString = x.Time.ToString(@"hh\:mm"),
+                           Date = x.Date,
+                           Time = x.Time,
+                           CreatedByUserID = x.CreatedByUserID,
+                           CreatedDateTime = x.CreatedDateTime,
+                       })
+                       .AsNoTracking().FirstOrDefault();
+            }
+            if (EventID != 0)
+            {
+                _item.EventID = EventID;
             }
             return View(_item);
         }
@@ -285,7 +268,7 @@ namespace TRSAppUpdated.Controllers
             {
                 _logger.LogError($"Error occured at Delete (POST) in {_Title} Controller due to {ex}");
             }
-            return RedirectToAction("Details", "Event", new { ID = EventID });
+            return RedirectToAction("Index");
         }
         //View Tickets (GET)
         [Authorize(Roles = "Super Admin,Admin,Moderator,User")]

@@ -1,0 +1,218 @@
+﻿@model ReservationVM
+@{
+    string _fn = "Add";
+    if (Model.ID != 0)
+    {
+        _fn = "Edit";
+    }
+    string _PageTitle = "Reservation";
+    ViewData["Title"] = $"{_fn} {_PageTitle}";
+    var _Message = TempData["Message"] as string;
+    bool isSuperAdmin = (await _authorizationService.AuthorizeAsync(User, "SuperAdmin")).Succeeded ? true : false;
+    bool isAdmin = (await _authorizationService.AuthorizeAsync(User, "Admin")).Succeeded ? true : false;
+    int _EventID = ViewBag.EventID != null ? ViewBag.EventID : 0;
+}
+@if (isSuperAdmin || isAdmin)
+{
+    <div class="row">
+        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4>@(ViewData["Title"])</h4>
+                </div>
+                <div class="card-body">
+                    <form class="separate-form" enctype="multipart/form-data" method="post" asp-action="AddOrEdit">
+                        <input type="hidden" asp-for="ID" />
+                        <input type="hidden" asp-for="CreatedByUserID" />
+                        <input type="hidden" asp-for="CreatedDateTime" />
+                        <div class="row">
+                            <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                                <div class="form-group">
+                                    <label class="col-form-label">Country <span class="text-danger">*</span></label>
+                                    <ejs-dropdownlist cssClass="form-control form-control-sm" dataSource="@(ViewData["ShowList"])" placeholder="Select a show"
+                                                      allowFiltering="true" ejs-for="ShowID" popupHeight="220px" change="showChange">
+                                        <e-dropdownlist-fields value="ID" text="ShowDateTime"></e-dropdownlist-fields>
+                                    </ejs-dropdownlist>
+                                    <span asp-validation-for="ShowID"></span>
+                                </div>
+                            </div>
+                            <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                                <div class="form-group">
+                                    <label class="col-form-label">Tickets <span class="text-danger">*</span></label>
+                                    <ejs-multiselect cssClass="form-control form-control-sm" dataSource="@(ViewData["TicketList"])" placeholder="Select tickets"
+                                                     allowFiltering="true" ejs-for="TicketIDs" popupHeight="220px" enabled="false">
+                                        <e-multiselect-fields value="ID" text="FormattedSeatNumber"></e-multiselect-fields>
+                                    </ejs-multiselect>
+                                    <span asp-validation-for="TicketIDs"></span>
+                                </div>
+                            </div>
+                            <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                                <div class="form-group">
+                                    <label class="col-form-label">Customer Name <span class="text-danger">*</span></label>
+                                    <input class="form-control" type="text" placeholder="Enter Customer Name" asp-for="CustomerName">
+                                    <span asp-validation-for="CustomerName"></span>
+                                </div>
+                            </div>
+                            <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                                <div class="form-group">
+                                    <label class="col-form-label">Phone # <span class="text-danger">*</span></label>
+                                    <input class="form-control" type="text" placeholder="Enter Customer Phone #" asp-for="CustomerPhone">
+                                    <span asp-validation-for="CustomerPhone"></span>
+                                </div>
+                            </div>
+                            <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                                <div class="form-group">
+                                    <label class="col-form-label">Cost Price <span class="text-danger">*</span></label>
+                                    <input class="form-control" type="number" placeholder="Enter Cost Price" asp-for="CostPrice" readonly="true">
+                                </div>
+                            </div>
+                            <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                                <div class="form-group">
+                                    <label class="col-form-label">Sale Price <span class="text-danger">*</span></label>
+                                    <input class="form-control" type="number" placeholder="Enter Sale Price" asp-for="SalePrice">
+                                    <span asp-validation-for="SalePrice"></span>
+                                </div>
+                            </div>
+                            <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                                <div class="form-group">
+                                    <label class="col-form-label">Discount</label>
+                                    <input class="form-control" type="number" placeholder="Enter Discount" asp-for="Discount" readonly="true">
+                                </div>
+                            </div>
+                            <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                                <div class="form-group">
+                                    <label class="col-form-label">Amount Paid<span class="text-danger">*</span></label>
+                                    <input class="form-control" type="number" placeholder="Enter Amount Paid" asp-for="AmountPaid">
+                                    <span asp-validation-for="AmountPaid"></span>
+                                </div>
+                            </div>
+                            <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                                <div class="form-group">
+                                    <label class="col-form-label">Amount Remaining<span class="text-danger">*</span></label>
+                                    <input class="form-control" type="number" placeholder="Enter Amount Remaining" asp-for="AmountRemaining" readonly="true">
+                                </div>
+                            </div>
+                            <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                                <div class="form-group">
+                                    <label class="col-form-label">Reservation Status <span class="text-danger">*</span></label>
+                                    <ejs-dropdownlist cssClass="form-control form-control-sm" dataSource="@(ViewData["ReservationStatusList"])" placeholder="Select an reservation status"
+                                                      allowFiltering="true" ejs-for="ReservationStatusID" popupHeight="220px">
+                                        <e-dropdownlist-fields value="ID" text="Title"></e-dropdownlist-fields>
+                                    </ejs-dropdownlist>
+                                    <span asp-validation-for="ReservationStatusID"></span>
+                                </div>
+                            </div>
+                            <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                                <div class="form-group">
+                                    <label class="col-form-label">Reservation Status <span class="text-danger">*</span></label>
+                                    <ejs-dropdownlist cssClass="form-control form-control-sm" dataSource="@(ViewData["ReservationStatusList"])" placeholder="Select an reservation status"
+                                                      allowFiltering="true" ejs-for="ReservationStatusID" popupHeight="220px">
+                                        <e-dropdownlist-fields value="ID" text="Title"></e-dropdownlist-fields>
+                                    </ejs-dropdownlist>
+                                    <span asp-validation-for="ReservationStatusID"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row optional-row">
+                            <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                                <div class="form-group">
+                                    <label class="col-form-label">Photo(s)</label>
+                                    <input class="form-control" type="file" asp-for="ImageFiles" id="imgSelector">
+                                </div>
+                            </div>
+                            <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                                <div class="form-group">
+                                    <label class="col-form-label">Transaction ID <span class="text-danger">*</span></label>
+                                    <input class="form-control" type="text" asp-for="TransactionID">
+                                </div>
+                            </div>
+                            <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                                <div class="form-group">
+                                    <label class="col-form-label">Booking Date Time <span class="text-danger">*</span></label>
+                                    <ejs-datetimepicker cssClass="form-control"  ejs-for="BookingDateTime"></ejs-datetimepicker>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                <div class="form-group mb-0 mt-2">
+                                    <input class="btn btn-primary" type="submit">
+                                    <a class="btn btn-danger" href="@(Url.Action("Details", "Event", new { ID = _EventID }))">Back</a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function showChange() {
+            var showObj = document.getElementById('ShowID').ej2_instances[0];
+            var tickets = document.getElementById('TicketIDs').ej2_instances[0];
+            tickets.enabled = true;
+            var tempQuery = new ej.data.Query().where('ShowID', 'equal', showObj.value);
+            tickets.query = tempQuery;
+            tickets.text = null;
+            tickets.dataBind();
+        }
+    </script>
+
+    @section Scripts {
+        <script>
+            $(document).ready(function () {
+                $("#imgSelector").change(
+                    function PreviewSelectedImage() {
+                        var imageFile = document.getElementById("imgSelector");
+                        var imagePreview = document.getElementById("imgPreview");
+                        var imageReader = new FileReader();
+                        imageReader.onload = function (e) {
+                            imagePreview.src = e.target.result;
+                            imagePreview.style.display = "block";
+                        };
+                        imageReader.readAsDataURL(imageFile.files[0]);
+                    });
+            });
+        </script>
+        @if (_Message != null)
+        {
+            if (_Message.StartsWith("1"))
+            {
+                <script>
+                    $(document).ready(function () {
+                        Lobibox.notify('success', {
+                            pauseDelayOnHover: true,
+                            size: 'mini',
+                            icon: 'bx bx-info-circle',
+                            continueDelayOnInactiveTab: false,
+                            position: 'bottom right',
+                            msg: '@(_Message.Substring(2))',
+                            soundPath: '/assets/sounds/'
+                        });
+                    });
+                </script>
+            }
+            else
+            {
+                <script>
+                    $(document).ready(function () {
+                        Lobibox.notify('error', {
+                            pauseDelayOnHover: true,
+                            size: 'mini',
+                            icon: 'bx bx-info-circle',
+                            continueDelayOnInactiveTab: false,
+                            position: 'bottom right',
+                            msg: '@(_Message.Substring(2))',
+                            soundPath: '/assets/sounds/'
+                        });
+                    });
+                </script>
+            }
+        }
+    }
+}
+else
+{
+    Layout = "_EmptyLayout";
+    @(await Html.PartialAsync("~/Views/Shared/_NotAuthorizedView.cshtml"))
+}

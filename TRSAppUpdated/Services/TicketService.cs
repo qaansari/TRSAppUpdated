@@ -33,10 +33,9 @@ namespace TRSAppUpdated.Services
                     .Select(x => new TicketVM()
                     {
                         ID = x.ID,
-                        ShowID=x.ShowID,
+                        ShowID = x.ShowID,
                         CostPrice = x.CostPrice,
-                        IsReserved = x.IsReserved,
-                        FormattedSeatNumber = x.Seat.Column.Row.RowLabel + x.Seat.SeatNumber,
+                        FormattedSeatNumber = !x.IsReserved ? x.Seat.Column.Row.RowLabel + x.Seat.SeatNumber : x.Seat.Column.Row.RowLabel + x.Seat.SeatNumber + " " + "(Reserved)",
                     })
                     .ToList();
                 return _ticketList ?? new List<TicketVM>();

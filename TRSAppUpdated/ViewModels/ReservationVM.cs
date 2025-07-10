@@ -18,6 +18,8 @@ namespace TRSAppUpdated.ViewModels
         [MinLength(11, ErrorMessage = "Please fill out minimum 11 characters")]
         [StringLength(20, ErrorMessage = "Please fill out maximum 20 characters")]
         public string CustomerPhone { get; set; }
+        [Required(ErrorMessage = "Please fill out this field")]
+        public List<int>? TicketIDs { get; set; }
         [Range(1, double.MaxValue, ErrorMessage = "Please fill out this field")]
         public double CostPrice { get; set; }
         [Range(1, double.MaxValue, ErrorMessage = "Please fill out this field")]
@@ -27,6 +29,7 @@ namespace TRSAppUpdated.ViewModels
         [Range(1, double.MaxValue, ErrorMessage = "Please fill out this field")]
         public double AmountRemaining { get; set; }
         public bool IsFullyPaid { get; set; } = false;
+        public List<IFormFile> ImageFiles { get; set; }
         [MinLength(4, ErrorMessage = "Please fill out minimum 4 characters")]
         [StringLength(50, ErrorMessage = "Please fill out maximum 50 characters")]
         public string? TransactionID { get; set; }
