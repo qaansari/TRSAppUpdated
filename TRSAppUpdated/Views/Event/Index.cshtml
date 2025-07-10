@@ -82,6 +82,29 @@
             </div>
         </div>
     </div>
+    <!--End Modal-->
+    <div class="modal fade" id="endModal" tabindex="-1" role="dialog" aria-labelledby="endModalCenterTitle" aria-hidden="true" style="display:none;">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="endModalCenterTitle">End @(_PageTitle)</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <form method="post" asp-action="End" class="end_form">
+                    <div class="modal-body">
+                        <input type="hidden" name="ID" class="selectedIdElement" />
+                        <p class="text-muted">Are you sure you want to end this @(_PageTitle)?</p>
+                    </div>
+                </form>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger confirmBtn">Yes</button>
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
     @section Scripts {
         <script>
             $(document).ready(function(){
@@ -102,6 +125,16 @@
                     loadData(1);
                 }
             });
+             // End functionality
+                 $(document).on('click', '.endBtn', function(){
+                    var selectedID = $(this).data("id");
+                    $("#endModal .selectedIdElement").val(selectedID);
+                    $("#endModal").modal("show");
+                });
+                $("#endModal .confirmBtn").click(function(){
+                    $("#endModal .end_form").submit();
+                    $("#endModal").modal("hide");
+                });
                 // Delete functionality
                  $(document).on('click', '.deleteBtn', function(){
                     var selectedID = $(this).data("id");

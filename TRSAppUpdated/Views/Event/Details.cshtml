@@ -107,14 +107,19 @@
                                                             @(DateTime.Today.Add(item.Time.Value).ToString("hh:mm tt"))
                                                         </td>
                                                         <td>
-                                                            @if (isSuperAdmin || isAdmin)
+                                                            @if (!item.IsEnded)
                                                             {
-                                                                <a asp-action="UpdateTickets" asp-controller="Show" asp-route-ID="@(item.ID)" asp-route-EventID="@(Model.ID)" class="btn btn-primary sm-btn">Update Tickets</a>
-                                                                <a asp-action="AddOrEdit" asp-controller="Show" asp-route-ID="@(item.ID)" asp-route-EventID="@(Model.ID)" class="btn btn-primary sm-btn">Edit</a>
-                                                            }
-                                                            @if (isSuperAdmin)
-                                                            {
-                                                                <button type="button" class="btn btn-danger sm-btn deleteShowBtn" data-id="@(item.ID)">Delete</button>
+                                                                <a asp-action="ViewTickets" asp-controller="Show" asp-route-ID="@(item.ID)" asp-route-EventID="@(Model.ID)" class="btn btn-primary sm-btn">View Tickets</a>
+                                                                @if (isSuperAdmin || isAdmin)
+                                                                {
+                                                                    <button type="button" class="btn btn-danger sm-btn endShowBtn" data-id="@(item.ID)">End</button>
+                                                                    <a asp-action="UpdateTickets" asp-controller="Show" asp-route-ID="@(item.ID)" asp-route-EventID="@(Model.ID)" class="btn btn-primary sm-btn">Update Tickets</a>
+                                                                    <a asp-action="AddOrEdit" asp-controller="Show" asp-route-ID="@(item.ID)" asp-route-EventID="@(Model.ID)" class="btn btn-primary sm-btn">Edit</a>
+                                                                }
+                                                                @if (isSuperAdmin)
+                                                                {
+                                                                    <button type="button" class="btn btn-danger sm-btn deleteShowBtn" data-id="@(item.ID)">Delete</button>
+                                                                }
                                                             }
                                                         </td>
                                                     </tr>
@@ -146,7 +151,7 @@
             </div>
         </div>
     </div>
-    <!--Delete Modal-->
+    <!--Delete Show Modal-->
     <div class="modal fade" id="deleteShowModal" tabindex="-1" role="dialog" aria-labelledby="deleteShowModalCenterTitle" aria-hidden="true" style="display:none;">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
@@ -170,6 +175,30 @@
             </div>
         </div>
     </div>
+    <!--End Show Modal-->
+    <div class="modal fade" id="endShowModal" tabindex="-1" role="dialog" aria-labelledby="endShowModalCenterTitle" aria-hidden="true" style="display:none;">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="endShowModalCenterTitle">End Show</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <form method="post" asp-controller="Show" asp-action="End" class="end_form">
+                    <div class="modal-body">
+                        <input type="hidden" name="ID" class="selectedIdElement" />
+                        <input type="hidden" name="EventID" value="@(Model.ID)"/>
+                        <p class="text-muted">Are you sure you want to end this Show?</p>
+                    </div>
+                </form>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger confirmBtn">Yes</button>
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     @section Scripts {
         <script src="~/assets/js/jquery.min.js"></script>
@@ -178,6 +207,7 @@
         <script>
                        $(document).ready(function(){
               $('#showTable').DataTable();
+              //Delete Show Functionality
               $(document).on('click', '.deleteShowBtn', function(){
                 var selectedID = $(this).data("id");
                 $("#deleteShowModal .selectedIdElement").val(selectedID);
@@ -187,6 +217,16 @@
                 $("#deleteShowModal .delete_form").submit();
                 $("#deleteShowModal").modal("hide");
               });
+              // End Show functionality
+                 $(document).on('click', '.endShowBtn', function(){
+                    var selectedID = $(this).data("id");
+                    $("#endShowModal .selectedIdElement").val(selectedID);
+                    $("#endShowModal").modal("show");
+                });
+                $("#endShowModal .confirmBtn").click(function(){
+                    $("#endShowModal .end_form").submit();
+                    $("#endShowModal").modal("hide");
+                });
             });
 
         </script>

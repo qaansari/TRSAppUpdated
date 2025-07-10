@@ -5,7 +5,7 @@ using TRSAppUpdated.ViewModels;
 
 namespace TRSAppUpdated.Services
 {
-    public class ReservationStatusService: IReservationStatusService
+    public class ReservationStatusService : IReservationStatusService
     {
         private readonly AppDbContext _context;
         private readonly ILogger<ReservationStatusService> _logger;

@@ -124,6 +124,7 @@ namespace TRSAppUpdated.Services
                                        ID = x.ID,
                                        Date = x.Date,
                                        Time = x.Time,
+                                       IsEnded = x.IsEnded,
                                    }).ToList(),
                                    EventCategoriesList = x.EventCategories.Select(x => x.Category.Title).ToList(),
                                    ImagePath = x.ImagePath

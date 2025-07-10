@@ -28,29 +28,36 @@ namespace TRSAppUpdated.Controllers
         [Authorize(Roles = "Super Admin,Admin")]
         public IActionResult AddOrEdit(int ID = 0, int EventID = 0)
         {
-            var _item = new ShowVM();
-            if (EventID != 0)
+            var _item = new ReservationVM();
+            try
             {
-                ViewBag.EventID = EventID;
+                if (EventID != 0)
+                {
+                    ViewBag.EventID = EventID;
+                }
+                if (ID != 0)
+                {
+                    _item = _context.Shows.Where(x => !x.IsDeleted && x.ID == ID)
+                           .Select(x => new ShowVM()
+                           {
+                               ID = x.ID,
+                               EventID = x.EventID,
+                               TimeString = x.Time.ToString(@"hh\:mm"),
+                               Date = x.Date,
+                               Time = x.Time,
+                               CreatedByUserID = x.CreatedByUserID,
+                               CreatedDateTime = x.CreatedDateTime,
+                           })
+                           .AsNoTracking().FirstOrDefault();
+                }
+                if (EventID != 0)
+                {
+                    _item.EventID = EventID;
+                }
             }
-            if (ID != 0)
+            catch (Exception ex)
             {
-                _item = _context.Shows.Where(x => !x.IsDeleted && x.ID == ID)
-                       .Select(x => new ShowVM()
-                       {
-                           ID = x.ID,
-                           EventID = x.EventID,
-                           TimeString = x.Time.ToString(@"hh\:mm"),
-                           Date = x.Date,
-                           Time = x.Time,
-                           CreatedByUserID = x.CreatedByUserID,
-                           CreatedDateTime = x.CreatedDateTime,
-                       })
-                       .AsNoTracking().FirstOrDefault();
-            }
-            if (EventID != 0)
-            {
-                _item.EventID = EventID;
+                _logger.LogError($"Error occured at AddOrEdit (GET) in {_Title} Controller due to {ex}");
             }
             return View(_item);
         }
@@ -239,6 +246,82 @@ namespace TRSAppUpdated.Controllers
                 _logger.LogError($"Error occured at UpdateTickets (GET) in {_Title} Controller due to {ex}");
             }
             return View(_item);
+        }
+        //End
+        [Authorize(Roles = "Super Admin,Admin")]
+        [HttpPost]
+        public async Task<IActionResult> End(int ID,int EventID)
+        {
+            try
+            {
+                var _item = _context.Shows.Where(x => !x.IsDeleted && x.ID == ID)
+                                  .AsNoTracking().FirstOrDefault();
+                if (_item != null)
+                {
+                    _item.IsEnded = true;
+                    _item.UpdatedByUserID = _UserID;
+                    _item.UpdatedDateTime = DateTime.UtcNow.AddHours(5);
+                    _context.ChangeTracker.Clear();
+                    _context.Entry(_item).State = EntityState.Modified;
+                    await _context.SaveChangesAsync();
+                    TempData["Message"] = $"1,{_Title} Successfully Ended";
+                }
+                else
+                {
+                    TempData["Message"] = $"0,No {_Title} Found";
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error occured at Delete (POST) in {_Title} Controller due to {ex}");
+            }
+            return RedirectToAction("Details", "Event", new { ID = EventID });
+        }
+        //View Tickets (GET)
+        [Authorize(Roles = "Super Admin,Admin,Moderator,User")]
+        public IActionResult ViewTickets(int ID, int EventID)
+        {
+            // Get all rows with their columns from database
+            try
+            {
+                if (EventID != 0)
+                {
+                    ViewBag.EventID = EventID;
+                }
+                var _object = _context.Tickets
+                    .Include(x => x.Show)
+                    .ThenInclude(x => x.Event)
+                    .ThenInclude(x => x.Auditorium)
+                    .ThenInclude(x => x.Rows)
+                    .ThenInclude(x => x.Columns)
+                    .Where(x => !x.IsDeleted && x.ID == ID).Select(x => new SeatVM()
+                    {
+                        AuditoriumName = x.Show.Event.Auditorium.Title.Trim(),
+                        VenueName = x.Show.Event.Auditorium.Venue.Title.Trim(),
+                        ShowDate = x.Show.Date,
+                        Rows = x.Show.Event.Auditorium.Rows.Select(y => new RowVM()
+                        {
+                            RowLabel = y.RowLabel,
+                            Columns = y.Columns.Select(c => new ColumnVM()
+                            {
+                                ID = c.ID,
+                                ColumnNumber = c.ColumnNumber,
+                                SeatTickets = c.Seats.Select(s => new TicketVM()
+                                {
+                                    CostPrice = x.CostPrice,
+                                    SeatNumber = s.SeatNumber,
+                                    IsReserved = x.IsReserved,
+                                }).ToList()
+                            }).ToList()
+                        }).ToList()
+                    }).FirstOrDefault();
+                return View(_object ?? new SeatVM());
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error occured at UpdateSeats (GET) in {_Title} Controller due to {ex}");
+            }
+            return View(new SeatVM());
         }
         //Update Tickets (POST)
         [Authorize(Roles = "Super Admin,Admin")]

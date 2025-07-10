@@ -4,7 +4,12 @@ namespace TRSAppUpdated.ViewModels
 {
     public class TicketVM
     {
-
+        public int ID { get; set; }
+        public int ShowID { get; set; }
+        public int SeatNumber { get; set; }
+        public string FormattedSeatNumber { get; set; }
+        public double CostPrice { get; set; }
+        public bool IsReserved { get; set; }
     }
     //Seat Ticket Form VM
     public class TicketsBySeatVM

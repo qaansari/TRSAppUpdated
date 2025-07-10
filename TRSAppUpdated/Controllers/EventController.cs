@@ -49,7 +49,7 @@ namespace TRSAppUpdated.Controllers
         {
             try
             {
-                var (_result, totalRecords) = await _service.GetAllPaginated(_pageNo,_pageSize, _searchedTerm);
+                var (_result, totalRecords) = await _service.GetAllPaginated(_pageNo, _pageSize, _searchedTerm);
                 ViewBag.TotalRecords = totalRecords;
                 ViewBag.PageNo = _pageNo;
                 ViewBag.PageSize = _pageSize;
@@ -305,6 +305,38 @@ namespace TRSAppUpdated.Controllers
                     _context.Entry(_item).State = EntityState.Modified;
                     await _context.SaveChangesAsync();
                     TempData["Message"] = $"1,{_Title} Successfully Deleted";
+                }
+                else
+                {
+                    TempData["Message"] = $"0,No {_Title} Found";
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error occured at Delete (POST) in {_Title} Controller due to {ex}");
+            }
+            return RedirectToAction("Index");
+        }
+        //End
+        [Authorize(Roles = "Super Admin,Admin")]
+        [HttpPost]
+        public async Task<IActionResult> End(int ID)
+        {
+            try
+            {
+                var _status = _context.EventStatuses.Where(x => !x.IsDeleted && x.Title.ToLower() == "ended")
+                                 .AsNoTracking().FirstOrDefault();
+                var _item = _context.Events.Where(x => !x.IsDeleted && x.ID == ID)
+                                  .AsNoTracking().FirstOrDefault();
+                if (_item != null && _status != null)
+                {
+                    _item.EventStatusID = _status.ID;
+                    _item.UpdatedByUserID = _UserID;
+                    _item.UpdatedDateTime = DateTime.UtcNow.AddHours(5);
+                    _context.ChangeTracker.Clear();
+                    _context.Entry(_item).State = EntityState.Modified;
+                    await _context.SaveChangesAsync();
+                    TempData["Message"] = $"1,{_Title} Successfully Ended";
                 }
                 else
                 {

@@ -67,13 +67,17 @@
 
                     <td>
                         <a asp-action="Details" asp-route-ID="@(item.ID)" class="btn btn-primary sm-btn">Details</a>
-                        @if (isSuperAdmin || isAdmin)
+                        @if (!string.IsNullOrEmpty(item.EventStatusTitle) && item.EventStatusTitle.ToLower()=="active")
                         {
-                            <a asp-action="AddOrEdit" asp-route-ID="@(item.ID)" class="btn btn-primary sm-btn">Edit</a>
-                        }
-                        @if (isSuperAdmin)
-                        {
-                            <button type="button" class="btn btn-danger sm-btn deleteBtn" data-id="@(item.ID)">Delete</button>
+                            @if (isSuperAdmin || isAdmin)
+                            {
+                                <button type="button" class="btn btn-danger sm-btn endBtn" data-id="@(item.ID)">End</button>
+                                <a asp-action="AddOrEdit" asp-route-ID="@(item.ID)" class="btn btn-primary sm-btn">Edit</a>
+                            }
+                            @if (isSuperAdmin)
+                            {
+                                <button type="button" class="btn btn-danger sm-btn deleteBtn" data-id="@(item.ID)">Delete</button>
+                            }
                         }
                     </td>
                 </tr>

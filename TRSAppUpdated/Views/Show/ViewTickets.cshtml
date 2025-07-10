@@ -1,0 +1,48 @@
+﻿@model SeatVM
+@{
+    ViewData["Title"] = $"Ticket Details";
+    var _Message = TempData["Message"] as string;
+    bool isSuperAdmin = (await _authorizationService.AuthorizeAsync(User, "SuperAdmin")).Succeeded ? true : false;
+    bool isAdmin = (await _authorizationService.AuthorizeAsync(User, "Admin")).Succeeded ? true : false;
+    bool isModerator = (await _authorizationService.AuthorizeAsync(User, "Moderator")).Succeeded ? true : false;
+    bool isUser = (await _authorizationService.AuthorizeAsync(User, "User")).Succeeded ? true : false;
+    int _EventID = ViewBag.EventID != null ? ViewBag.EventID : 0;
+}
+@if (isSuperAdmin || isAdmin || isModerator || isUser)
+{
+    <div class="row">
+        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+            <div class="info w-100">
+                <div class="form-group mb-0 float-right my-2 mr-5px">
+                    <a class="btn btn-danger" href="@(Url.Action("Details", "Event", new { ID = _EventID }))">Back</a>
+                </div>
+                <h1 class="fw-bold text-uppercase text-center">@(ViewData["Title"]) for @(Model.ShowDate.Value.ToString("dddd, dd MMMM yyyy"))</h1>
+                <h3 class="fw-medium text-uppercase text-center">@(Model.Rows.SelectMany(x => x.Columns).SelectMany(x => x.SeatTickets).Count()) SEATS</h3>
+            </div>
+            <div class="w-100">
+                @foreach (var row in Model.Rows)
+                {
+                    <div class="seat-row mt-2">
+                        <span class="row_label  mr-5px">@(row.RowLabel)</span>
+                        @foreach (var column in row.Columns)
+                        {
+                            @foreach (var seat in column.SeatTickets)
+                            {
+                                <div class="seat @(seat.IsReserved ? "reserved" : "")">
+                                    @seat.SeatNumber
+                                </div>
+                            }
+                            <div class="column-gap"></div>
+                        }
+                        <span class="row_label">@(row.RowLabel)</span>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    Layout = "_EmptyLayout";
+    @(await Html.PartialAsync("~/Views/Shared/_NotAuthorizedView.cshtml"))
+}

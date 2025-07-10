@@ -158,8 +158,8 @@ span.e-input-group.e-control-wrapper.form-control.form-control-sm.e-ddl.e-lib.e-
     display: inline-block;
 }
 
-.column-gap {
-    width: 30px; /* Space between columns */
+.column-gap:not(:last-child) {
+    width: 30px;
 }
 
 .w-5per {
@@ -199,3 +199,6 @@ span.e-input-group.e-control-wrapper.form-control.form-control-sm.e-ddl.e-lib.e-
         font-size: 16px;
         margin-top: 20px;
     }
+.seat.reserved {
+    background-color: var(--warning);
+}

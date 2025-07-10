@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Syncfusion.EJ2.Layouts;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using TRSAppUpdated.Models;
 
@@ -15,5 +16,12 @@ namespace TRSAppUpdated.ViewModels
         [Required(ErrorMessage = "Please fill out this field")]
         public string TimeString { get; set; }
         public bool IsEnded { get; set; } = false;
+        public string? ShowDateTime
+        {
+            get
+            {
+                return this.Date.Value.ToString("dddd, dd MMMM yyyy") + " " +DateTime.Today.Add(this.Time.Value).ToString("hh:mm tt");
+            }
+        }
     }
 }

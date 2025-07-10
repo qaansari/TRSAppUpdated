@@ -20,13 +20,16 @@
                     <span class="row_label  mr-5px">@(row.RowLabel)</span>
                     @foreach (var column in row.Columns)
                     {
-                        @foreach (var seat in column.Seats)
+                        if (column.Seats.Count > 0)
                         {
-                            <div class="seat">
-                                @seat
-                            </div>
+                            @foreach (var seat in column.Seats)
+                            {
+                                <div class="seat">
+                                    @seat
+                                </div>
+                            }
+                            <div class="column-gap"></div>
                         }
-                        <div class="column-gap"></div>
                     }
                     <span class="row_label">@(row.RowLabel)</span>
                 </div>
