@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Syncfusion.EJ2.Layouts;
 using System.Security.Claims;
 using TRSAppUpdated.Interfaces;
 using TRSAppUpdated.Models;
+using TRSAppUpdated.Services;
 using TRSAppUpdated.ViewModels;
 
 namespace TRSAppUpdated.Controllers
@@ -24,7 +26,7 @@ namespace TRSAppUpdated.Controllers
         public ReservationController(AppDbContext context, IHttpContextAccessor httpContextAccessor,
             IWebHostEnvironment webHostEnvironment, ILogger<ReservationController> logger,
             IShowService showService, ITicketService ticketService,
-            IPaymentModeService paymentModeService,IReservationStatusService reservationStatusService)
+            IPaymentModeService paymentModeService, IReservationStatusService reservationStatusService)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;
@@ -37,10 +39,10 @@ namespace TRSAppUpdated.Controllers
             _logger = logger;
             _UserID = Convert.ToInt32(_httpContextAccessor.HttpContext.User.FindFirstValue("UserID"));
         }
-        [Authorize(Roles ="Super Admin,Admin")]
+        [Authorize(Roles = "Super Admin,Admin")]
         public IActionResult AddOrEdit(int ID = 0, int EventID = 0)
         {
-           
+
             var _item = new ReservationVM();
             try
             {
@@ -61,6 +63,7 @@ namespace TRSAppUpdated.Controllers
                                   {
                                       ID = x.ID,
                                       TicketNumber = x.TicketNumber,
+                                      EventID = EventID,
                                       CustomerName = x.CustomerName,
                                       CustomerPhone = x.CustomerPhone,
                                       TicketIDs = x.ReservationTickets.Select(x => x.TicketID).ToList(),
@@ -82,15 +85,126 @@ namespace TRSAppUpdated.Controllers
                 }
                 else
                 {
-                    _item.TicketNumber= (Guid.NewGuid().ToString().Substring(0, 7)).ToUpper();
+                    _item.EventID = EventID;
+                    _item.TicketNumber = (Guid.NewGuid().ToString().Substring(0, 7)).ToUpper();
                 }
             }
             catch (Exception ex)
             {
 
-                throw;
+                _logger.LogError($"Error occured at AddOrEdit (GET) in {_Title} Controller due to {ex}");
             }
-            return View();
+            return View(_item);
+        }
+        //AddOrEdit (POST)
+        [HttpPost]
+        public async Task<IActionResult> AddOrEdit(ReservationVM Model)
+        {
+            try
+            {
+                ViewData["TicketList"] = _ticketService.GetTicketsByEventID(Model.EventID);
+                ViewData["ShowList"] = _showService.GetShowsByEventID(Model.EventID);
+                ViewData["PaymentModeList"] = _paymentModeService.GetAll();
+                ViewData["ReservationStatusList"] = _reservationStatusService.GetAll();
+                if (ModelState.IsValid)
+                {
+                    var _item = new Reservation();
+                    if (Model.AmountRemaining == 0)
+                    {
+                        Model.IsFullyPaid = true;
+                    }
+                    if (Model.ID != 0)
+                    {
+                        _item = _context.Reservations.Where(x => !x.IsDeleted && x.ID == Model.ID)
+                            .AsNoTracking().FirstOrDefault();
+                        if (_item != null)
+                        {
+                            _item.CustomerName = Model.CustomerName.Trim();
+                            _item.CustomerPhone = Model.CustomerPhone.Trim();
+                            _item.CostPrice = Model.CostPrice;
+                            _item.Discount = Model.Discount;
+                            _item.SalePrice = Model.SalePrice;
+                            _item.AmountPaid = Model.AmountPaid;
+                            _item.AmountRemaining = Model.AmountRemaining;
+                            _item.IsFullyPaid = Model.IsFullyPaid;
+                            _item.TransactionID = Model.TransactionID;
+                            _item.BookingDateTime = Model.BookingDateTime;
+                            _item.ShowID = Model.ShowID;
+                            _item.PaymentModeID = Model.PaymentModeID;
+                            _item.ReservationStatusID = Model.ReservationStatusID;
+                            _item.UpdatedByUserID = _UserID;
+                            _item.UpdatedDateTime = DateTime.UtcNow.AddHours(5);
+                            _context.Entry(_item).State = EntityState.Modified;
+                            await _context.SaveChangesAsync();
+                            TempData["Message"] = $"1,{_Title} Successfully Updated";
+                        }
+                    }
+                    else
+                    {
+                        var isExists = _context.Auditoriums.Where(x => !x.IsDeleted
+                            && x.Title.Trim().ToLower() == Model.Title.Trim().ToLower())
+                        .Any();
+                        if (isExists)
+                        {
+                            TempData["Message"] = $"0,{_Title} Already Exists";
+                            return View(Model);
+                        }
+                        _item.CustomerName = Model.CustomerName.Trim();
+                        _item.CustomerPhone = Model.CustomerPhone.Trim();
+                        _item.CostPrice = Model.CostPrice;
+                        _item.Discount = Model.Discount;
+                        _item.SalePrice = Model.SalePrice;
+                        _item.AmountPaid = Model.AmountPaid;
+                        _item.AmountRemaining = Model.AmountRemaining;
+                        _item.IsFullyPaid = Model.IsFullyPaid;
+                        _item.TransactionID = Model.TransactionID;
+                        _item.BookingDateTime = Model.BookingDateTime;
+                        _item.ShowID = Model.ShowID;
+                        _item.PaymentModeID = Model.PaymentModeID;
+                        _item.ReservationStatusID = Model.ReservationStatusID;
+                        _item.CreatedByUserID = _UserID;
+                        _item.CreatedDateTime = DateTime.UtcNow.AddHours(5);
+                        _context.Reservations.Add(_item);
+                        await _context.SaveChangesAsync();
+                        TempData["Message"] = $"1,{_Title} Successfully Added";
+                    }
+                    if (_item != null && Model.ImageFiles != null && Model.ImageFiles.Count > 0)
+                    {
+                        var _eventName = _context.Events.Where(x => !x.IsDeleted && x.ID == Model.EventID).AsNoTracking().Select(x => x.Title).FirstOrDefault();
+                        if (!string.IsNullOrEmpty(_eventName))
+                        {
+                            if (_eventName.Contains(" "))
+                            {
+                                _eventName = _eventName.Replace(" ", "");
+                            }
+                        }
+                        var folderPath = Path.Combine(_webHostEnvironment.WebRootPath, "assets", "images", "reservations", _eventName);
+                        if (!Directory.Exists(folderPath))
+                        {
+                            Directory.CreateDirectory(folderPath);
+                        }
+                        var _fileName = $"payment_slip" + "_" + _item.CreatedDateTime.ToString("yyyyddMMhhmmss") + Path.GetExtension(Model.ImageFile.FileName);
+                        _item.ImagePath = _fileName.Trim();
+                        _item.UpdatedByUserID = _UserID;
+                        _item.UpdatedDateTime = DateTime.UtcNow.AddHours(5);
+                        var _filePath = Path.Combine(folderPath, _fileName);
+                        using (var _stream = new FileStream(_filePath, FileMode.Create))
+                        {
+                            await Model.ImageFile.CopyToAsync(_stream);
+                        }
+                        _context.ChangeTracker.Clear();
+                        _context.Entry(_item).State = EntityState.Modified;
+                        await _context.SaveChangesAsync();
+                    }
+                    return RedirectToAction("Index");
+                }
+            }
+
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error occured at AddOrEdit (POST) in {_Title} Controller due to {ex}");
+            }
+            return View(Model);
         }
     }
 }

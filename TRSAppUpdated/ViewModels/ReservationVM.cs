@@ -7,6 +7,7 @@ namespace TRSAppUpdated.ViewModels
     public class ReservationVM : CommonModel
     {
         public int ID { get; set; }
+        public int EventID { get; set; }
         [Required(ErrorMessage = "Please fill out this field")]
         [StringLength(20, ErrorMessage = "Please fill out maximum 20 characters")]
         public string TicketNumber { get; set; }
@@ -22,7 +23,6 @@ namespace TRSAppUpdated.ViewModels
         public List<int>? TicketIDs { get; set; }
         [Range(1, double.MaxValue, ErrorMessage = "Please fill out this field")]
         public double CostPrice { get; set; }
-        [Range(1, double.MaxValue, ErrorMessage = "Please fill out this field")]
         public double Discount { get; set; }
         public double SalePrice { get; set; }
         public double AmountPaid { get; set; }
