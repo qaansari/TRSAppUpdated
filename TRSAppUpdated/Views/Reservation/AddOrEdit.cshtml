@@ -28,6 +28,20 @@
                         <div class="row">
                             <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
                                 <div class="form-group">
+                                    <label class="col-form-label">Customer Name <span class="text-danger">*</span></label>
+                                    <input class="form-control" type="text" placeholder="Enter Customer Name" asp-for="CustomerName">
+                                    <span asp-validation-for="CustomerName"></span>
+                                </div>
+                            </div>
+                            <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                                <div class="form-group">
+                                    <label class="col-form-label">Phone # <span class="text-danger">*</span></label>
+                                    <input class="form-control" type="text" placeholder="Enter Customer Phone #" asp-for="CustomerPhone">
+                                    <span asp-validation-for="CustomerPhone"></span>
+                                </div>
+                            </div>
+                            <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                                <div class="form-group">
                                     <label class="col-form-label">Country <span class="text-danger">*</span></label>
                                     <ejs-dropdownlist cssClass="form-control form-control-sm" dataSource="@(ViewData["ShowList"])" placeholder="Select a show"
                                                       allowFiltering="true" ejs-for="ShowID" popupHeight="220px" change="showChange">
@@ -44,20 +58,6 @@
                                         <e-multiselect-fields value="ID" text="FormattedSeatNumber"></e-multiselect-fields>
                                     </ejs-multiselect>
                                     <span asp-validation-for="TicketIDs"></span>
-                                </div>
-                            </div>
-                            <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
-                                <div class="form-group">
-                                    <label class="col-form-label">Customer Name <span class="text-danger">*</span></label>
-                                    <input class="form-control" type="text" placeholder="Enter Customer Name" asp-for="CustomerName">
-                                    <span asp-validation-for="CustomerName"></span>
-                                </div>
-                            </div>
-                            <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
-                                <div class="form-group">
-                                    <label class="col-form-label">Phone # <span class="text-danger">*</span></label>
-                                    <input class="form-control" type="text" placeholder="Enter Customer Phone #" asp-for="CustomerPhone">
-                                    <span asp-validation-for="CustomerPhone"></span>
                                 </div>
                             </div>
                             <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
@@ -104,12 +104,12 @@
                             </div>
                             <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
                                 <div class="form-group">
-                                    <label class="col-form-label">Reservation Status <span class="text-danger">*</span></label>
-                                    <ejs-dropdownlist cssClass="form-control form-control-sm" dataSource="@(ViewData["ReservationStatusList"])" placeholder="Select an reservation status"
-                                                      allowFiltering="true" ejs-for="ReservationStatusID" popupHeight="220px">
+                                    <label class="col-form-label">Payment Mode <span class="text-danger">*</span></label>
+                                    <ejs-dropdownlist cssClass="form-control form-control-sm" dataSource="@(ViewData["PaymentModeList"])" placeholder="Select a payment mode"
+                                                      allowFiltering="true" ejs-for="PaymentModeID" popupHeight="220px">
                                         <e-dropdownlist-fields value="ID" text="Title"></e-dropdownlist-fields>
                                     </ejs-dropdownlist>
-                                    <span asp-validation-for="ReservationStatusID"></span>
+                                    <span asp-validation-for="PaymentModeID"></span>
                                 </div>
                             </div>
                         </div>
@@ -117,7 +117,7 @@
                             <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
                                 <div class="form-group">
                                     <label class="col-form-label">Photo(s)</label>
-                                    <input class="form-control" type="file" asp-for="ImageFiles" id="imgSelector">
+                                    <input class="form-control" type="file" asp-for="ImageFiles" multiple>
                                 </div>
                             </div>
                             <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
@@ -157,21 +157,80 @@
             tickets.dataBind();
         }
     </script>
-
     @section Scripts {
         <script>
+                const ticketList = @Html.Raw(Json.Serialize(ViewData["TicketList"]));
+            function getSelectedTicketCost(ticketIds) {
+                let total = 0;
+                ticketList.forEach(ticket => {
+                    if (ticketIds.includes(ticket.ID)) {
+                        total += ticket.Price;
+                    }
+                });
+                return total;
+            }
+
+            function updateCostPrice() {
+                const ticketDropdown = document.querySelector('[name="TicketIDs"]');
+                const ticketIds = $(ticketDropdown).val()?.map(x => parseInt(x)) || [];
+                const cost = getSelectedTicketCost(ticketIds);
+                $('[name="CostPrice"]').val(cost);
+                updateDiscount();
+                updateAmountRemaining();
+            }
+
+            function updateDiscount() {
+                const costPrice = parseFloat($('[name="CostPrice"]').val()) || 0;
+                const salePrice = parseFloat($('[name="SalePrice"]').val()) || 0;
+
+                if (salePrice > costPrice) {
+                    alert('Sale Price cannot be greater than Cost Price.');
+                    $('[name="SalePrice"]').val('');
+                    $('[name="Discount"]').val('');
+                    return;
+                }
+
+                const discount = costPrice - salePrice;
+                $('[name="Discount"]').val(discount);
+            }
+
+            function updateAmountRemaining() {
+                const salePrice = parseFloat($('[name="SalePrice"]').val()) || 0;
+                const amountPaid = parseFloat($('[name="AmountPaid"]').val()) || 0;
+
+                if (amountPaid > salePrice) {
+                    alert('Amount Paid cannot be greater than Sale Price.');
+                    $('[name="AmountPaid"]').val('');
+                    $('[name="AmountRemaining"]').val('');
+                    return;
+                }
+
+                const remaining = salePrice - amountPaid;
+                $('[name="AmountRemaining"]').val(remaining);
+            }
+
+            function toggleOptionalRow() {
+                const dropdownObj = ej.base.getComponent(document.querySelector('[name="PaymentModeID"]'), "ejs-dropdownlist");
+                const selectedText = dropdownObj.text?.trim().toLowerCase();
+                if (selectedText && selectedText !== 'cash') {
+                    $('.optional-row').slideDown();
+                } else {
+                    $('.optional-row').slideUp();
+                }
+            }
+
             $(document).ready(function () {
-                $("#imgSelector").change(
-                    function PreviewSelectedImage() {
-                        var imageFile = document.getElementById("imgSelector");
-                        var imagePreview = document.getElementById("imgPreview");
-                        var imageReader = new FileReader();
-                        imageReader.onload = function (e) {
-                            imagePreview.src = e.target.result;
-                            imagePreview.style.display = "block";
-                        };
-                        imageReader.readAsDataURL(imageFile.files[0]);
-                    });
+                    $('.optional-row').hide();
+                // Ticket change => update cost price
+                const ticketMulti = ej.base.getComponent(document.querySelector('[name="TicketIDs"]'), "ejs-multiselect");
+                ticketMulti.addEventListener('change', updateCostPrice);
+                // Sale price change => update discount
+                $('[name="SalePrice"]').on('input', updateDiscount);
+                // Amount paid change => update remaining
+                $('[name="AmountPaid"]').on('input', updateAmountRemaining);
+                // Payment mode change => toggle optional row
+                const paymentDropdown = ej.base.getComponent(document.querySelector('[name="PaymentModeID"]'), "ejs-dropdownlist");
+                paymentDropdown.addEventListener('change', toggleOptionalRow);
             });
         </script>
         @if (_Message != null)

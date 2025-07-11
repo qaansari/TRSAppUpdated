@@ -40,5 +40,8 @@ namespace TRSAppUpdated.ViewModels
         public int PaymentModeID { get; set; }
         [Range(1, int.MaxValue, ErrorMessage = "Please fill out this field")]
         public int ReservationStatusID { get; set; }
+        public string? PaymentModeTitle { get; set; }
+        public string? ReservationSattusTitle { get; set; }
+        public string? ShowDateTime { get; set; }
     }
 }

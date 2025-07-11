@@ -21,7 +21,7 @@ namespace TRSAppUpdated.Services
             try
             {
                 var _list = _context.Shows
-                        .Where(x => !x.IsDeleted && x.EventID == EventID)
+                        .Where(x => !x.IsDeleted && !x.IsEnded && x.EventID == EventID)
                         .Select(x => new ShowVM()
                         {
                             ID = x.ID,

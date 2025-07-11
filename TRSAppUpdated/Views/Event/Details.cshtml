@@ -85,64 +85,119 @@
                                             </span>
                                         }
                                     </h4>
-                                    <table id="showTable" class="table display table-striped table-bordered dt-responsive nowrap mt-2" style="width:100%">
-                                        <thead>
-                                            <tr>
-                                                <th>Date</th>
-                                                <th>Time</th>
-                                                <th>Action</th>
+                                    @if (Model.ShowsList != null)
+                                    {
+                                        <table id="showTable" class="table display table-striped table-bordered dt-responsive nowrap mt-2" style="width:100%">
+                                            <thead>
+                                                <tr>
+                                                    <th>Date</th>
+                                                    <th>Time</th>
+                                                    <th>Action</th>
 
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @if (Model.ShowsList.Count > 0)
-                                            {
-                                                foreach (var item in Model.ShowsList)
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @if (Model.ShowsList.Count > 0)
                                                 {
+                                                    foreach (var item in Model.ShowsList)
+                                                    {
+                                                        <tr>
+                                                            <td>
+                                                                @(item.Date.Value.ToString("dddd, dd MMMM yyyy"))
+                                                            </td>
+                                                            <td>
+                                                                @(DateTime.Today.Add(item.Time.Value).ToString("hh:mm tt"))
+                                                            </td>
+                                                            <td>
+                                                                @if (!item.IsEnded)
+                                                                {
+                                                                    <a asp-action="ViewTickets" asp-controller="Show" asp-route-ID="@(item.ID)" asp-route-EventID="@(Model.ID)" class="btn btn-primary sm-btn">View Tickets</a>
+                                                                    @if (isSuperAdmin || isAdmin)
+                                                                    {
+                                                                        <button type="button" class="btn btn-danger sm-btn endShowBtn" data-id="@(item.ID)">End</button>
+                                                                        <a asp-action="UpdateTickets" asp-controller="Show" asp-route-ID="@(item.ID)" asp-route-EventID="@(Model.ID)" class="btn btn-primary sm-btn">Update Tickets</a>
+                                                                        <a asp-action="AddOrEdit" asp-controller="Show" asp-route-ID="@(item.ID)" asp-route-EventID="@(Model.ID)" class="btn btn-primary sm-btn">Edit</a>
+                                                                    }
+                                                                    @if (isSuperAdmin)
+                                                                    {
+                                                                        <button type="button" class="btn btn-danger sm-btn deleteShowBtn" data-id="@(item.ID)">Delete</button>
+                                                                    }
+                                                                }
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    int _colspan = 3;
                                                     <tr>
-                                                        <td>
-                                                            @(item.Date.Value.ToString("dddd, dd MMMM yyyy"))
-                                                        </td>
-                                                        <td>
-                                                            @(DateTime.Today.Add(item.Time.Value).ToString("hh:mm tt"))
-                                                        </td>
-                                                        <td>
-                                                            @if (!item.IsEnded)
-                                                            {
-                                                                <a asp-action="ViewTickets" asp-controller="Show" asp-route-ID="@(item.ID)" asp-route-EventID="@(Model.ID)" class="btn btn-primary sm-btn">View Tickets</a>
-                                                                @if (isSuperAdmin || isAdmin)
-                                                                {
-                                                                    <button type="button" class="btn btn-danger sm-btn endShowBtn" data-id="@(item.ID)">End</button>
-                                                                    <a asp-action="UpdateTickets" asp-controller="Show" asp-route-ID="@(item.ID)" asp-route-EventID="@(Model.ID)" class="btn btn-primary sm-btn">Update Tickets</a>
-                                                                    <a asp-action="AddOrEdit" asp-controller="Show" asp-route-ID="@(item.ID)" asp-route-EventID="@(Model.ID)" class="btn btn-primary sm-btn">Edit</a>
-                                                                }
-                                                                @if (isSuperAdmin)
-                                                                {
-                                                                    <button type="button" class="btn btn-danger sm-btn deleteShowBtn" data-id="@(item.ID)">Delete</button>
-                                                                }
-                                                            }
+                                                        <td colspan="@(_colspan)" class="text-center">
+                                                            <img class="error_img" src="~/assets/images/no-data.png" />
                                                         </td>
                                                     </tr>
                                                 }
-                                            }
-                                            else
-                                            {
-                                                int _colspan = 2;
-                                                @if (isSuperAdmin || isAdmin)
-                                                {
-                                                    _colspan = 3;
-                                                }
-                                                <tr>
-                                                    <td colspan="@(_colspan)" class="text-center">
-                                                        <img class="error_img" src="~/assets/images/no-data.png" />
-                                                    </td>
-                                                </tr>
-                                            }
-                                        </tbody>
-                                    </table>
+                                            </tbody>
+                                        </table>
+                                    }
                                 </div>
                                 <div class="tab-pane fade" id="reservations" role="tabpanel">
-                                    <p>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.</p>
+                                    <h4 class="card-title mb-2">
+                                        Reservations For @(Model.Title)
+                                        @if (isSuperAdmin || isAdmin)
+                                        {
+                                            <span class="float-right mb-2">
+                                                <a asp-action="AddOrEdit" asp-controller="Reservation" asp-route-ID="0" asp-route-EventID="@(Model.ID)" class="btn btn-primary sm-btn">Add Reservation</a>
+                                            </span>
+                                        }
+                                    </h4>
+                                    @if (Model.ReservationList != null)
+                                    {
+                                        <table id="reservationTable" class="table display table-striped table-bordered dt-responsive nowrap mt-2" style="width:100%">
+                                            <thead>
+                                                <tr>
+                                                    <th>Customer Name</th>
+                                                    <th>Customer Phone</th>
+                                                    <th>Original Price</th>
+                                                    <th>Sale Price</th>
+                                                    <th>Amount Paid</th>
+                                                    <th>Amount Remaining</th>
+                                                    <th>Action</th>
+
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @if (Model.ReservationList.Count > 0)
+                                                {
+                                                    foreach (var item in Model.ReservationList)
+                                                    {
+                                                        <tr>
+                                                            <td>@(item.CustomerName)</td>
+                                                            <td>@(item.CustomerPhone)</td>
+                                                            <td>@(item.CostPrice)</td>
+                                                            <td>@(item.SalePrice)</td>
+                                                            <td>@(item.AmountPaid)</td>
+                                                            <td>@(item.AmountRemaining)</td>
+                                                            <td>
+                                                                @if (isSuperAdmin || isAdmin)
+                                                                {
+                                                                    <a asp-action="AddOrEdit" asp-controller="Reservation" asp-route-ID="@(item.ID)" asp-route-EventID="@(Model.ID)" class="btn btn-primary sm-btn">Edit</a>
+                                                                }
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    int _colspan = 7;
+                                                    <tr>
+                                                        <td colspan="@(_colspan)" class="text-center">
+                                                            <img class="error_img" src="~/assets/images/no-data.png" />
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    }
                                 </div>
                             </div>
                         </div>
@@ -188,7 +243,7 @@
                 <form method="post" asp-controller="Show" asp-action="End" class="end_form">
                     <div class="modal-body">
                         <input type="hidden" name="ID" class="selectedIdElement" />
-                        <input type="hidden" name="EventID" value="@(Model.ID)"/>
+                        <input type="hidden" name="EventID" value="@(Model.ID)" />
                         <p class="text-muted">Are you sure you want to end this Show?</p>
                     </div>
                 </form>
@@ -206,7 +261,8 @@
         <script src="~/assets/js/dataTables.responsive.min.js"></script>
         <script>
                        $(document).ready(function(){
-              $('#showTable').DataTable();
+              $('#showTable').DataTable({responsive:true});
+              $('#reservationTable').DataTable({responsive:true});
               //Delete Show Functionality
               $(document).on('click', '.deleteShowBtn', function(){
                 var selectedID = $(this).data("id");

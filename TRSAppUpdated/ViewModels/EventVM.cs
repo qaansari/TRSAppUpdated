@@ -39,5 +39,6 @@ namespace TRSAppUpdated.ViewModels
         public string? EventTypeTitle { get; set; }
         public List<string>? EventCategoriesList { get; set; }
         public List<ShowVM>? ShowsList { get; set; }
+        public List<ReservationVM>? ReservationList { get; set; }
     }
 }

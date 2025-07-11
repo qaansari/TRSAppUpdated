@@ -20,7 +20,11 @@ namespace TRSAppUpdated.ViewModels
         {
             get
             {
-                return this.Date.Value.ToString("dddd, dd MMMM yyyy") + " " +DateTime.Today.Add(this.Time.Value).ToString("hh:mm tt");
+                if (this.Date.HasValue && this.Time.HasValue)
+                {
+                    return this.Date.Value.ToString("dddd, dd MMMM yyyy") + " " + DateTime.Today.Add(this.Time.Value).ToString("hh:mm tt");
+                }
+                return "-";
             }
         }
     }

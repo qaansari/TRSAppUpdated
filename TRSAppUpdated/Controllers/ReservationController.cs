@@ -115,6 +115,14 @@ namespace TRSAppUpdated.Controllers
                     }
                     if (Model.ID != 0)
                     {
+                        var isExists = _context.Reservations.Where(x => !x.IsDeleted
+                            && x.ID != Model.ID
+                            && x.TicketNumber.Trim().ToLower() == Model.TicketNumber.Trim().ToLower()).Any();
+                        if (isExists)
+                        {
+                            TempData["Message"] = $"0,{_Title} Already Exists";
+                            return View(Model);
+                        }
                         _item = _context.Reservations.Where(x => !x.IsDeleted && x.ID == Model.ID)
                             .AsNoTracking().FirstOrDefault();
                         if (_item != null)
@@ -141,8 +149,8 @@ namespace TRSAppUpdated.Controllers
                     }
                     else
                     {
-                        var isExists = _context.Auditoriums.Where(x => !x.IsDeleted
-                            && x.Title.Trim().ToLower() == Model.Title.Trim().ToLower())
+                        var isExists = _context.Reservations.Where(x => !x.IsDeleted
+                            && x.TicketNumber.Trim().ToLower() == Model.TicketNumber.Trim().ToLower())
                         .Any();
                         if (isExists)
                         {
@@ -168,8 +176,13 @@ namespace TRSAppUpdated.Controllers
                         await _context.SaveChangesAsync();
                         TempData["Message"] = $"1,{_Title} Successfully Added";
                     }
+                    _context.ChangeTracker.Clear();
+                    _context.Entry(_item).State = EntityState.Modified;
                     if (_item != null && Model.ImageFiles != null && Model.ImageFiles.Count > 0)
                     {
+                        var _allReservationImages = _context.ReservationImages
+                           .Where(x => x.ReservationID == _item.ID)
+                           .AsNoTracking().ToList();
                         var _eventName = _context.Events.Where(x => !x.IsDeleted && x.ID == Model.EventID).AsNoTracking().Select(x => x.Title).FirstOrDefault();
                         if (!string.IsNullOrEmpty(_eventName))
                         {
@@ -183,20 +196,67 @@ namespace TRSAppUpdated.Controllers
                         {
                             Directory.CreateDirectory(folderPath);
                         }
-                        var _fileName = $"payment_slip" + "_" + _item.CreatedDateTime.ToString("yyyyddMMhhmmss") + Path.GetExtension(Model.ImageFile.FileName);
-                        _item.ImagePath = _fileName.Trim();
-                        _item.UpdatedByUserID = _UserID;
-                        _item.UpdatedDateTime = DateTime.UtcNow.AddHours(5);
-                        var _filePath = Path.Combine(folderPath, _fileName);
-                        using (var _stream = new FileStream(_filePath, FileMode.Create))
+                        foreach (var image in Model.ImageFiles)
                         {
-                            await Model.ImageFile.CopyToAsync(_stream);
+                            var _fileName = $"payment_slip" + "_" + _item.TicketNumber;
+                            _item.UpdatedByUserID = _UserID;
+                            _item.UpdatedDateTime = DateTime.UtcNow.AddHours(5);
+                            var _filePath = Path.Combine(folderPath, _fileName);
+                            int count = 1;
+                            while (System.IO.File.Exists(_filePath))
+                            {
+                                _fileName = $"{_fileName}_{count}{Path.GetExtension(image.FileName)}";
+                                var isEntryExists = _allReservationImages
+                                    .Where(x => x.ImagePath.ToLower() == _fileName.ToLower()).Any();
+                                if (!isEntryExists)
+                                {
+                                    _context.ReservationImages.Add(new ReservationImage()
+                                    {
+                                        ImagePath = _filePath,
+                                        ReservationID = _item.ID,
+                                        CreatedByUserID = _UserID,
+                                        CreatedDateTime = DateTime.UtcNow.AddHours(5),
+                                    });
+                                    using (var _stream = new FileStream(_filePath, FileMode.Create))
+                                    {
+                                        await image.CopyToAsync(_stream);
+                                    }
+                                }
+                                else
+                                {
+                                    continue;
+                                }
+                            }
                         }
-                        _context.ChangeTracker.Clear();
-                        _context.Entry(_item).State = EntityState.Modified;
                         await _context.SaveChangesAsync();
                     }
-                    return RedirectToAction("Index");
+                    if (_item != null && Model.TicketIDs != null && Model.TicketIDs.Count > 0)
+                    {
+                        var _allReservationTickets = _context.ReservationTickets
+                               .Where(x => x.ReservationID == _item.ID)
+                               .AsNoTracking().ToList();
+                        foreach (var _ticketID in Model.TicketIDs)
+                        {
+                            var isEntryExists = _allReservationTickets
+                                   .Where(x => x.TicketID == _ticketID).Any();
+                            if (!isEntryExists)
+                            {
+                                _context.ReservationTickets.Add(new ReservationTicket()
+                                {
+                                    TicketID = _ticketID,
+                                    ReservationID = _item.ID,
+                                    CreatedByUserID = _UserID,
+                                    CreatedDateTime = DateTime.UtcNow.AddHours(5),
+                                });
+                            }
+                            else
+                            {
+                                continue;
+                            }
+                        }
+                        await _context.SaveChangesAsync();
+                    }
+                    return RedirectToAction("Details", "Event",new{ EventID= Model.EventID });
                 }
             }
 

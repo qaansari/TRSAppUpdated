@@ -98,6 +98,10 @@ namespace TRSAppUpdated.Services
             {
                 var _object = await _context.Events
                         .Include(x => x.Shows)
+                        .ThenInclude(x => x.Reservations)
+                        .ThenInclude(x => x.ReservationTickets)
+                        .ThenInclude(x => x.Reservations)
+                        .ThenInclude(x => x.ReservationImages)
                         .Include(x => x.EventCategories)
                         .ThenInclude(x => x.Category)
                         .Include(x => x.EventStatus)
@@ -127,6 +131,16 @@ namespace TRSAppUpdated.Services
                                        IsEnded = x.IsEnded,
                                    }).ToList(),
                                    EventCategoriesList = x.EventCategories.Select(x => x.Category.Title).ToList(),
+                                   ReservationList=x.Shows.SelectMany(x=>x.Reservations).Select(x=>new ReservationVM()
+                                   {
+                                       ID = x.ID,
+                                       CustomerName = x.CustomerName,
+                                       CustomerPhone = x.CustomerPhone,
+                                       CostPrice = x.CostPrice,
+                                       SalePrice=x.SalePrice,
+                                       AmountPaid=x.AmountPaid,
+                                       AmountRemaining=x.AmountRemaining
+                                   }).ToList(),
                                    ImagePath = x.ImagePath
                                })
                                .AsNoTracking()
