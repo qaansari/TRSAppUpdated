@@ -26,10 +26,9 @@ namespace TRSAppUpdated.ViewModels
         public double Discount { get; set; }
         public double SalePrice { get; set; }
         public double AmountPaid { get; set; }
-        [Range(1, double.MaxValue, ErrorMessage = "Please fill out this field")]
         public double AmountRemaining { get; set; }
         public bool IsFullyPaid { get; set; } = false;
-        public List<IFormFile> ImageFiles { get; set; }
+        public List<IFormFile>? ImageFiles { get; set; }
         [MinLength(4, ErrorMessage = "Please fill out minimum 4 characters")]
         [StringLength(50, ErrorMessage = "Please fill out maximum 50 characters")]
         public string? TransactionID { get; set; }

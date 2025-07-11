@@ -158,6 +158,7 @@ namespace TRSAppUpdated.Controllers
                             TempData["Message"] = $"0,{_Title} Already Exists";
                             return View(Model);
                         }
+                        _item.TicketNumber = Model.TicketNumber.Trim();
                         _item.CustomerName = Model.CustomerName.Trim();
                         _item.CustomerPhone = Model.CustomerPhone.Trim();
                         _item.CostPrice = Model.CostPrice;
@@ -177,8 +178,6 @@ namespace TRSAppUpdated.Controllers
                         await _context.SaveChangesAsync();
                         TempData["Message"] = $"1,{_Title} Successfully Added";
                     }
-                    _context.ChangeTracker.Clear();
-                    _context.Entry(_item).State = EntityState.Modified;
                     if (_item != null && Model.ImageFiles != null && Model.ImageFiles.Count > 0)
                     {
                         var _allReservationImages = _context.ReservationImages
@@ -239,7 +238,6 @@ namespace TRSAppUpdated.Controllers
                         await _context.Tickets
                         .Where(x => !x.IsDeleted && Model.TicketIDs.Contains(x.ID))
                         .BatchUpdateAsync(x => new Ticket {
-                            ID = x.ID,
                             CostPrice = _item.CostPrice / Model.TicketIDs.Count,
                             IsReserved = true,
                             ReservationDateTime=DateTime.UtcNow.AddHours(5),
