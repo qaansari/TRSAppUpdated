@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using EFCore.BulkExtensions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -235,6 +236,16 @@ namespace TRSAppUpdated.Controllers
                         var _allReservationTickets = _context.ReservationTickets
                                .Where(x => x.ReservationID == _item.ID)
                                .AsNoTracking().ToList();
+                        await _context.Tickets
+                        .Where(x => !x.IsDeleted && Model.TicketIDs.Contains(x.ID))
+                        .BatchUpdateAsync(x => new Ticket {
+                            ID = x.ID,
+                            CostPrice = _item.CostPrice / Model.TicketIDs.Count,
+                            IsReserved = true,
+                            ReservationDateTime=DateTime.UtcNow.AddHours(5),
+                            SalePrice = _item.SalePrice / Model.TicketIDs.Count,
+                            Discount = _item.Discount / Model.TicketIDs.Count,
+                            });
                         foreach (var _ticketID in Model.TicketIDs)
                         {
                             var isEntryExists = _allReservationTickets
@@ -256,7 +267,7 @@ namespace TRSAppUpdated.Controllers
                         }
                         await _context.SaveChangesAsync();
                     }
-                    return RedirectToAction("Details", "Event",new{ EventID= Model.EventID });
+                    return RedirectToAction("Details", "Event", new { EventID = Model.EventID });
                 }
             }
 
