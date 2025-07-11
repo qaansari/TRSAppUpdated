@@ -20,7 +20,7 @@ namespace TRSAppUpdated.Services
         {
             try
             {
-                var showIDList = _context.Shows.Where(x => !x.IsDeleted && x.EventID == EventID)
+                var showIDList = _context.Shows.Where(x => !x.IsDeleted && !x.IsEnded && x.EventID == EventID)
                                                    .AsNoTracking()
                                                    .Select(x => x.ID)
                                                    .ToList();

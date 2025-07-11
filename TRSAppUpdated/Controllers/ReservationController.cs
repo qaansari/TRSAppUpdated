@@ -47,7 +47,7 @@ namespace TRSAppUpdated.Controllers
             try
             {
                 ViewData["TicketList"] = _ticketService.GetTicketsByEventID(EventID);
-                ViewData["ShowList"] = _showService.GetShowsByEventID(EventID);
+                ViewData["ShowList"] = _showService.GeActiveShowsByEventID(EventID);
                 ViewData["PaymentModeList"] = _paymentModeService.GetAll();
                 ViewData["ReservationStatusList"] = _reservationStatusService.GetAll();
                 if (EventID != 0)
@@ -103,7 +103,7 @@ namespace TRSAppUpdated.Controllers
             try
             {
                 ViewData["TicketList"] = _ticketService.GetTicketsByEventID(Model.EventID);
-                ViewData["ShowList"] = _showService.GetShowsByEventID(Model.EventID);
+                ViewData["ShowList"] = _showService.GeActiveShowsByEventID(Model.EventID);
                 ViewData["PaymentModeList"] = _paymentModeService.GetAll();
                 ViewData["ReservationStatusList"] = _reservationStatusService.GetAll();
                 if (ModelState.IsValid)

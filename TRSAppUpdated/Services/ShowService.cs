@@ -16,7 +16,7 @@ namespace TRSAppUpdated.Services
             _logger = logger;
         }
         //Get Shows By EventID
-        public List<ShowVM> GetShowsByEventID(int EventID)
+        public List<ShowVM> GeActiveShowsByEventID(int EventID)
         {
             try
             {
