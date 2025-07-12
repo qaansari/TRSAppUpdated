@@ -181,6 +181,13 @@
                     <div class="ticket-number">
                         <h3>@Model.PaymentModeTitle</h3>
                     </div>
+                    @if (Model.BookingDateTime.HasValue)
+                    {
+                        <div class="info-row">
+                            <div class="info-label">Booking Date:</div>
+                            <div class="info-value">@Model.BookingDateTime.Value.ToString("dddd, dd MMMM yyyy, hh:mm tt")</div>
+                        </div>
+                    }
                     <div class="ticket-info">
                         <div class="info-row">
                             <div class="info-label">Cost Price:</div>
@@ -193,10 +200,6 @@
                         <div class="info-row">
                             <div class="info-label">Amount Paid:</div>
                             <div class="info-value">@Model.AmountPaid</div>
-                        </div>
-                        <div class="info-row">
-                            <div class="info-label">Amount Remaining:</div>
-                            <div class="info-value">@Model.AmountRemaining</div>
                         </div>
                         @if (!Model.IsFullyPaid || Model.AmountRemaining > 0)
                         {

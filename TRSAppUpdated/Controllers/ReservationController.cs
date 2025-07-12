@@ -171,6 +171,10 @@ namespace TRSAppUpdated.Controllers
                         _item.AmountRemaining = Model.AmountRemaining;
                         _item.IsFullyPaid = Model.IsFullyPaid;
                         _item.TransactionID = Model.TransactionID;
+                        if (!Model.BookingDateTime.HasValue)
+                        {
+                            Model.BookingDateTime = DateTime.UtcNow.AddHours(5);
+                        }
                         _item.BookingDateTime = Model.BookingDateTime;
                         _item.ShowID = Model.ShowID;
                         _item.PaymentModeID = Model.PaymentModeID;
