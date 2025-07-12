@@ -3,6 +3,14 @@
     int _EventID = ViewBag.EventID != null ? ViewBag.EventID : 0;
     string _PageTitle = "Reservation Details";
     ViewData["Title"] = _PageTitle;
+    bool isSuperAdmin = (await _authorizationService.AuthorizeAsync(User, "SuperAdmin")).Succeeded ? true : false;
+    bool isAdmin = (await _authorizationService.AuthorizeAsync(User, "Admin")).Succeeded ? true : false;
+    bool isModerator = (await _authorizationService.AuthorizeAsync(User, "Moderator")).Succeeded ? true : false;
+    bool isUser = (await _authorizationService.AuthorizeAsync(User, "User")).Succeeded ? true : false;
+    if (isModerator || isUser)
+    {
+        Layout = "_EmptyLayout";
+    }
 }
 <style type="text/css">
     .ticket-container {
@@ -161,50 +169,98 @@
             Thank you for your reservation. Please present this ticket at the venue.
         </div>
     </div>
-    <div class="ticket-container ml-2">
-        <div class="ticket-header">
-            <h2>Payment Information</h2>
-        </div>
-        <div class="ticket-body">
-            @if (Model.ID != 0)
-            {
-                <div class="ticket-number">
-                    <h3>@Model.PaymentModeTitle</h3>
-                </div>
-                <div class="ticket-info">
-                    <div class="info-row">
-                        <div class="info-label">Cost Price:</div>
-                        <div class="info-value">@Model.CostPrice</div>
+    @if (isSuperAdmin || isAdmin)
+    {
+        <div class="ticket-container ml-2">
+            <div class="ticket-header">
+                <h2>Payment Information</h2>
+            </div>
+            <div class="ticket-body">
+                @if (Model.ID != 0)
+                {
+                    <div class="ticket-number">
+                        <h3>@Model.PaymentModeTitle</h3>
                     </div>
-                    <div class="info-row">
-                        <div class="info-label">Sale Price:</div>
-                        <div class="info-value">@Model.SalePrice</div>
-                    </div>
-                    <div class="info-row">
-                        <div class="info-label">Amount Paid:</div>
-                        <div class="info-value">@Model.AmountPaid</div>
-                    </div>
-                    <div class="info-row">
-                        <div class="info-label">Amount Remaining:</div>
-                        <div class="info-value">@Model.AmountRemaining</div>
-                    </div>
-                    @if (!Model.IsFullyPaid || Model.AmountRemaining > 0)
-                    {
+                    <div class="ticket-info">
+                        <div class="info-row">
+                            <div class="info-label">Cost Price:</div>
+                            <div class="info-value">@Model.CostPrice</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Sale Price:</div>
+                            <div class="info-value">@Model.SalePrice</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Amount Paid:</div>
+                            <div class="info-value">@Model.AmountPaid</div>
+                        </div>
                         <div class="info-row">
                             <div class="info-label">Amount Remaining:</div>
                             <div class="info-value">@Model.AmountRemaining</div>
                         </div>
-                    }
-                </div>
-            }
-            else
-            {
-                <p>No reservation details found.</p>
-            }
+                        @if (!Model.IsFullyPaid || Model.AmountRemaining > 0)
+                        {
+                            <div class="info-row">
+                                <div class="info-label">Amount Remaining:</div>
+                                <div class="info-value">@Model.AmountRemaining</div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p>No reservation details found.</p>
+                }
+            </div>
+            <div class="footer">
+                Thank you for your reservation. Please present this ticket at the venue.
+            </div>
         </div>
-        <div class="footer">
-            Thank you for your reservation. Please present this ticket at the venue.
+        <div class="ticket-container ml-2">
+            <div class="ticket-header">
+                <h2>Payment Information</h2>
+            </div>
+            <div class="ticket-body">
+                @if (Model.ID != 0)
+                {
+                    <div class="ticket-number">
+                        <h3>@Model.PaymentModeTitle</h3>
+                    </div>
+                    <div class="ticket-info">
+                        <div class="info-row">
+                            <div class="info-label">Cost Price:</div>
+                            <div class="info-value">@Model.CostPrice</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Sale Price:</div>
+                            <div class="info-value">@Model.SalePrice</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Amount Paid:</div>
+                            <div class="info-value">@Model.AmountPaid</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Amount Remaining:</div>
+                            <div class="info-value">@Model.AmountRemaining</div>
+                        </div>
+                        @if (!Model.IsFullyPaid || Model.AmountRemaining > 0)
+                        {
+                            <div class="info-row">
+                                <div class="info-label">Amount Remaining:</div>
+                                <div class="info-value">@Model.AmountRemaining</div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p>No reservation details found.</p>
+                }
+            </div>
+            <div class="footer">
+                Thank you for your reservation. Please present this ticket at the venue.
+            </div>
         </div>
-    </div>
+    }
 </div>
 
