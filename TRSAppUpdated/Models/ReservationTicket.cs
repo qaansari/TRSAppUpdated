@@ -7,15 +7,15 @@ namespace TRSAppUpdated.Models
     {
         [Key]
         public int ID { get; set; }
-        [ForeignKey("Tickets")]
+        [ForeignKey("Ticket")]
         public int TicketID { get; set; }
-        [ForeignKey("Reservations")]
+        [ForeignKey("Reservation")]
         public int ReservationID { get; set; }
         [ForeignKey("CreatedByUser")]
         public int CreatedByUserID { get; set; }
         public DateTime CreatedDateTime { get; set; }
         public User? CreatedByUser { get; set; }
-        public ICollection<Ticket> Tickets { get; set; }
-        public ICollection<Reservation> Reservations { get; set; }
+        public Ticket Ticket { get; set; }
+        public Reservation Reservation { get; set; }
     }
 }

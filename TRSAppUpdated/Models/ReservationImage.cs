@@ -7,13 +7,14 @@ namespace TRSAppUpdated.Models
     {
         [Key]
         public int ID { get; set; }
-        [ForeignKey("Reservations")]
+        [ForeignKey("Reservation")]
         public int ReservationID { get; set; }
         public string ImagePath { get; set; }
         [ForeignKey("CreatedByUser")]
         public int CreatedByUserID { get; set; }
         public DateTime CreatedDateTime { get; set; }
         public User? CreatedByUser { get; set; }
-        public ICollection<Reservation> Reservations { get; set; }
+        public Category Category { get; set; }
+        public Reservation Reservation { get; set; }
     }
 }

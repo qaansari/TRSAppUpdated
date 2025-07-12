@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Syncfusion.EJ2.Linq;
+using Syncfusion.EJ2.Spreadsheet;
 using TRSAppUpdated.Interfaces;
 using TRSAppUpdated.Models;
 using TRSAppUpdated.ViewModels;
@@ -97,56 +99,55 @@ namespace TRSAppUpdated.Services
             try
             {
                 var _object = await _context.Events
-                        .Include(x => x.Shows)
-                        .ThenInclude(x => x.Reservations)
-                        .ThenInclude(x => x.ReservationTickets)
-                        .ThenInclude(x => x.Reservations)
-                        .ThenInclude(x => x.ReservationImages)
-                        .Include(x => x.EventCategories)
-                        .ThenInclude(x => x.Category)
-                        .Include(x => x.EventStatus)
-                        .Include(x => x.Auditorium)
-                        .ThenInclude(x => x.Venue)
-                        .ThenInclude(x => x.City)
-                        .ThenInclude(x => x.Country)
-                        .Where(x => !x.IsDeleted && x.ID == ID)
-                               .Select(x => new EventVM()
-                               {
-                                   ID = x.ID,
-                                   Title = x.Title,
-                                   StartDate=x.StartDate,
-                                   EndDate=x.EndDate,
-                                   Description=x.Description,
-                                   CountryID = x.Auditorium.Venue.City.CountryID,
-                                   CountryTitle = x.Auditorium.Venue.City.Country.Title,
-                                   CityTitle = x.Auditorium.Venue.City.Title,
-                                   VenueTitle = x.Auditorium.Venue.Title,
-                                   AuditoriumTitle = x.Auditorium.Title,
-                                   EventStatusTitle = x.EventStatus.Title,
-                                   ShowsList = x.Shows.Where(x => !x.IsDeleted).Select(x => new ShowVM()
-                                   {
-                                       ID = x.ID,
-                                       Date = x.Date,
-                                       Time = x.Time,
-                                       IsEnded = x.IsEnded,
-                                   }).ToList(),
-                                   EventCategoriesList = x.EventCategories.Select(x => x.Category.Title).ToList(),
-                                   ReservationList=x.Shows.SelectMany(x=>x.Reservations).Select(x=>new ReservationVM()
-                                   {
-                                       ID = x.ID,
-                                       CustomerName = x.CustomerName,
-                                       CustomerPhone = x.CustomerPhone,
-                                       CostPrice = x.CostPrice,
-                                       SalePrice=x.SalePrice,
-                                       AmountPaid=x.AmountPaid,
-                                       AmountRemaining=x.AmountRemaining
-                                   }).ToList(),
-                                   ImagePath = x.ImagePath
-                               })
-                               .AsNoTracking()
-                               .FirstOrDefaultAsync();
+     .Where(x => !x.IsDeleted && x.ID == ID)
+     .Select(x => new EventVM()
+     {
+         ID = x.ID,
+         Title = x.Title,
+         StartDate = x.StartDate,
+         EndDate = x.EndDate,
+         Description = x.Description,
+         CountryID = x.Auditorium.Venue.City.CountryID,
+         CountryTitle = x.Auditorium.Venue.City.Country.Title,
+         CityTitle = x.Auditorium.Venue.City.Title,
+         VenueTitle = x.Auditorium.Venue.Title,
+         AuditoriumTitle = x.Auditorium.Title,
+         EventStatusTitle = x.EventStatus.Title,
+         ShowsList = x.Shows
+             .Where(s => !s.IsDeleted)
+             .OrderBy(x => x.Date)
+             .Select(s => new ShowVM()
+             {
+                 ID = s.ID,
+                 Date = s.Date,
+                 Time = s.Time,
+                 IsEnded = s.IsEnded,
+             })
+             .ToList(),
+         EventCategoriesList = x.EventCategories
+              .Select(ec => ec.Category.Title)
+             .ToList(),
+         ReservationList = x.Shows
+             .SelectMany(s => s.Reservations)
+             .Select(r => new ReservationVM()
+             {
+                 ID = r.ID,
+                 TicketNumber = r.TicketNumber,
+                 ShowDateTime = r.Show.Date.ToString("dddd, dd MMMM yyyy")+" "
+                 + DateTime.Today.Add(r.Show.Time).ToString("hh:mm tt"),
+                 CustomerName = r.CustomerName,
+                 CustomerPhone = r.CustomerPhone,
+                 CostPrice = r.CostPrice,
+                 SalePrice = r.SalePrice,
+                 AmountPaid = r.AmountPaid,
+                 AmountRemaining = r.AmountRemaining
+             })
+             .ToList(),
+         ImagePath = x.ImagePath
+     })
+            .AsNoTracking()
+            .FirstOrDefaultAsync();
                 return _object ?? new EventVM();
-
             }
             catch (Exception ex)
             {

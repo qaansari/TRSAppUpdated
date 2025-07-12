@@ -212,7 +212,7 @@ namespace TRSAppUpdated.Controllers
                                 {
                                     _context.ReservationImages.Add(new ReservationImage()
                                     {
-                                        ImagePath = _filePath,
+                                        ImagePath = _fileName,
                                         ReservationID = _item.ID,
                                         CreatedByUserID = _UserID,
                                         CreatedDateTime = DateTime.UtcNow.AddHours(5),
@@ -235,15 +235,6 @@ namespace TRSAppUpdated.Controllers
                         var _allReservationTickets = _context.ReservationTickets
                                .Where(x => x.ReservationID == _item.ID)
                                .AsNoTracking().ToList();
-                        await _context.Tickets
-                        .Where(x => !x.IsDeleted && Model.TicketIDs.Contains(x.ID))
-                        .BatchUpdateAsync(x => new Ticket {
-                            CostPrice = _item.CostPrice / Model.TicketIDs.Count,
-                            IsReserved = true,
-                            ReservationDateTime=DateTime.UtcNow.AddHours(5),
-                            SalePrice = _item.SalePrice / Model.TicketIDs.Count,
-                            Discount = _item.Discount / Model.TicketIDs.Count,
-                            });
                         foreach (var _ticketID in Model.TicketIDs)
                         {
                             var isEntryExists = _allReservationTickets
@@ -263,9 +254,19 @@ namespace TRSAppUpdated.Controllers
                                 continue;
                             }
                         }
+                        await _context.Tickets
+                        .Where(x => !x.IsDeleted && Model.TicketIDs.Contains(x.ID))
+                        .BatchUpdateAsync(x => new Ticket {
+                            CostPrice = _item.CostPrice / Model.TicketIDs.Count,
+                            IsReserved = true,
+                            ReservationDateTime=DateTime.UtcNow.AddHours(5),
+                            SalePrice = _item.SalePrice / Model.TicketIDs.Count,
+                            Discount = _item.Discount / Model.TicketIDs.Count,
+                            });
+                        
                         await _context.SaveChangesAsync();
                     }
-                    return RedirectToAction("Details", "Event", new { EventID = Model.EventID });
+                    return RedirectToAction("Details", "Event", new { ID = Model.EventID });
                 }
             }
 

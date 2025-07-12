@@ -12,7 +12,7 @@ using TRSAppUpdated.Models;
 namespace TRSAppUpdated.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250710072311_Db Init")]
+    [Migration("20250712062838_Db Init")]
     partial class DbInit
     {
         /// <inheritdoc />
@@ -24,51 +24,6 @@ namespace TRSAppUpdated.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("ReservationReservationImage", b =>
-                {
-                    b.Property<int>("ReservationImagesID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ReservationsID")
-                        .HasColumnType("int");
-
-                    b.HasKey("ReservationImagesID", "ReservationsID");
-
-                    b.HasIndex("ReservationsID");
-
-                    b.ToTable("ReservationReservationImage");
-                });
-
-            modelBuilder.Entity("ReservationReservationTicket", b =>
-                {
-                    b.Property<int>("ReservationTicketsID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ReservationsID")
-                        .HasColumnType("int");
-
-                    b.HasKey("ReservationTicketsID", "ReservationsID");
-
-                    b.HasIndex("ReservationsID");
-
-                    b.ToTable("ReservationReservationTicket");
-                });
-
-            modelBuilder.Entity("ReservationTicketTicket", b =>
-                {
-                    b.Property<int>("ReservationTicketsID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TicketsID")
-                        .HasColumnType("int");
-
-                    b.HasKey("ReservationTicketsID", "TicketsID");
-
-                    b.HasIndex("TicketsID");
-
-                    b.ToTable("ReservationTicketTicket");
-                });
 
             modelBuilder.Entity("TRSAppUpdated.Models.Auditorium", b =>
                 {
@@ -227,7 +182,7 @@ namespace TRSAppUpdated.Migrations
                             ID = 1,
                             CountryID = 1,
                             CreatedByUserID = 1,
-                            CreatedDateTime = new DateTime(2025, 7, 10, 12, 23, 10, 879, DateTimeKind.Utc).AddTicks(5747),
+                            CreatedDateTime = new DateTime(2025, 7, 12, 11, 28, 37, 726, DateTimeKind.Utc).AddTicks(5875),
                             IsDeleted = false,
                             Title = "Karachi"
                         },
@@ -236,7 +191,7 @@ namespace TRSAppUpdated.Migrations
                             ID = 2,
                             CountryID = 1,
                             CreatedByUserID = 1,
-                            CreatedDateTime = new DateTime(2025, 7, 10, 12, 23, 10, 879, DateTimeKind.Utc).AddTicks(5749),
+                            CreatedDateTime = new DateTime(2025, 7, 12, 11, 28, 37, 726, DateTimeKind.Utc).AddTicks(5878),
                             IsDeleted = false,
                             Title = "Lahore"
                         },
@@ -245,7 +200,7 @@ namespace TRSAppUpdated.Migrations
                             ID = 3,
                             CountryID = 1,
                             CreatedByUserID = 1,
-                            CreatedDateTime = new DateTime(2025, 7, 10, 12, 23, 10, 879, DateTimeKind.Utc).AddTicks(5751),
+                            CreatedDateTime = new DateTime(2025, 7, 12, 11, 28, 37, 726, DateTimeKind.Utc).AddTicks(5880),
                             IsDeleted = false,
                             Title = "Islamabad"
                         });
@@ -336,7 +291,7 @@ namespace TRSAppUpdated.Migrations
                         {
                             ID = 1,
                             CreatedByUserID = 1,
-                            CreatedDateTime = new DateTime(2025, 7, 10, 12, 23, 10, 879, DateTimeKind.Utc).AddTicks(5709),
+                            CreatedDateTime = new DateTime(2025, 7, 12, 11, 28, 37, 726, DateTimeKind.Utc).AddTicks(5818),
                             DialingCode = "+92",
                             Flag = "🇵🇰",
                             IsDeleted = false,
@@ -492,7 +447,7 @@ namespace TRSAppUpdated.Migrations
                         {
                             ID = 1,
                             CreatedByUserID = 1,
-                            CreatedDateTime = new DateTime(2025, 7, 10, 12, 23, 10, 879, DateTimeKind.Utc).AddTicks(5646),
+                            CreatedDateTime = new DateTime(2025, 7, 12, 11, 28, 37, 726, DateTimeKind.Utc).AddTicks(5749),
                             IsDeleted = false,
                             Title = "Active"
                         },
@@ -500,7 +455,7 @@ namespace TRSAppUpdated.Migrations
                         {
                             ID = 2,
                             CreatedByUserID = 1,
-                            CreatedDateTime = new DateTime(2025, 7, 10, 12, 23, 10, 879, DateTimeKind.Utc).AddTicks(5650),
+                            CreatedDateTime = new DateTime(2025, 7, 12, 11, 28, 37, 726, DateTimeKind.Utc).AddTicks(5753),
                             IsDeleted = false,
                             Title = "Ended"
                         },
@@ -508,7 +463,7 @@ namespace TRSAppUpdated.Migrations
                         {
                             ID = 3,
                             CreatedByUserID = 1,
-                            CreatedDateTime = new DateTime(2025, 7, 10, 12, 23, 10, 879, DateTimeKind.Utc).AddTicks(5651),
+                            CreatedDateTime = new DateTime(2025, 7, 12, 11, 28, 37, 726, DateTimeKind.Utc).AddTicks(5755),
                             IsDeleted = false,
                             Title = "Postponed"
                         });
@@ -700,6 +655,32 @@ namespace TRSAppUpdated.Migrations
                     b.HasIndex("UpdatedByUserID");
 
                     b.ToTable("PaymentModes");
+
+                    b.HasData(
+                        new
+                        {
+                            ID = 1,
+                            CreatedByUserID = 1,
+                            CreatedDateTime = new DateTime(2025, 7, 12, 11, 28, 37, 726, DateTimeKind.Utc).AddTicks(5930),
+                            IsDeleted = false,
+                            Title = "Cash"
+                        },
+                        new
+                        {
+                            ID = 2,
+                            CreatedByUserID = 1,
+                            CreatedDateTime = new DateTime(2025, 7, 12, 11, 28, 37, 726, DateTimeKind.Utc).AddTicks(5932),
+                            IsDeleted = false,
+                            Title = "Easypaisa/Jazzcash"
+                        },
+                        new
+                        {
+                            ID = 3,
+                            CreatedByUserID = 1,
+                            CreatedDateTime = new DateTime(2025, 7, 12, 11, 28, 37, 726, DateTimeKind.Utc).AddTicks(5934),
+                            IsDeleted = false,
+                            Title = "Bank Transfer"
+                        });
                 });
 
             modelBuilder.Entity("TRSAppUpdated.Models.Reservation", b =>
@@ -801,6 +782,9 @@ namespace TRSAppUpdated.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
 
+                    b.Property<int>("CategoryID")
+                        .HasColumnType("int");
+
                     b.Property<int>("CreatedByUserID")
                         .HasColumnType("int");
 
@@ -816,7 +800,11 @@ namespace TRSAppUpdated.Migrations
 
                     b.HasKey("ID");
 
+                    b.HasIndex("CategoryID");
+
                     b.HasIndex("CreatedByUserID");
+
+                    b.HasIndex("ReservationID");
 
                     b.ToTable("ReservationImages");
                 });
@@ -863,6 +851,40 @@ namespace TRSAppUpdated.Migrations
                     b.HasIndex("UpdatedByUserID");
 
                     b.ToTable("ReservationStatuses");
+
+                    b.HasData(
+                        new
+                        {
+                            ID = 1,
+                            CreatedByUserID = 1,
+                            CreatedDateTime = new DateTime(2025, 7, 12, 11, 28, 37, 726, DateTimeKind.Utc).AddTicks(5979),
+                            IsDeleted = false,
+                            Title = "Arrival Pending"
+                        },
+                        new
+                        {
+                            ID = 2,
+                            CreatedByUserID = 1,
+                            CreatedDateTime = new DateTime(2025, 7, 12, 11, 28, 37, 726, DateTimeKind.Utc).AddTicks(5981),
+                            IsDeleted = false,
+                            Title = "Cancelled"
+                        },
+                        new
+                        {
+                            ID = 3,
+                            CreatedByUserID = 1,
+                            CreatedDateTime = new DateTime(2025, 7, 12, 11, 28, 37, 726, DateTimeKind.Utc).AddTicks(5982),
+                            IsDeleted = false,
+                            Title = "Closed"
+                        },
+                        new
+                        {
+                            ID = 4,
+                            CreatedByUserID = 1,
+                            CreatedDateTime = new DateTime(2025, 7, 12, 11, 28, 37, 726, DateTimeKind.Utc).AddTicks(5984),
+                            IsDeleted = false,
+                            Title = "Refunded"
+                        });
                 });
 
             modelBuilder.Entity("TRSAppUpdated.Models.ReservationTicket", b =>
@@ -888,6 +910,10 @@ namespace TRSAppUpdated.Migrations
                     b.HasKey("ID");
 
                     b.HasIndex("CreatedByUserID");
+
+                    b.HasIndex("ReservationID");
+
+                    b.HasIndex("TicketID");
 
                     b.ToTable("ReservationTickets");
                 });
@@ -1270,7 +1296,7 @@ namespace TRSAppUpdated.Migrations
                         {
                             ID = 1,
                             ContactNumber = "+923312541767",
-                            CreatedDateTime = new DateTime(2025, 7, 10, 12, 23, 10, 879, DateTimeKind.Utc).AddTicks(5282),
+                            CreatedDateTime = new DateTime(2025, 7, 12, 11, 28, 37, 726, DateTimeKind.Utc).AddTicks(5170),
                             Email = "sa@eventland.pk",
                             FirstName = "Super",
                             IsActive = true,
@@ -1337,51 +1363,6 @@ namespace TRSAppUpdated.Migrations
                     b.HasIndex("UpdatedByUserID");
 
                     b.ToTable("Venues");
-                });
-
-            modelBuilder.Entity("ReservationReservationImage", b =>
-                {
-                    b.HasOne("TRSAppUpdated.Models.ReservationImage", null)
-                        .WithMany()
-                        .HasForeignKey("ReservationImagesID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("TRSAppUpdated.Models.Reservation", null)
-                        .WithMany()
-                        .HasForeignKey("ReservationsID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("ReservationReservationTicket", b =>
-                {
-                    b.HasOne("TRSAppUpdated.Models.ReservationTicket", null)
-                        .WithMany()
-                        .HasForeignKey("ReservationTicketsID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("TRSAppUpdated.Models.Reservation", null)
-                        .WithMany()
-                        .HasForeignKey("ReservationsID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("ReservationTicketTicket", b =>
-                {
-                    b.HasOne("TRSAppUpdated.Models.ReservationTicket", null)
-                        .WithMany()
-                        .HasForeignKey("ReservationTicketsID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("TRSAppUpdated.Models.Ticket", null)
-                        .WithMany()
-                        .HasForeignKey("TicketsID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("TRSAppUpdated.Models.Auditorium", b =>
@@ -1749,13 +1730,29 @@ namespace TRSAppUpdated.Migrations
 
             modelBuilder.Entity("TRSAppUpdated.Models.ReservationImage", b =>
                 {
+                    b.HasOne("TRSAppUpdated.Models.Category", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("TRSAppUpdated.Models.User", "CreatedByUser")
                         .WithMany("ReservationImagesCreated")
                         .HasForeignKey("CreatedByUserID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("TRSAppUpdated.Models.Reservation", "Reservation")
+                        .WithMany("ReservationImages")
+                        .HasForeignKey("ReservationID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+
                     b.Navigation("CreatedByUser");
+
+                    b.Navigation("Reservation");
                 });
 
             modelBuilder.Entity("TRSAppUpdated.Models.ReservationStatus", b =>
@@ -1789,7 +1786,23 @@ namespace TRSAppUpdated.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("TRSAppUpdated.Models.Reservation", "Reservation")
+                        .WithMany("ReservationTickets")
+                        .HasForeignKey("ReservationID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TRSAppUpdated.Models.Ticket", "Ticket")
+                        .WithMany("ReservationTickets")
+                        .HasForeignKey("TicketID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("CreatedByUser");
+
+                    b.Navigation("Reservation");
+
+                    b.Navigation("Ticket");
                 });
 
             modelBuilder.Entity("TRSAppUpdated.Models.Row", b =>
@@ -2071,6 +2084,13 @@ namespace TRSAppUpdated.Migrations
                     b.Navigation("Reservations");
                 });
 
+            modelBuilder.Entity("TRSAppUpdated.Models.Reservation", b =>
+                {
+                    b.Navigation("ReservationImages");
+
+                    b.Navigation("ReservationTickets");
+                });
+
             modelBuilder.Entity("TRSAppUpdated.Models.ReservationStatus", b =>
                 {
                     b.Navigation("Reservations");
@@ -2098,6 +2118,11 @@ namespace TRSAppUpdated.Migrations
                     b.Navigation("ShowExpenses");
 
                     b.Navigation("Tickets");
+                });
+
+            modelBuilder.Entity("TRSAppUpdated.Models.Ticket", b =>
+                {
+                    b.Navigation("ReservationTickets");
                 });
 
             modelBuilder.Entity("TRSAppUpdated.Models.User", b =>

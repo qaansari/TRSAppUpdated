@@ -155,12 +155,10 @@
                                         <table id="reservationTable" class="table display table-striped table-bordered dt-responsive nowrap mt-2" style="width:100%">
                                             <thead>
                                                 <tr>
+                                                    <th>Ticket #</th>
                                                     <th>Customer Name</th>
                                                     <th>Customer Phone</th>
-                                                    <th>Original Price</th>
-                                                    <th>Sale Price</th>
-                                                    <th>Amount Paid</th>
-                                                    <th>Amount Remaining</th>
+                                                    <th>Show Date</th>
                                                     <th>Action</th>
 
                                                 </tr>
@@ -171,12 +169,10 @@
                                                     foreach (var item in Model.ReservationList)
                                                     {
                                                         <tr>
+                                                            <td>@(item.TicketNumber)</td>
                                                             <td>@(item.CustomerName)</td>
                                                             <td>@(item.CustomerPhone)</td>
-                                                            <td>@(item.CostPrice)</td>
-                                                            <td>@(item.SalePrice)</td>
-                                                            <td>@(item.AmountPaid)</td>
-                                                            <td>@(item.AmountRemaining)</td>
+                                                            <td>@(item.ShowDateTime)</td>
                                                             <td>
                                                                 @if (isSuperAdmin || isAdmin)
                                                                 {
@@ -188,7 +184,7 @@
                                                 }
                                                 else
                                                 {
-                                                    int _colspan = 7;
+                                                    int _colspan = 8;
                                                     <tr>
                                                         <td colspan="@(_colspan)" class="text-center">
                                                             <img class="error_img" src="~/assets/images/no-data.png" />

@@ -281,34 +281,56 @@ namespace TRSAppUpdated.Controllers
                 {
                     ViewBag.EventID = EventID;
                 }
-                var _object = _context.Tickets
-                    .Include(x => x.Show)
-                    .ThenInclude(x => x.Event)
-                    .ThenInclude(x => x.Auditorium)
-                    .ThenInclude(x => x.Rows)
-                    .ThenInclude(x => x.Columns)
-                    .Where(x => !x.IsDeleted && x.ID == ID).Select(x => new SeatVM()
+                var eventTickets = _context.Tickets
+                    .Where(x=>x.ShowID== ID)
+     .Include(t => t.Seat)
+     .Include(t => t.Show)
+         .ThenInclude(s => s.Event)
+             .ThenInclude(e => e.Auditorium)
+                 .ThenInclude(a => a.Rows)
+                     .ThenInclude(r => r.Columns)
+                     .ThenInclude(r => r.Seats)
+     .Where(t => !t.IsDeleted && t.Show.Event.ID == EventID)
+     .ToList();
+
+                var firstTicket = eventTickets.FirstOrDefault();
+
+                var seatVM = new SeatVM()
+                {
+                    AuditoriumName = firstTicket?.Show?.Event?.Auditorium?.Title?.Trim(),
+                    VenueName = firstTicket?.Show?.Event?.Auditorium?.Venue?.Title?.Trim(),
+                    ShowDate = firstTicket?.Show?.Date,
+                    Rows = firstTicket?.Show?.Event?.Auditorium?.Rows.Select(row =>
                     {
-                        AuditoriumName = x.Show.Event.Auditorium.Title.Trim(),
-                        VenueName = x.Show.Event.Auditorium.Venue.Title.Trim(),
-                        ShowDate = x.Show.Date,
-                        Rows = x.Show.Event.Auditorium.Rows.Select(y => new RowVM()
+                        // Try to find a ticket for any seat in this row to get the price
+                        var firstSeatIdInRow = row.Columns.SelectMany(c => c.Seats).FirstOrDefault()?.ID;
+                        var rowTicket = eventTickets.FirstOrDefault(t => t.Seat.ID == firstSeatIdInRow);
+                        var rowPrice = rowTicket?.CostPrice ?? 0;
+
+                        return new RowVM()
                         {
-                            RowLabel = y.RowLabel,
-                            Columns = y.Columns.Select(c => new ColumnVM()
+                            RowLabel = row.RowLabel,
+                            CostPrice = rowPrice.ToString(), // Assign price here
+                            Columns = row.Columns.Select(col => new ColumnVM()
                             {
-                                ID = c.ID,
-                                ColumnNumber = c.ColumnNumber,
-                                SeatTickets = c.Seats.Select(s => new TicketVM()
+                                ID = col.ID,
+                                ColumnNumber = col.ColumnNumber,
+                                SeatTickets = col.Seats.Select(seat =>
                                 {
-                                    CostPrice = x.CostPrice,
-                                    SeatNumber = s.SeatNumber,
-                                    IsReserved = x.IsReserved,
+                                    var ticket = eventTickets.FirstOrDefault(t => t.Seat.ID == seat.ID);
+                                    return new TicketVM()
+                                    {
+                                        SeatNumber = seat.SeatNumber,
+                                        IsReserved = ticket?.IsReserved ?? false
+                                    };
                                 }).ToList()
                             }).ToList()
-                        }).ToList()
-                    }).FirstOrDefault();
-                return View(_object ?? new SeatVM());
+                        };
+                    }).ToList()
+                };
+
+
+                return View(seatVM ?? new SeatVM());
             }
             catch (Exception ex)
             {

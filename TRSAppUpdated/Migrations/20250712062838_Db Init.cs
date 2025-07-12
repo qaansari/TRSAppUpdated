@@ -332,28 +332,6 @@ namespace TRSAppUpdated.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ReservationImages",
-                columns: table => new
-                {
-                    ID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ReservationID = table.Column<int>(type: "int", nullable: false),
-                    ImagePath = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreatedByUserID = table.Column<int>(type: "int", nullable: false),
-                    CreatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ReservationImages", x => x.ID);
-                    table.ForeignKey(
-                        name: "FK_ReservationImages_Users_CreatedByUserID",
-                        column: x => x.CreatedByUserID,
-                        principalTable: "Users",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.NoAction);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "ReservationStatuses",
                 columns: table => new
                 {
@@ -387,28 +365,6 @@ namespace TRSAppUpdated.Migrations
                         column: x => x.UpdatedByUserID,
                         principalTable: "Users",
                         principalColumn: "ID");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ReservationTickets",
-                columns: table => new
-                {
-                    ID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    TicketID = table.Column<int>(type: "int", nullable: false),
-                    ReservationID = table.Column<int>(type: "int", nullable: false),
-                    CreatedByUserID = table.Column<int>(type: "int", nullable: false),
-                    CreatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ReservationTickets", x => x.ID);
-                    table.ForeignKey(
-                        name: "FK_ReservationTickets_Users_CreatedByUserID",
-                        column: x => x.CreatedByUserID,
-                        principalTable: "Users",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -872,73 +828,70 @@ namespace TRSAppUpdated.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ReservationReservationImage",
+                name: "ReservationImages",
                 columns: table => new
                 {
-                    ReservationImagesID = table.Column<int>(type: "int", nullable: false),
-                    ReservationsID = table.Column<int>(type: "int", nullable: false)
+                    ID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ReservationID = table.Column<int>(type: "int", nullable: false),
+                    ImagePath = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedByUserID = table.Column<int>(type: "int", nullable: false),
+                    CreatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CategoryID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ReservationReservationImage", x => new { x.ReservationImagesID, x.ReservationsID });
+                    table.PrimaryKey("PK_ReservationImages", x => x.ID);
                     table.ForeignKey(
-                        name: "FK_ReservationReservationImage_ReservationImages_ReservationImagesID",
-                        column: x => x.ReservationImagesID,
-                        principalTable: "ReservationImages",
+                        name: "FK_ReservationImages_Categories_CategoryID",
+                        column: x => x.CategoryID,
+                        principalTable: "Categories",
                         principalColumn: "ID",
                         onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
-                        name: "FK_ReservationReservationImage_Reservations_ReservationsID",
-                        column: x => x.ReservationsID,
+                        name: "FK_ReservationImages_Reservations_ReservationID",
+                        column: x => x.ReservationID,
                         principalTable: "Reservations",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.NoAction);
+                    table.ForeignKey(
+                        name: "FK_ReservationImages_Users_CreatedByUserID",
+                        column: x => x.CreatedByUserID,
+                        principalTable: "Users",
                         principalColumn: "ID",
                         onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
-                name: "ReservationReservationTicket",
+                name: "ReservationTickets",
                 columns: table => new
                 {
-                    ReservationTicketsID = table.Column<int>(type: "int", nullable: false),
-                    ReservationsID = table.Column<int>(type: "int", nullable: false)
+                    ID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TicketID = table.Column<int>(type: "int", nullable: false),
+                    ReservationID = table.Column<int>(type: "int", nullable: false),
+                    CreatedByUserID = table.Column<int>(type: "int", nullable: false),
+                    CreatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ReservationReservationTicket", x => new { x.ReservationTicketsID, x.ReservationsID });
+                    table.PrimaryKey("PK_ReservationTickets", x => x.ID);
                     table.ForeignKey(
-                        name: "FK_ReservationReservationTicket_ReservationTickets_ReservationTicketsID",
-                        column: x => x.ReservationTicketsID,
-                        principalTable: "ReservationTickets",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.NoAction);
-                    table.ForeignKey(
-                        name: "FK_ReservationReservationTicket_Reservations_ReservationsID",
-                        column: x => x.ReservationsID,
+                        name: "FK_ReservationTickets_Reservations_ReservationID",
+                        column: x => x.ReservationID,
                         principalTable: "Reservations",
                         principalColumn: "ID",
                         onDelete: ReferentialAction.NoAction);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ReservationTicketTicket",
-                columns: table => new
-                {
-                    ReservationTicketsID = table.Column<int>(type: "int", nullable: false),
-                    TicketsID = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ReservationTicketTicket", x => new { x.ReservationTicketsID, x.TicketsID });
                     table.ForeignKey(
-                        name: "FK_ReservationTicketTicket_ReservationTickets_ReservationTicketsID",
-                        column: x => x.ReservationTicketsID,
-                        principalTable: "ReservationTickets",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.NoAction);
-                    table.ForeignKey(
-                        name: "FK_ReservationTicketTicket_Tickets_TicketsID",
-                        column: x => x.TicketsID,
+                        name: "FK_ReservationTickets_Tickets_TicketID",
+                        column: x => x.TicketID,
                         principalTable: "Tickets",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.NoAction);
+                    table.ForeignKey(
+                        name: "FK_ReservationTickets_Users_CreatedByUserID",
+                        column: x => x.CreatedByUserID,
+                        principalTable: "Users",
                         principalColumn: "ID",
                         onDelete: ReferentialAction.NoAction);
                 });
@@ -957,21 +910,42 @@ namespace TRSAppUpdated.Migrations
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "ID", "ContactNumber", "CountryID", "CreatedByUserID", "CreatedDateTime", "DeletedByUserID", "DeletedDateTime", "Email", "FirstName", "ImagePath", "IsActive", "IsDeleted", "IsTokenExpired", "IsVerified", "LastName", "Password", "RoleID", "UpdatedByUserID", "UpdatedDateTime", "UserToken" },
-                values: new object[] { 1, "+923312541767", null, null, new DateTime(2025, 7, 10, 12, 23, 10, 879, DateTimeKind.Utc).AddTicks(5282), null, null, "sa@eventland.pk", "Super", null, true, false, false, true, "Admin", "6FkLTXY5CrK8ccZIBV6HAibnMhfq44wfgPMuzSxJjQ4=", 1, null, null, null });
+                values: new object[] { 1, "+923312541767", null, null, new DateTime(2025, 7, 12, 11, 28, 37, 726, DateTimeKind.Utc).AddTicks(5170), null, null, "sa@eventland.pk", "Super", null, true, false, false, true, "Admin", "6FkLTXY5CrK8ccZIBV6HAibnMhfq44wfgPMuzSxJjQ4=", 1, null, null, null });
 
             migrationBuilder.InsertData(
                 table: "Countries",
                 columns: new[] { "ID", "CreatedByUserID", "CreatedDateTime", "DeletedByUserID", "DeletedDateTime", "DialingCode", "Flag", "IsDeleted", "Title", "UpdatedByUserID", "UpdatedDateTime" },
-                values: new object[] { 1, 1, new DateTime(2025, 7, 10, 12, 23, 10, 879, DateTimeKind.Utc).AddTicks(5709), null, null, "+92", "🇵🇰", false, "Pakistan", null, null });
+                values: new object[] { 1, 1, new DateTime(2025, 7, 12, 11, 28, 37, 726, DateTimeKind.Utc).AddTicks(5818), null, null, "+92", "🇵🇰", false, "Pakistan", null, null });
 
             migrationBuilder.InsertData(
                 table: "EventStatuses",
                 columns: new[] { "ID", "CreatedByUserID", "CreatedDateTime", "DeletedByUserID", "DeletedDateTime", "IsDeleted", "Title", "UpdatedByUserID", "UpdatedDateTime" },
                 values: new object[,]
                 {
-                    { 1, 1, new DateTime(2025, 7, 10, 12, 23, 10, 879, DateTimeKind.Utc).AddTicks(5646), null, null, false, "Active", null, null },
-                    { 2, 1, new DateTime(2025, 7, 10, 12, 23, 10, 879, DateTimeKind.Utc).AddTicks(5650), null, null, false, "Ended", null, null },
-                    { 3, 1, new DateTime(2025, 7, 10, 12, 23, 10, 879, DateTimeKind.Utc).AddTicks(5651), null, null, false, "Postponed", null, null }
+                    { 1, 1, new DateTime(2025, 7, 12, 11, 28, 37, 726, DateTimeKind.Utc).AddTicks(5749), null, null, false, "Active", null, null },
+                    { 2, 1, new DateTime(2025, 7, 12, 11, 28, 37, 726, DateTimeKind.Utc).AddTicks(5753), null, null, false, "Ended", null, null },
+                    { 3, 1, new DateTime(2025, 7, 12, 11, 28, 37, 726, DateTimeKind.Utc).AddTicks(5755), null, null, false, "Postponed", null, null }
+                });
+
+            migrationBuilder.InsertData(
+                table: "PaymentModes",
+                columns: new[] { "ID", "CreatedByUserID", "CreatedDateTime", "DeletedByUserID", "DeletedDateTime", "IsDeleted", "Title", "UpdatedByUserID", "UpdatedDateTime" },
+                values: new object[,]
+                {
+                    { 1, 1, new DateTime(2025, 7, 12, 11, 28, 37, 726, DateTimeKind.Utc).AddTicks(5930), null, null, false, "Cash", null, null },
+                    { 2, 1, new DateTime(2025, 7, 12, 11, 28, 37, 726, DateTimeKind.Utc).AddTicks(5932), null, null, false, "Easypaisa/Jazzcash", null, null },
+                    { 3, 1, new DateTime(2025, 7, 12, 11, 28, 37, 726, DateTimeKind.Utc).AddTicks(5934), null, null, false, "Bank Transfer", null, null }
+                });
+
+            migrationBuilder.InsertData(
+                table: "ReservationStatuses",
+                columns: new[] { "ID", "CreatedByUserID", "CreatedDateTime", "DeletedByUserID", "DeletedDateTime", "IsDeleted", "Title", "UpdatedByUserID", "UpdatedDateTime" },
+                values: new object[,]
+                {
+                    { 1, 1, new DateTime(2025, 7, 12, 11, 28, 37, 726, DateTimeKind.Utc).AddTicks(5979), null, null, false, "Arrival Pending", null, null },
+                    { 2, 1, new DateTime(2025, 7, 12, 11, 28, 37, 726, DateTimeKind.Utc).AddTicks(5981), null, null, false, "Cancelled", null, null },
+                    { 3, 1, new DateTime(2025, 7, 12, 11, 28, 37, 726, DateTimeKind.Utc).AddTicks(5982), null, null, false, "Closed", null, null },
+                    { 4, 1, new DateTime(2025, 7, 12, 11, 28, 37, 726, DateTimeKind.Utc).AddTicks(5984), null, null, false, "Refunded", null, null }
                 });
 
             migrationBuilder.InsertData(
@@ -979,9 +953,9 @@ namespace TRSAppUpdated.Migrations
                 columns: new[] { "ID", "CountryID", "CreatedByUserID", "CreatedDateTime", "DeletedByUserID", "DeletedDateTime", "IsDeleted", "Title", "UpdatedByUserID", "UpdatedDateTime" },
                 values: new object[,]
                 {
-                    { 1, 1, 1, new DateTime(2025, 7, 10, 12, 23, 10, 879, DateTimeKind.Utc).AddTicks(5747), null, null, false, "Karachi", null, null },
-                    { 2, 1, 1, new DateTime(2025, 7, 10, 12, 23, 10, 879, DateTimeKind.Utc).AddTicks(5749), null, null, false, "Lahore", null, null },
-                    { 3, 1, 1, new DateTime(2025, 7, 10, 12, 23, 10, 879, DateTimeKind.Utc).AddTicks(5751), null, null, false, "Islamabad", null, null }
+                    { 1, 1, 1, new DateTime(2025, 7, 12, 11, 28, 37, 726, DateTimeKind.Utc).AddTicks(5875), null, null, false, "Karachi", null, null },
+                    { 2, 1, 1, new DateTime(2025, 7, 12, 11, 28, 37, 726, DateTimeKind.Utc).AddTicks(5878), null, null, false, "Lahore", null, null },
+                    { 3, 1, 1, new DateTime(2025, 7, 12, 11, 28, 37, 726, DateTimeKind.Utc).AddTicks(5880), null, null, false, "Islamabad", null, null }
                 });
 
             migrationBuilder.CreateIndex(
@@ -1185,19 +1159,19 @@ namespace TRSAppUpdated.Migrations
                 column: "UpdatedByUserID");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ReservationImages_CategoryID",
+                table: "ReservationImages",
+                column: "CategoryID");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ReservationImages_CreatedByUserID",
                 table: "ReservationImages",
                 column: "CreatedByUserID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ReservationReservationImage_ReservationsID",
-                table: "ReservationReservationImage",
-                column: "ReservationsID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ReservationReservationTicket_ReservationsID",
-                table: "ReservationReservationTicket",
-                column: "ReservationsID");
+                name: "IX_ReservationImages_ReservationID",
+                table: "ReservationImages",
+                column: "ReservationID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Reservations_CreatedByUserID",
@@ -1250,9 +1224,14 @@ namespace TRSAppUpdated.Migrations
                 column: "CreatedByUserID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ReservationTicketTicket_TicketsID",
-                table: "ReservationTicketTicket",
-                column: "TicketsID");
+                name: "IX_ReservationTickets_ReservationID",
+                table: "ReservationTickets",
+                column: "ReservationID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ReservationTickets_TicketID",
+                table: "ReservationTickets",
+                column: "TicketID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Rows_AuditoriumID",
@@ -1537,31 +1516,22 @@ namespace TRSAppUpdated.Migrations
                 name: "Notes");
 
             migrationBuilder.DropTable(
-                name: "ReservationReservationImage");
+                name: "ReservationImages");
 
             migrationBuilder.DropTable(
-                name: "ReservationReservationTicket");
-
-            migrationBuilder.DropTable(
-                name: "ReservationTicketTicket");
+                name: "ReservationTickets");
 
             migrationBuilder.DropTable(
                 name: "ShowExpenses");
 
             migrationBuilder.DropTable(
-                name: "Categories");
-
-            migrationBuilder.DropTable(
                 name: "NoteTypes");
 
             migrationBuilder.DropTable(
-                name: "ReservationImages");
+                name: "Categories");
 
             migrationBuilder.DropTable(
                 name: "Reservations");
-
-            migrationBuilder.DropTable(
-                name: "ReservationTickets");
 
             migrationBuilder.DropTable(
                 name: "Tickets");

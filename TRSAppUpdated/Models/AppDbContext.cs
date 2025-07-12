@@ -80,8 +80,8 @@ namespace TRSAppUpdated.Models
                 {
                     ID = 1,
                     Title = "Active",
-                    CreatedByUserID=1,
-                    CreatedDateTime= DateTime.UtcNow.AddHours(5),
+                    CreatedByUserID = 1,
+                    CreatedDateTime = DateTime.UtcNow.AddHours(5),
                     IsDeleted = false,
                 },
                  new EventStatus()
@@ -135,6 +135,64 @@ namespace TRSAppUpdated.Models
                     ID = 3,
                     Title = "Islamabad",
                     CountryID = 1,
+                    CreatedByUserID = 1,
+                    CreatedDateTime = DateTime.UtcNow.AddHours(5),
+                    IsDeleted = false,
+                });
+            modelBuilder.Entity<PaymentMode>().HasData(
+                new PaymentMode()
+                {
+                    ID = 1,
+                    Title = "Cash",
+                    CreatedByUserID = 1,
+                    CreatedDateTime = DateTime.UtcNow.AddHours(5),
+                    IsDeleted = false,
+                },
+                new PaymentMode()
+                {
+                    ID = 2,
+                    Title = "Easypaisa/Jazzcash",
+                    CreatedByUserID = 1,
+                    CreatedDateTime = DateTime.UtcNow.AddHours(5),
+                    IsDeleted = false,
+                },
+                new PaymentMode()
+                {
+                    ID = 3,
+                    Title = "Bank Transfer",
+                    CreatedByUserID = 1,
+                    CreatedDateTime = DateTime.UtcNow.AddHours(5),
+                    IsDeleted = false,
+                });
+            modelBuilder.Entity<ReservationStatus>().HasData(
+                new ReservationStatus()
+                {
+                    ID = 1,
+                    Title = "Arrival Pending",
+                    CreatedByUserID = 1,
+                    CreatedDateTime = DateTime.UtcNow.AddHours(5),
+                    IsDeleted = false,
+                },
+                new ReservationStatus()
+                {
+                    ID = 2,
+                    Title = "Cancelled",
+                    CreatedByUserID = 1,
+                    CreatedDateTime = DateTime.UtcNow.AddHours(5),
+                    IsDeleted = false,
+                },
+                new ReservationStatus()
+                {
+                    ID = 3,
+                    Title = "Closed",
+                    CreatedByUserID = 1,
+                    CreatedDateTime = DateTime.UtcNow.AddHours(5),
+                    IsDeleted = false,
+                },
+                new ReservationStatus()
+                {
+                    ID = 4,
+                    Title = "Refunded",
                     CreatedByUserID = 1,
                     CreatedDateTime = DateTime.UtcNow.AddHours(5),
                     IsDeleted = false,
