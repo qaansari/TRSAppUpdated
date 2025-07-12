@@ -18,6 +18,7 @@ namespace TRSAppUpdated.Controllers
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly ILogger<ReservationController> _logger;
+        private readonly IReservationService _reservationService;
         private readonly IShowService _showService;
         private readonly ITicketService _ticketService;
         private readonly IPaymentModeService _paymentModeService;
@@ -26,13 +27,15 @@ namespace TRSAppUpdated.Controllers
         private readonly int _UserID;
         public ReservationController(AppDbContext context, IHttpContextAccessor httpContextAccessor,
             IWebHostEnvironment webHostEnvironment, ILogger<ReservationController> logger,
-            IShowService showService, ITicketService ticketService,
-            IPaymentModeService paymentModeService, IReservationStatusService reservationStatusService)
+            IReservationService reservationService, IShowService showService,
+            ITicketService ticketService, IPaymentModeService paymentModeService,
+            IReservationStatusService reservationStatusService)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;
             _webHostEnvironment = webHostEnvironment;
             _logger = logger;
+            _reservationService = reservationService;
             _showService = showService;
             _ticketService = ticketService;
             _paymentModeService = paymentModeService;
@@ -256,14 +259,15 @@ namespace TRSAppUpdated.Controllers
                         }
                         await _context.Tickets
                         .Where(x => !x.IsDeleted && Model.TicketIDs.Contains(x.ID))
-                        .BatchUpdateAsync(x => new Ticket {
+                        .BatchUpdateAsync(x => new Ticket
+                        {
                             CostPrice = _item.CostPrice / Model.TicketIDs.Count,
                             IsReserved = true,
-                            ReservationDateTime=DateTime.UtcNow.AddHours(5),
+                            ReservationDateTime = DateTime.UtcNow.AddHours(5),
                             SalePrice = _item.SalePrice / Model.TicketIDs.Count,
                             Discount = _item.Discount / Model.TicketIDs.Count,
-                            });
-                        
+                        });
+
                         await _context.SaveChangesAsync();
                     }
                     return RedirectToAction("Details", "Event", new { ID = Model.EventID });
@@ -275,6 +279,29 @@ namespace TRSAppUpdated.Controllers
                 _logger.LogError($"Error occured at AddOrEdit (POST) in {_Title} Controller due to {ex}");
             }
             return View(Model);
+        }
+        [Authorize(Roles = "Super Admin,Admin,Moderator,User")]
+        public IActionResult Details(int ID = 0, int EventID = 0)
+        {
+
+            var _item = new ReservationDetailVM();
+            try
+            {
+                if (EventID != 0)
+                {
+                    ViewBag.EventID = EventID;
+                }
+                if (ID != 0)
+                {
+                    _item = _reservationService.GetDetailsByID(ID);
+                }
+            }
+            catch (Exception ex)
+            {
+
+                _logger.LogError($"Error occured at AddOrEdit (GET) in {_Title} Controller due to {ex}");
+            }
+            return View(_item);
         }
     }
 }

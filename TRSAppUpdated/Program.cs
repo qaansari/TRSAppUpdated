@@ -32,6 +32,7 @@ namespace TRSAppUpdated
             builder.Services.AddScoped<INoteTypeService, NoteTypeService>();
             builder.Services.AddScoped<INoteService, NoteService>();
             builder.Services.AddScoped<IPaymentModeService, PaymentModeService>();
+            builder.Services.AddScoped<IReservationService, ReservationService>();
             builder.Services.AddScoped<IReservationStatusService, ReservationStatusService>();
             builder.Services.AddScoped<IShowService, ShowService>();
             builder.Services.AddScoped<ITicketService, TicketService>();

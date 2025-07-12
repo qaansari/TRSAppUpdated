@@ -137,10 +137,6 @@ namespace TRSAppUpdated.Services
                  + DateTime.Today.Add(r.Show.Time).ToString("hh:mm tt"),
                  CustomerName = r.CustomerName,
                  CustomerPhone = r.CustomerPhone,
-                 CostPrice = r.CostPrice,
-                 SalePrice = r.SalePrice,
-                 AmountPaid = r.AmountPaid,
-                 AmountRemaining = r.AmountRemaining
              })
              .ToList(),
          ImagePath = x.ImagePath

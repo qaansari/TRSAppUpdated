@@ -40,7 +40,27 @@ namespace TRSAppUpdated.ViewModels
         [Range(1, int.MaxValue, ErrorMessage = "Please fill out this field")]
         public int ReservationStatusID { get; set; }
         public string? PaymentModeTitle { get; set; }
-        public string? ReservationSattusTitle { get; set; }
+        public string? ReservationStatusTitle { get; set; }
+        public string? ShowDateTime { get; set; }
+    }
+    public class ReservationDetailVM : CommonModel
+    {
+        public int ID { get; set; }
+        public string EventName { get; set; }
+        public string TicketNumber { get; set; }
+        public string CustomerName { get; set; }
+        public string CustomerPhone { get; set; }
+        public bool IsFullyPaid { get; set; }
+        public string SeatLabels  { get; set; }
+        public double CostPrice { get; set; }
+        public double Discount { get; set; }
+        public double SalePrice { get; set; }
+        public double AmountPaid { get; set; }
+        public double? AmountRemaining { get; set; }
+        public string? TransactionID { get; set; }
+        public DateTime? BookingDateTime { get; set; }
+        public string? PaymentModeTitle { get; set; }
+        public string? ReservationStatusTitle { get; set; }
         public string? ShowDateTime { get; set; }
     }
 }
