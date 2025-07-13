@@ -23,7 +23,7 @@ namespace TRSAppUpdated.Controllers
         private readonly ITicketService _ticketService;
         private readonly IPaymentModeService _paymentModeService;
         private readonly IReservationStatusService _reservationStatusService;
-        private readonly string _Title = "Event";
+        private readonly string _Title = "Reservation";
         private readonly int _UserID;
         public ReservationController(AppDbContext context, IHttpContextAccessor httpContextAccessor,
             IWebHostEnvironment webHostEnvironment, ILogger<ReservationController> logger,
@@ -124,7 +124,7 @@ namespace TRSAppUpdated.Controllers
                         if (isExists)
                         {
                             TempData["Message"] = $"0,Invalid Tickets Selected";
-                            return View(Model);
+                            return RedirectToAction("AddOrEdit", _Title, new { ID = Model.ID, EventID = Model.EventID });
                         }
                         _item = _context.Reservations.Where(x => !x.IsDeleted && x.ID == Model.ID)
                             .AsNoTracking().FirstOrDefault();
@@ -157,7 +157,7 @@ namespace TRSAppUpdated.Controllers
                         if (isExists)
                         {
                             TempData["Message"] = $"0,Invalid Tickets Selected";
-                            return View(Model);
+                            return RedirectToAction("AddOrEdit", _Title, new { ID = Model.ID, EventID = Model.EventID });
                         }
                         _item.TicketNumber = Model.TicketNumber.Trim();
                         _item.CustomerName = Model.CustomerName.Trim();
@@ -185,9 +185,6 @@ namespace TRSAppUpdated.Controllers
                     }
                     if (_item != null && Model.ImageFiles != null && Model.ImageFiles.Count > 0)
                     {
-                        var _allReservationImages = _context.ReservationImages
-                           .Where(x => x.ReservationID == _item.ID)
-                           .AsNoTracking().ToList();
                         var _eventName = _context.Events.Where(x => !x.IsDeleted && x.ID == Model.EventID).AsNoTracking().Select(x => x.Title).FirstOrDefault();
                         if (!string.IsNullOrEmpty(_eventName))
                         {
@@ -203,33 +200,24 @@ namespace TRSAppUpdated.Controllers
                         }
                         foreach (var image in Model.ImageFiles)
                         {
-                            var _fileName = $"payment_slip" + "_" + _item.TicketNumber;
+                            var _fileName = $"payment_slip" + "_" + _item.TicketNumber + Path.GetExtension(image.FileName);
                             _item.UpdatedByUserID = _UserID;
                             _item.UpdatedDateTime = DateTime.UtcNow.AddHours(5);
                             var _filePath = Path.Combine(folderPath, _fileName);
                             int count = 1;
-                            while (System.IO.File.Exists(_filePath))
+                            while (!System.IO.File.Exists(_filePath))
                             {
                                 _fileName = $"{_fileName}_{count}{Path.GetExtension(image.FileName)}";
-                                var isEntryExists = _allReservationImages
-                                    .Where(x => x.ImagePath.ToLower() == _fileName.ToLower()).Any();
-                                if (!isEntryExists)
+                                _context.ReservationImages.Add(new ReservationImage()
                                 {
-                                    _context.ReservationImages.Add(new ReservationImage()
-                                    {
-                                        ImagePath = _fileName,
-                                        ReservationID = _item.ID,
-                                        CreatedByUserID = _UserID,
-                                        CreatedDateTime = DateTime.UtcNow.AddHours(5),
-                                    });
-                                    using (var _stream = new FileStream(_filePath, FileMode.Create))
-                                    {
-                                        await image.CopyToAsync(_stream);
-                                    }
-                                }
-                                else
+                                    ImagePath = _fileName,
+                                    ReservationID = _item.ID,
+                                    CreatedByUserID = _UserID,
+                                    CreatedDateTime = DateTime.UtcNow.AddHours(5),
+                                });
+                                using (var _stream = new FileStream(_filePath, FileMode.Create))
                                 {
-                                    continue;
+                                    await image.CopyToAsync(_stream);
                                 }
                             }
                         }
@@ -249,9 +237,9 @@ namespace TRSAppUpdated.Controllers
                           {
                               CostPrice = _item.CostPrice / Model.TicketIDs.Count,
                               IsReserved = false,
-                              IsRefunded= _reservationStatusTitle.ToLower() == "refunded"?true:false,
-                              RefundDateTime= _reservationStatusTitle.ToLower() == "refunded" ? DateTime.UtcNow.AddHours(5):null,
-                              ReservationDateTime = _reservationStatusTitle.ToLower() == "cancelled" ? null:x.ReservationDateTime,
+                              IsRefunded = _reservationStatusTitle.ToLower() == "refunded" ? true : false,
+                              RefundDateTime = _reservationStatusTitle.ToLower() == "refunded" ? DateTime.UtcNow.AddHours(5) : null,
+                              ReservationDateTime = _reservationStatusTitle.ToLower() == "cancelled" ? null : x.ReservationDateTime,
                               SalePrice = _reservationStatusTitle.ToLower() == "cancelled" ? 0 : x.SalePrice,
                               Discount = _reservationStatusTitle.ToLower() == "cancelled" ? 0 : x.Discount,
                           });
@@ -263,10 +251,10 @@ namespace TRSAppUpdated.Controllers
                                 {
                                     _item.AmountPaid -= _item.AmountPaid;
                                     _context.Entry(_item).State = EntityState.Modified;
-                            }
+                                }
                                 await _context.SaveChangesAsync();
                             }
-                            
+
                             else
                             {
                                 var _allReservationTickets = _context.ReservationTickets

@@ -14,7 +14,7 @@
         <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
             <div class="info w-100">
                 <div class="form-group mb-0 float-right my-2 mr-5px">
-                    <a class="btn btn-danger" href="@Url.Action("Details", "Event", new { ID = _EventID })">Back</a>
+                    <a class="btn btn-danger btn-sm" href="@Url.Action("Details", "Event", new { ID = _EventID })">Back</a>
                 </div>
                 <h1 class="fw-bold text-uppercase text-center">@(ViewData["Title"]) for @(Model.ShowDate.Value.ToString("dddd, dd MMMM yyyy"))</h1>
                 <h3 class="fw-medium text-uppercase text-center">@(Model.Rows.SelectMany(x => x.Columns).SelectMany(x => x.SeatTickets).Count()) SEATS</h3>
@@ -23,7 +23,7 @@
                 @foreach (var row in Model.Rows)
                 {
                     <div class="seat-row mt-2">
-                        <span class="row_label mr-5px">@row.RowLabel - @(row.CostPrice)</span>
+                        <span class="row_label mr-5px">@row.RowLabel (@(row.CostPrice))</span>
                         @foreach (var column in row.Columns)
                         {
                             foreach (var seat in column.SeatTickets)
@@ -34,7 +34,7 @@
                             }
                             <div class="column-gap"></div>
                         }
-                        <span class="row_label">@row.RowLabel - @(row.CostPrice)</span>
+                        <span class="row_label">@row.RowLabel (@(row.CostPrice))</span>
                     </div>
                 }
 

@@ -19,6 +19,7 @@
                     @(ViewData["Title"])
                     <span class="float-right">
                         <a asp-action="AddOrEdit" asp-route-ID="0" asp-route-EventID="@_EventID" class="btn btn-primary sm-btn">Add @_PageTitle</a>
+                        <a asp-action="Details" asp-controller="Event" asp-route-ID="@(_EventID)" class="btn btn-danger sm-btn">Back</a>
                     </span>
                 </h4>
             </div>
