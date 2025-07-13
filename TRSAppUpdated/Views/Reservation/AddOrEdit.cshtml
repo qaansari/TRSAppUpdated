@@ -246,12 +246,7 @@
         $(document).ready(function () {
             try {
                 $('.optional-row').hide();
-                const selectedPaymentText = dropdownObj.text?.trim().toLowerCase();
-                 if (selectedPaymentText && selectedPaymentText !== 'cash') {
-                    $('.optional-row').slideDown();
-                } else {
-                    $('.optional-row').slideUp();
-                }
+               toggleOptionalRow();
                 // Ticket change => update cost price
                             const ticketMulti = document.getElementById('TicketIDs')?.ej2_instances?.[0];
         if (ticketMulti) {
