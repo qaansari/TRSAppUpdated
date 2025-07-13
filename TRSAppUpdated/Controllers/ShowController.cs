@@ -273,7 +273,7 @@ namespace TRSAppUpdated.Controllers
         //View Tickets (GET)
         [Authorize(Roles = "Super Admin,Admin,Moderator,User")]
         public IActionResult ViewTickets(int ID, int EventID)
-        {
+       {
             // Get all rows with their columns from database
             try
             {
@@ -363,7 +363,8 @@ namespace TRSAppUpdated.Controllers
                     {
                         // Apply updates
                         ticket.CostPrice = row.Price;
-                        ticket.IsReserved = ticket.IsReserved;
+                        ticket.IsRefunded = row.IsRefunded;
+                        ticket.IsReserved = row.IsReserved;
                         ticket.UpdatedByUserID = _UserID;
                         ticket.UpdatedDateTime = DateTime.UtcNow.AddHours(5);
                         _context.Entry(ticket).State = EntityState.Modified;

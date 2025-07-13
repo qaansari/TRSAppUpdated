@@ -26,5 +26,6 @@ namespace TRSAppUpdated.ViewModels
         [Range(1,double.MaxValue,ErrorMessage= "Please fill out this field")]
         public double Price { get; set; }
         public bool IsReserved { get; set; } = false;
+        public bool IsRefunded { get; set; } = false;
     }
 }

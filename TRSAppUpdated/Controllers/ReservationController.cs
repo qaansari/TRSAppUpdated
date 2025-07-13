@@ -259,8 +259,14 @@ namespace TRSAppUpdated.Controllers
                                  .Where(x => x.ReservationID == _item.ID)
                                  .AsNoTracking().ToList();
                                 _context.ReservationTickets.RemoveRange(_allReservedTickets);
+                                if (_reservationStatusTitle.ToLower() == "refunded")
+                                {
+                                    _item.AmountPaid -= _item.AmountPaid;
+                                    _context.Entry(_item).State = EntityState.Modified;
+                            }
                                 await _context.SaveChangesAsync();
                             }
+                            
                             else
                             {
                                 var _allReservationTickets = _context.ReservationTickets

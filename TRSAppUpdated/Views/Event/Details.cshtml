@@ -111,7 +111,7 @@
                                                             <td>
                                                                 @if (!item.IsEnded)
                                                                 {
-                                                                    <a asp-action="ViewTickets" asp-controller="Show" asp-route-ID="@(item.ID)" asp-route-EventID="@(Model.ID)" class="btn btn-primary sm-btn">View Tickets</a>
+                                                                    <a asp-action="ViewTickets" asp-controller="Show" asp-route-ID="@(item.ID)" asp-route-EventID="@(Model.ID)" class="btn btn-primary sm-btn" target="_blank">View Tickets</a>
                                                                     @if (isSuperAdmin || isAdmin)
                                                                     {
                                                                         <button type="button" class="btn btn-danger sm-btn endShowBtn" data-id="@(item.ID)">End</button>
