@@ -11,7 +11,16 @@
 {
     <div class="row">
         <div class="col-xl-12">
-            <h4 class="card-title">@(ViewData["Title"])</h4>
+            <h4 class="card-title">
+                @(ViewData["Title"])
+                <span class="float-right">
+                    @if (isSuperAdmin || isAdmin)
+                    {
+                        <a asp-action="Index" asp-route-EventID="@(Model.ID)" class="btn btn-primary sm-btn">Expense Details</a>
+                    }
+                    <a asp-action="Index" class="btn btn-primary sm-btn">Back</a>
+                </span>
+            </h4>
         </div>
     </div>
     <hr />
@@ -253,36 +262,36 @@
     </div>
 
     @section Scripts {
-        <script src="~/assets/js/jquery.min.js"></script>
-        <script src="~/assets/js/datatables.min.js"></script>
-        <script src="~/assets/js/dataTables.responsive.min.js"></script>
-        <script>
-                       $(document).ready(function(){
-              $('#showTable').DataTable({responsive:true});
-              $('#reservationTable').DataTable({responsive:true});
-              //Delete Show Functionality
-              $(document).on('click', '.deleteShowBtn', function(){
+    <script src="~/assets/js/jquery.min.js"></script>
+    <script src="~/assets/js/datatables.min.js"></script>
+    <script src="~/assets/js/dataTables.responsive.min.js"></script>
+    <script>
+                   $(document).ready(function(){
+          $('#showTable').DataTable({responsive:true});
+          $('#reservationTable').DataTable({responsive:true});
+          //Delete Show Functionality
+          $(document).on('click', '.deleteShowBtn', function(){
+            var selectedID = $(this).data("id");
+            $("#deleteShowModal .selectedIdElement").val(selectedID);
+            $("#deleteShowModal").modal("show");
+          });
+          $("#deleteShowModal .confirmDeleteBtn").click(function(){
+            $("#deleteShowModal .delete_form").submit();
+            $("#deleteShowModal").modal("hide");
+          });
+          // End Show functionality
+             $(document).on('click', '.endShowBtn', function(){
                 var selectedID = $(this).data("id");
-                $("#deleteShowModal .selectedIdElement").val(selectedID);
-                $("#deleteShowModal").modal("show");
-              });
-              $("#deleteShowModal .confirmDeleteBtn").click(function(){
-                $("#deleteShowModal .delete_form").submit();
-                $("#deleteShowModal").modal("hide");
-              });
-              // End Show functionality
-                 $(document).on('click', '.endShowBtn', function(){
-                    var selectedID = $(this).data("id");
-                    $("#endShowModal .selectedIdElement").val(selectedID);
-                    $("#endShowModal").modal("show");
-                });
-                $("#endShowModal .confirmBtn").click(function(){
-                    $("#endShowModal .end_form").submit();
-                    $("#endShowModal").modal("hide");
-                });
+                $("#endShowModal .selectedIdElement").val(selectedID);
+                $("#endShowModal").modal("show");
             });
+            $("#endShowModal .confirmBtn").click(function(){
+                $("#endShowModal .end_form").submit();
+                $("#endShowModal").modal("hide");
+            });
+        });
 
-        </script>
+    </script>
     @if (_Message != null)
         {
             if (_Message.StartsWith("1"))
