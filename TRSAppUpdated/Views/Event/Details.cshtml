@@ -16,7 +16,7 @@
                 <span class="float-right">
                     @if (isSuperAdmin || isAdmin)
                     {
-                        <a asp-action="Index" asp-route-EventID="@(Model.ID)" class="btn btn-primary sm-btn">Expense Details</a>
+                        <a asp-action="Index" asp-controller="ShowExpense" asp-route-EventID="@(Model.ID)" class="btn btn-primary sm-btn">Expense Details</a>
                     }
                     <a asp-action="Index" class="btn btn-primary sm-btn">Back</a>
                 </span>

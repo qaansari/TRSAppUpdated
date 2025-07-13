@@ -22,6 +22,7 @@ namespace TRSAppUpdated
             builder.Services.AddDistributedMemoryCache();
             builder.Services.AddSession();
             builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            builder.Services.AddScoped<IExpenseService, ExpenseService>();
             builder.Services.AddScoped<IVenueService, VenueService>();
             builder.Services.AddScoped<IAuditoriumService, AuditoriumService>();
             builder.Services.AddScoped<ICategoryService, CategoryService>();

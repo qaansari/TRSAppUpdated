@@ -15,9 +15,11 @@ namespace TRSAppUpdated.ViewModels
         public int ExpenseID { get; set; }
         [Required(ErrorMessage = "Please fill out this field")]
         public DateTime? Date { get; set; }
-        [Required(ErrorMessage = "Please fill out this field")]
+        [Range(1, double.MaxValue, ErrorMessage = "Please fill out this field")]
         public double Amount { get; set; }
         [Required(ErrorMessage = "Please fill out this field")]
         public string Description { get; set; }
+        public string? ExpenseTitle { get; set; }
+        public string? ShowDateTime { get; set; }
     }
 }

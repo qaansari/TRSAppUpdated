@@ -1,0 +1,119 @@
+﻿@model ShowExpenseVM
+@{
+    string _fn = "Add";
+    if (Model.ID != 0)
+    {
+        _fn = "Edit";
+    }
+    string _PageTitle = "Show Expense";
+    ViewData["Title"] = $"{_fn} {_PageTitle}";
+    var _Message = TempData["Message"] as string;
+    int _EventID = ViewBag.EventID != null ? ViewBag.EventID : 0;
+}
+<div class="row">
+    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+        <div class="card">
+            <div class="card-header">
+                <h4>@(ViewData["Title"])</h4>
+            </div>
+            <div class="card-body">
+                <form class="separate-form" enctype="multipart/form-data" method="post" asp-action="AddOrEdit">
+                    <input type="hidden" asp-for="ID" />
+                    <input type="hidden" asp-for="EventID" />
+                    <input type="hidden" asp-for="CreatedByUserID" />
+                    <input type="hidden" asp-for="CreatedDateTime" />
+                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                        <div class="row">
+                            <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                                <div class="form-group">
+                                    <label class="col-form-label">Show <span class="text-danger">*</span></label>
+                                    <ejs-dropdownlist cssClass="form-control form-control-sm" dataSource="@(ViewData["ShowList"])" placeholder="Select a show"
+                                                      allowFiltering="true" ejs-for="ShowID" popupHeight="220px">
+                                        <e-dropdownlist-fields value="ID" text="ShowDateTime"></e-dropdownlist-fields>
+                                    </ejs-dropdownlist>
+                                    <span asp-validation-for="ShowID"></span>
+                                </div>
+                            </div>
+                            <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                                <div class="form-group">
+                                    <label class="col-form-label">Expense <span class="text-danger">*</span></label>
+                                    <ejs-dropdownlist cssClass="form-control form-control-sm" dataSource="@(ViewData["ExpenseList"])" placeholder="Select a show"
+                                                      allowFiltering="true" ejs-for="ExpenseID" popupHeight="220px">
+                                        <e-dropdownlist-fields value="ID" text="Title"></e-dropdownlist-fields>
+                                    </ejs-dropdownlist>
+                                    <span asp-validation-for="ExpenseID"></span>
+                                </div>
+                            </div>
+                            <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                                <div class="form-group">
+                                    <label class="col-form-label">Date <span class="text-danger">*</span></label>
+                                    <ejs-datetimepicker cssClass="form-control" ejs-for="Date"></ejs-datetimepicker>
+                                    <span asp-validation-for="Date"></span>
+                                </div>
+                            </div>
+                            <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                                <div class="form-group">
+                                    <label class="col-form-label">Amount <span class="text-danger">*</span></label>
+                                    <input class="form-control" type="number" placeholder="Enter Amount" asp-for="Amount">
+                                    <span asp-validation-for="Amount"></span>
+                                </div>
+                            </div>
+                            <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                                <div class="form-group">
+                                    <label class="col-form-label">Description</label>
+                                    <textarea class="form-control" type="text" placeholder="Enter Expense Description"
+                                              rows="3" asp-for="Description"></textarea>
+                                    <span asp-validation-for="Description"></span>
+                                </div>
+                            </div>
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                <div class="form-group mb-0">
+                                    <input class="btn btn-primary" type="submit">
+                                    <a class="btn btn-danger" href="@(Url.Action("Index",new {EventID=_EventID}))">Back</a>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    @if (_Message != null)
+    {
+        if (_Message.StartsWith("1"))
+        {
+            <script>
+                $(document).ready(function () {
+                    Lobibox.notify('success', {
+                        pauseDelayOnHover: true,
+                        size: 'mini',
+                        icon: 'bx bx-info-circle',
+                        continueDelayOnInactiveTab: false,
+                        position: 'bottom right',
+                        msg: '@(_Message.Substring(2))',
+                        soundPath: '/assets/sounds/'
+                    });
+                });
+            </script>
+        }
+        else
+        {
+            <script>
+                $(document).ready(function () {
+                    Lobibox.notify('error', {
+                        pauseDelayOnHover: true,
+                        size: 'mini',
+                        icon: 'bx bx-info-circle',
+                        continueDelayOnInactiveTab: false,
+                        position: 'bottom right',
+                        msg: '@(_Message.Substring(2))',
+                        soundPath: '/assets/sounds/'
+                    });
+                });
+            </script>
+        }
+    }
+}
