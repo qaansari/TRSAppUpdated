@@ -174,7 +174,7 @@
                                                             <td>@(item.CustomerPhone)</td>
                                                             <td>@(item.ShowDateTime)</td>
                                                             <td>
-                                                                <a asp-action="Details" asp-controller="Reservation" asp-route-ID="@(item.ID)" asp-route-EventID="@(Model.ID)" class="btn btn-primary sm-btn">Details</a>
+                                                                <a asp-action="Details" asp-controller="Reservation" asp-route-ID="@(item.ID)" asp-route-EventID="@(Model.ID)" class="btn btn-primary sm-btn" target="_blank">Details</a>
                                                                 @if (isSuperAdmin || isAdmin)
                                                                 {
                                                                     <a asp-action="AddOrEdit" asp-controller="Reservation" asp-route-ID="@(item.ID)" asp-route-EventID="@(Model.ID)" class="btn btn-primary sm-btn">Edit</a>
@@ -283,35 +283,39 @@
             });
 
         </script>
-        @if (_Message != null)
+    @if (_Message != null)
         {
             if (_Message.StartsWith("1"))
             {
-                <text>
-                    Lobibox.notify('success', {
-                    pauseDelayOnHover: true,
-                    size: 'mini',
-                    icon: 'bx bx-info-circle',
-                    continueDelayOnInactiveTab: false,
-                    position: 'bottom right',
-                    msg: '@(_Message.Substring(2))',
-                    soundPath: '/assets/sounds/'
+                <script>
+                    $(document).ready(function () {
+                        Lobibox.notify('success', {
+                            pauseDelayOnHover: true,
+                            size: 'mini',
+                            icon: 'bx bx-info-circle',
+                            continueDelayOnInactiveTab: false,
+                            position: 'bottom right',
+                            msg: '@(_Message.Substring(2))',
+                            soundPath: '/assets/sounds/'
+                        });
                     });
-                </text>
+                </script>
             }
             else
             {
-                <text>
-                    Lobibox.notify('error', {
-                    pauseDelayOnHover: true,
-                    size: 'mini',
-                    icon: 'bx bx-info-circle',
-                    continueDelayOnInactiveTab: false,
-                    position: 'bottom right',
-                    msg: '@(_Message.Substring(2))',
-                    soundPath: '/assets/sounds/'
+                <script>
+                    $(document).ready(function () {
+                        Lobibox.notify('error', {
+                            pauseDelayOnHover: true,
+                            size: 'mini',
+                            icon: 'bx bx-info-circle',
+                            continueDelayOnInactiveTab: false,
+                            position: 'bottom right',
+                            msg: '@(_Message.Substring(2))',
+                            soundPath: '/assets/sounds/'
+                        });
                     });
-                </text>
+                </script>
             }
         }
     }
