@@ -147,6 +147,29 @@ namespace TRSAppUpdated.Controllers
                             _item.UpdatedDateTime = DateTime.UtcNow.AddHours(5);
                             _context.Entry(_item).State = EntityState.Modified;
                             await _context.SaveChangesAsync();
+                            var _existingRsvs = _context.ReservationTickets
+                                .Where(x => x.ReservationID == Model.ID).ToList();
+                            if (_existingRsvs != null && _existingRsvs.Count > 0)
+                            {
+                                List<int> _existingTicketIDs = _existingRsvs.Select(x => x.TicketID).ToList();
+                                await _context.Tickets
+                                .Where(x => !x.IsDeleted && _existingTicketIDs.Contains(x.ID))
+                                .BatchUpdateAsync(x => new Ticket
+                                {
+                                    CostPrice = x.CostPrice,
+                                    IsReserved = false,
+                                    ReservationDateTime = null,
+                                    IsRefunded = x.IsRefunded,
+                                    RefundDateTime = x.RefundDateTime,
+                                    IsCancelled = x.IsCancelled,
+                                    CancellationDateTime = x.CancellationDateTime,
+                                    SalePrice = 0,
+                                    Discount = 0,
+                                    UpdatedByUserID = _UserID,
+                                    UpdatedDateTime = DateTime.UtcNow.AddHours(5),
+                                });
+                                _context.ReservationTickets.RemoveRange(_existingRsvs);
+                            }
                             TempData["Message"] = $"1,{_Title} Successfully Updated";
                         }
                     }
@@ -244,22 +267,7 @@ namespace TRSAppUpdated.Controllers
                         {
                             if (_reservationStatusTitle.ToLower() == "arrival pending")
                             {
-                                await _context.Tickets
-                                .Where(x => !x.IsDeleted && Model.TicketIDs.Contains(x.ID))
-                                .BatchUpdateAsync(x => new Ticket
-                                {
-                                    CostPrice = _item.CostPrice / Model.TicketIDs.Count,
-                                    IsReserved = true,
-                                    IsRefunded = x.IsRefunded,
-                                    RefundDateTime = x.RefundDateTime,
-                                    IsCancelled = x.IsCancelled,
-                                    CancellationDateTime = x.CancellationDateTime,
-                                    ReservationDateTime = DateTime.UtcNow.AddHours(5),
-                                    SalePrice = _item.SalePrice / Model.TicketIDs.Count,
-                                    Discount = _item.Discount / Model.TicketIDs.Count,
-                                    UpdatedByUserID = _UserID,
-                                    UpdatedDateTime = DateTime.UtcNow.AddHours(5),
-                                });
+
                                 foreach (var _ticketID in Model.TicketIDs)
                                 {
                                     _context.ReservationTickets.Add(new ReservationTicket()
