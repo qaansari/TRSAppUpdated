@@ -202,3 +202,10 @@ span.e-input-group.e-control-wrapper.form-control.form-control-sm.e-ddl.e-lib.e-
 .seat.reserved {
     background-color: var(--warning);
 }
+.reservation_image_preview {
+    width: 240px;
+    height: 400px;
+}
+.reservation_textarea {
+    max-height: 400px;
+}

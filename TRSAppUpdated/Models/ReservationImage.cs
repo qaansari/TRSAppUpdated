@@ -14,7 +14,6 @@ namespace TRSAppUpdated.Models
         public int CreatedByUserID { get; set; }
         public DateTime CreatedDateTime { get; set; }
         public User? CreatedByUser { get; set; }
-        public Category Category { get; set; }
         public Reservation Reservation { get; set; }
     }
 }

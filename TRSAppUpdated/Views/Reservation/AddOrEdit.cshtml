@@ -126,13 +126,24 @@
                             <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
                                 <div class="form-group">
                                     <label class="col-form-label">Photo(s)</label>
-                                    <input class="form-control" type="file" asp-for="ImageFiles" multiple>
+                                    <input class="form-control" type="file" asp-for="ImageFile" accept="image/*">
                                 </div>
                             </div>
                             <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
                                 <div class="form-group">
                                     <label class="col-form-label">Transaction ID <span class="text-danger">*</span></label>
                                     <input class="form-control" type="text" asp-for="TransactionID">
+                                </div>
+                            </div>
+                            <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                                <div class="form-group">
+                                    <img src="~/assets/images/no-image-found.png" class="reservation_image_preview" />
+                                </div>
+                            </div>
+                            <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                                <div class="form-group">
+                                    <label class="col-form-label">Extract Text</label>
+                                    <textarea class="form-control reservation_textarea" rows="5" id="extractedText"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -162,113 +173,146 @@
     </script>
 
     @section Scripts {
-    <script>
-        const ticketList = @Html.Raw(JsonConvert.SerializeObject(ViewData["TicketList"]));
-        console.log(ticketList);
-        function getSelectedTicketCost(ticketIds) {
-            if (!ticketIds || !ticketList) return 0;
+        <script>
+            const ticketList = @Html.Raw(JsonConvert.SerializeObject(ViewData["TicketList"]));
+            console.log(ticketList);
+            function getSelectedTicketCost(ticketIds) {
+                if (!ticketIds || !ticketList) return 0;
 
-            let total = 0;
-            ticketList.forEach(ticket => {
-                if (ticketIds.includes(ticket.ID)) {
-                    total += parseFloat(ticket.CostPrice) || 0;
+                let total = 0;
+                ticketList.forEach(ticket => {
+                    if (ticketIds.includes(ticket.ID)) {
+                        total += parseFloat(ticket.CostPrice) || 0;
+                    }
+                });
+                console.log();
+                return total;
+            }
+
+            function updateCostPrice() {
+                try {
+                    const ticketDropdown = $('[name="TicketIDs"]');
+                    const ticketIds = $(ticketDropdown).val()?.map(x => parseInt(x)) || [];
+                    const cost = getSelectedTicketCost(ticketIds);
+                    console.log(cost);
+                    $('[name="CostPrice"]').val(cost.toFixed(2));
+                    updateDiscount();
+                    updateAmountRemaining();
+                } catch (e) {
+                    console.error("Error in updateCostPrice:", e);
+                }
+            }
+
+            function updateDiscount() {
+                try {
+                    const costPrice = parseFloat($('[name="CostPrice"]').val()) || 0;
+                    const salePrice = parseFloat($('[name="SalePrice"]').val()) || 0;
+
+                    if (salePrice > costPrice) {
+                        alert('Sale Price cannot be greater than Cost Price.');
+                        $('[name="SalePrice"]').val('');
+                        $('[name="Discount"]').val('');
+                        return;
+                    }
+                    const discount = costPrice - salePrice;
+                    $('[name="Discount"]').val(discount.toFixed(2));
+                } catch (e) {
+                    console.error("Error in updateDiscount:", e);
+                }
+            }
+
+            function updateAmountRemaining() {
+                try {
+                    const salePrice = parseFloat($('[name="SalePrice"]').val()) || 0;
+                    const amountPaid = parseFloat($('[name="AmountPaid"]').val()) || 0;
+
+                    if (amountPaid > salePrice) {
+                        alert('Amount Paid cannot be greater than Sale Price.');
+                        $('[name="AmountPaid"]').val('');
+                        $('[name="AmountRemaining"]').val('');
+                        return;
+                    }
+
+                    const remaining = salePrice - amountPaid;
+                    $('[name="AmountRemaining"]').val(remaining.toFixed(2));
+                } catch (e) {
+                    console.error("Error in updateAmountRemaining:", e);
+                }
+            }
+
+            function toggleOptionalRow() {
+                try {
+                     const dropdownObj = document.getElementById('PaymentMode')?.ej2_instances?.[0];
+                    const selectedText = dropdownObj.text?.trim().toLowerCase();
+                    if (selectedText && selectedText !== 'cash') {
+                        $('.optional-row').slideDown();
+                    } else {
+                        $('.optional-row').slideUp();
+                    }
+                } catch (e) {
+                    console.error("Error in toggleOptionalRow:", e);
+                }
+            }
+
+            $(document).ready(function () {
+                try {
+                    $('.optional-row').hide();
+                   toggleOptionalRow();
+                    // Ticket change => update cost price
+                                const ticketMulti = document.getElementById('TicketIDs')?.ej2_instances?.[0];
+            if (ticketMulti) {
+                ticketMulti.addEventListener('change', updateCostPrice);
+            }
+                    // Sale price change => update discount
+                    $('[name="SalePrice"]').on('input', updateDiscount);
+
+                    // Amount paid change => update remaining
+                    $('[name="AmountPaid"]').on('input', updateAmountRemaining);
+
+                    // Payment mode change => toggle optional row
+                        const paymentDropdown = document.getElementById('PaymentMode')?.ej2_instances?.[0];
+                    if (paymentDropdown) {
+                        paymentDropdown.addEventListener('change', toggleOptionalRow);
+                    }
+                    $('#ImageFile').on('change', function(event) {
+                    const file = event.target.files[0];
+                    if (file) {
+                        const formData = new FormData();
+                        formData.append('file', file);
+
+                        $.ajax({
+                            url: '/ImageProcess/ExtractTextFromImage',
+                            type: 'POST',
+                            data: formData,
+                            processData: false,
+                            contentType: false,
+                            success: function(data) {
+                                $('#extractedText').val(data.text);
+                            },
+                            error: function(xhr, status, error) {
+                                console.error('Error:', error);
+                                alert('Failed to extract text from the image.');
+                            }
+                        });
+                    }
+                });
+                $("#ImageFile").change(
+                function PreviewSelectedImage() {
+                    var imageFile = document.getElementById("ImageFile");
+                    var imagePreview = document.getElementById("imgPreview");
+                    var imageReader = new FileReader();
+                    imageReader.onload = function (e) {
+                        imagePreview.src = e.target.result;
+                        imagePreview.style.display = "block";
+                    };
+                    imageReader.readAsDataURL(imageFile.files[0]);
+                });
+                } catch (e) {
+                    console.error("Document ready error:", e);
                 }
             });
-            console.log();
-            return total;
-        }
-
-        function updateCostPrice() {
-            try {
-                const ticketDropdown = $('[name="TicketIDs"]');
-                const ticketIds = $(ticketDropdown).val()?.map(x => parseInt(x)) || [];
-                const cost = getSelectedTicketCost(ticketIds);
-                console.log(cost);
-                $('[name="CostPrice"]').val(cost.toFixed(2));
-                updateDiscount();
-                updateAmountRemaining();
-            } catch (e) {
-                console.error("Error in updateCostPrice:", e);
-            }
-        }
-
-        function updateDiscount() {
-            try {
-                const costPrice = parseFloat($('[name="CostPrice"]').val()) || 0;
-                const salePrice = parseFloat($('[name="SalePrice"]').val()) || 0;
-
-                if (salePrice > costPrice) {
-                    alert('Sale Price cannot be greater than Cost Price.');
-                    $('[name="SalePrice"]').val('');
-                    $('[name="Discount"]').val('');
-                    return;
-                }
-                const discount = costPrice - salePrice;
-                $('[name="Discount"]').val(discount.toFixed(2));
-            } catch (e) {
-                console.error("Error in updateDiscount:", e);
-            }
-        }
-
-        function updateAmountRemaining() {
-            try {
-                const salePrice = parseFloat($('[name="SalePrice"]').val()) || 0;
-                const amountPaid = parseFloat($('[name="AmountPaid"]').val()) || 0;
-
-                if (amountPaid > salePrice) {
-                    alert('Amount Paid cannot be greater than Sale Price.');
-                    $('[name="AmountPaid"]').val('');
-                    $('[name="AmountRemaining"]').val('');
-                    return;
-                }
-
-                const remaining = salePrice - amountPaid;
-                $('[name="AmountRemaining"]').val(remaining.toFixed(2));
-            } catch (e) {
-                console.error("Error in updateAmountRemaining:", e);
-            }
-        }
-
-        function toggleOptionalRow() {
-            try {
-                 const dropdownObj = document.getElementById('PaymentMode')?.ej2_instances?.[0];
-                const selectedText = dropdownObj.text?.trim().toLowerCase();
-                if (selectedText && selectedText !== 'cash') {
-                    $('.optional-row').slideDown();
-                } else {
-                    $('.optional-row').slideUp();
-                }
-            } catch (e) {
-                console.error("Error in toggleOptionalRow:", e);
-            }
-        }
-
-        $(document).ready(function () {
-            try {
-                $('.optional-row').hide();
-               toggleOptionalRow();
-                // Ticket change => update cost price
-                            const ticketMulti = document.getElementById('TicketIDs')?.ej2_instances?.[0];
-        if (ticketMulti) {
-            ticketMulti.addEventListener('change', updateCostPrice);
-        }
-                // Sale price change => update discount
-                $('[name="SalePrice"]').on('input', updateDiscount);
-
-                // Amount paid change => update remaining
-                $('[name="AmountPaid"]').on('input', updateAmountRemaining);
-
-                // Payment mode change => toggle optional row
-                    const paymentDropdown = document.getElementById('PaymentMode')?.ej2_instances?.[0];
-                if (paymentDropdown) {
-                    paymentDropdown.addEventListener('change', toggleOptionalRow);
-                }
-            } catch (e) {
-                console.error("Document ready error:", e);
-            }
-        });
-    </script>
-    @if (_Message != null)
+        </script>
+        @if (_Message != null)
         {
             if (_Message.StartsWith("1"))
             {

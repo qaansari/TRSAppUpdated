@@ -183,7 +183,7 @@ namespace TRSAppUpdated.Controllers
                         await _context.SaveChangesAsync();
                         TempData["Message"] = $"1,{_Title} Successfully Added";
                     }
-                    if (_item != null && Model.ImageFiles != null && Model.ImageFiles.Count > 0)
+                    if (_item != null && Model.ImageFile != null)
                     {
                         var _eventName = _context.Events.Where(x => !x.IsDeleted && x.ID == Model.EventID).AsNoTracking().Select(x => x.Title).FirstOrDefault();
                         if (!string.IsNullOrEmpty(_eventName))
@@ -198,29 +198,42 @@ namespace TRSAppUpdated.Controllers
                         {
                             Directory.CreateDirectory(folderPath);
                         }
-                        foreach (var image in Model.ImageFiles)
+
+                        // Build initial filename
+                        var baseFileName = $"payment_slip_{_item.TicketNumber}";
+                        var _reservationStatusTitle = _context.ReservationStatuses.Where(x => !x.IsDeleted
+                        && x.ID == Model.ReservationStatusID).Select(x => x.Title).FirstOrDefault();
+                        if (!string.IsNullOrEmpty(_reservationStatusTitle))
                         {
-                            var _fileName = $"payment_slip" + "_" + _item.TicketNumber + Path.GetExtension(image.FileName);
-                            _item.UpdatedByUserID = _UserID;
-                            _item.UpdatedDateTime = DateTime.UtcNow.AddHours(5);
-                            var _filePath = Path.Combine(folderPath, _fileName);
-                            int count = 1;
-                            while (!System.IO.File.Exists(_filePath))
+                            if (_reservationStatusTitle.Contains(" "))
                             {
-                                _fileName = $"{_fileName}_{count}{Path.GetExtension(image.FileName)}";
-                                _context.ReservationImages.Add(new ReservationImage()
-                                {
-                                    ImagePath = _fileName,
-                                    ReservationID = _item.ID,
-                                    CreatedByUserID = _UserID,
-                                    CreatedDateTime = DateTime.UtcNow.AddHours(5),
-                                });
-                                using (var _stream = new FileStream(_filePath, FileMode.Create))
-                                {
-                                    await image.CopyToAsync(_stream);
-                                }
+                                _reservationStatusTitle = _reservationStatusTitle.Replace(" ", "");
                             }
+                            baseFileName = $"payment_slip_{_item.TicketNumber}_{_reservationStatusTitle}";
                         }
+                        var extension = Path.GetExtension(Model.ImageFile.FileName);
+                        var _fileName = baseFileName + extension;
+                        var _filePath = Path.Combine(folderPath, _fileName);
+                        // Ensure unique filename if file exists
+                        int counter = 1;
+                        while (System.IO.File.Exists(_filePath))
+                        {
+                            _fileName = $"{baseFileName}_{counter}{extension}";
+                            _filePath = Path.Combine(folderPath, _fileName);
+                            counter++;
+                        }
+                        // Save file
+                        using (var stream = new FileStream(_filePath, FileMode.Create))
+                        {
+                            await Model.ImageFile.CopyToAsync(stream);
+                        }
+                        _context.ReservationImages.Add(new ReservationImage()
+                        {
+                            ReservationID = _item.ID,
+                            ImagePath = _fileName,
+                            CreatedByUserID = _UserID,
+                            CreatedDateTime = DateTime.UtcNow.AddHours(5),
+                        });
                         await _context.SaveChangesAsync();
                     }
                     if (_item != null && Model.TicketIDs != null && Model.TicketIDs.Count > 0)
@@ -229,69 +242,73 @@ namespace TRSAppUpdated.Controllers
                         && x.ID == Model.ReservationStatusID).Select(x => x.Title).FirstOrDefault();
                         if (!string.IsNullOrEmpty(_reservationStatusTitle))
                         {
-                            if (_reservationStatusTitle.ToLower() == "cancelled" || _reservationStatusTitle.ToLower() == "refunded")
+                            if (_reservationStatusTitle.ToLower() == "arrival pending")
                             {
-                                await _context.Tickets
-                          .Where(x => !x.IsDeleted && Model.TicketIDs.Contains(x.ID))
-                          .BatchUpdateAsync(x => new Ticket
-                          {
-                              CostPrice = _item.CostPrice / Model.TicketIDs.Count,
-                              IsReserved = false,
-                              IsRefunded = _reservationStatusTitle.ToLower() == "refunded" ? true : false,
-                              RefundDateTime = _reservationStatusTitle.ToLower() == "refunded" ? DateTime.UtcNow.AddHours(5) : null,
-                              ReservationDateTime = _reservationStatusTitle.ToLower() == "cancelled" ? null : x.ReservationDateTime,
-                              SalePrice = _reservationStatusTitle.ToLower() == "cancelled" ? 0 : x.SalePrice,
-                              Discount = _reservationStatusTitle.ToLower() == "cancelled" ? 0 : x.Discount,
-                          });
-                                var _allReservedTickets = _context.ReservationTickets
-                                 .Where(x => x.ReservationID == _item.ID)
-                                 .AsNoTracking().ToList();
-                                _context.ReservationTickets.RemoveRange(_allReservedTickets);
-                                if (_reservationStatusTitle.ToLower() == "refunded")
-                                {
-                                    _item.AmountPaid -= _item.AmountPaid;
-                                    _context.Entry(_item).State = EntityState.Modified;
-                                }
-                                await _context.SaveChangesAsync();
-                            }
-
-                            else
-                            {
-                                var _allReservationTickets = _context.ReservationTickets
-                                       .Where(x => x.ReservationID == _item.ID)
-                                       .AsNoTracking().ToList();
-                                foreach (var _ticketID in Model.TicketIDs)
-                                {
-                                    var isEntryExists = _allReservationTickets
-                                           .Where(x => x.TicketID == _ticketID).Any();
-                                    if (!isEntryExists)
-                                    {
-                                        _context.ReservationTickets.Add(new ReservationTicket()
-                                        {
-                                            TicketID = _ticketID,
-                                            ReservationID = _item.ID,
-                                            CreatedByUserID = _UserID,
-                                            CreatedDateTime = DateTime.UtcNow.AddHours(5),
-                                        });
-                                    }
-                                    else
-                                    {
-                                        continue;
-                                    }
-                                }
                                 await _context.Tickets
                                 .Where(x => !x.IsDeleted && Model.TicketIDs.Contains(x.ID))
                                 .BatchUpdateAsync(x => new Ticket
                                 {
                                     CostPrice = _item.CostPrice / Model.TicketIDs.Count,
                                     IsReserved = true,
+                                    IsRefunded = x.IsRefunded,
+                                    RefundDateTime = x.RefundDateTime,
+                                    IsCancelled = x.IsCancelled,
+                                    CancellationDateTime = x.CancellationDateTime,
                                     ReservationDateTime = DateTime.UtcNow.AddHours(5),
                                     SalePrice = _item.SalePrice / Model.TicketIDs.Count,
                                     Discount = _item.Discount / Model.TicketIDs.Count,
+                                    UpdatedByUserID = _UserID,
+                                    UpdatedDateTime = DateTime.UtcNow.AddHours(5),
                                 });
-
+                                foreach (var _ticketID in Model.TicketIDs)
+                                {
+                                    _context.ReservationTickets.Add(new ReservationTicket()
+                                    {
+                                        ReservationID = _item.ReservationStatusID,
+                                        TicketID = _ticketID,
+                                        CreatedByUserID = _UserID,
+                                        CreatedDateTime = DateTime.UtcNow.AddHours(5)
+                                    });
+                                }
                                 await _context.SaveChangesAsync();
                             }
+                            else if (_reservationStatusTitle.ToLower() == "refunded")
+                            {
+                                await _context.Tickets
+                                .Where(x => !x.IsDeleted && Model.TicketIDs.Contains(x.ID))
+                                .BatchUpdateAsync(x => new Ticket
+                                {
+                                    CostPrice = _item.CostPrice / Model.TicketIDs.Count,
+                                    IsReserved = x.IsReserved,
+                                    IsRefunded = true,
+                                    RefundDateTime = DateTime.UtcNow.AddHours(5),
+                                    IsCancelled = x.IsCancelled,
+                                    CancellationDateTime = x.CancellationDateTime,
+                                    ReservationDateTime = x.ReservationDateTime,
+                                    SalePrice = _item.SalePrice / Model.TicketIDs.Count,
+                                    Discount = _item.Discount / Model.TicketIDs.Count,
+                                    UpdatedByUserID = _UserID,
+                                    UpdatedDateTime = DateTime.UtcNow.AddHours(5),
+                                });
+                            }
+                            else if (_reservationStatusTitle.ToLower() == "cancelled")
+                            {
+                                await _context.Tickets
+                                .Where(x => !x.IsDeleted && Model.TicketIDs.Contains(x.ID))
+                                .BatchUpdateAsync(x => new Ticket
+                                {
+                                    CostPrice = x.CostPrice,
+                                    IsReserved = false,
+                                    IsRefunded = x.IsRefunded,
+                                    RefundDateTime = x.RefundDateTime,
+                                    ReservationDateTime = null,
+                                    SalePrice = x.SalePrice,
+                                    Discount = x.Discount,
+                                    UpdatedByUserID = _UserID,
+                                    UpdatedDateTime = DateTime.UtcNow.AddHours(5),
+                                });
+                            }
+                            await _context.SaveChangesAsync();
                         }
                     }
                     return RedirectToAction("Details", "Event", new { ID = Model.EventID });

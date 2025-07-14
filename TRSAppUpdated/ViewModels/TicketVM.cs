@@ -27,5 +27,6 @@ namespace TRSAppUpdated.ViewModels
         public double Price { get; set; }
         public bool IsReserved { get; set; } = false;
         public bool IsRefunded { get; set; } = false;
+        public bool IsCancelled { get; set; } = false;
     }
 }

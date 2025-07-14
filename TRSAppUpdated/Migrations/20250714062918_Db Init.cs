@@ -786,8 +786,10 @@ namespace TRSAppUpdated.Migrations
                     SalePrice = table.Column<double>(type: "float", nullable: false),
                     IsReserved = table.Column<bool>(type: "bit", nullable: false),
                     IsRefunded = table.Column<bool>(type: "bit", nullable: false),
+                    IsCancelled = table.Column<bool>(type: "bit", nullable: false),
                     ReservationDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
                     RefundDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CancellationDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     CreatedByUserID = table.Column<int>(type: "int", nullable: false),
                     UpdatedByUserID = table.Column<int>(type: "int", nullable: true),
@@ -838,18 +840,11 @@ namespace TRSAppUpdated.Migrations
                     ReservationID = table.Column<int>(type: "int", nullable: false),
                     ImagePath = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreatedByUserID = table.Column<int>(type: "int", nullable: false),
-                    CreatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CategoryID = table.Column<int>(type: "int", nullable: false)
+                    CreatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ReservationImages", x => x.ID);
-                    table.ForeignKey(
-                        name: "FK_ReservationImages_Categories_CategoryID",
-                        column: x => x.CategoryID,
-                        principalTable: "Categories",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
                         name: "FK_ReservationImages_Reservations_ReservationID",
                         column: x => x.ReservationID,
@@ -912,21 +907,21 @@ namespace TRSAppUpdated.Migrations
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "ID", "ContactNumber", "CountryID", "CreatedByUserID", "CreatedDateTime", "DeletedByUserID", "DeletedDateTime", "Email", "FirstName", "ImagePath", "IsActive", "IsDeleted", "IsTokenExpired", "IsVerified", "LastName", "Password", "RoleID", "UpdatedByUserID", "UpdatedDateTime", "UserToken" },
-                values: new object[] { 1, "+923312541767", null, null, new DateTime(2025, 7, 13, 12, 27, 35, 507, DateTimeKind.Utc).AddTicks(4369), null, null, "sa@eventland.pk", "Super", null, true, false, false, true, "Admin", "6FkLTXY5CrK8ccZIBV6HAibnMhfq44wfgPMuzSxJjQ4=", 1, null, null, null });
+                values: new object[] { 1, "+923312541767", null, null, new DateTime(2025, 7, 14, 11, 29, 17, 847, DateTimeKind.Utc).AddTicks(1507), null, null, "sa@eventland.pk", "Super", null, true, false, false, true, "Admin", "6FkLTXY5CrK8ccZIBV6HAibnMhfq44wfgPMuzSxJjQ4=", 1, null, null, null });
 
             migrationBuilder.InsertData(
                 table: "Countries",
                 columns: new[] { "ID", "CreatedByUserID", "CreatedDateTime", "DeletedByUserID", "DeletedDateTime", "DialingCode", "Flag", "IsDeleted", "Title", "UpdatedByUserID", "UpdatedDateTime" },
-                values: new object[] { 1, 1, new DateTime(2025, 7, 13, 12, 27, 35, 507, DateTimeKind.Utc).AddTicks(4803), null, null, "+92", "🇵🇰", false, "Pakistan", null, null });
+                values: new object[] { 1, 1, new DateTime(2025, 7, 14, 11, 29, 17, 847, DateTimeKind.Utc).AddTicks(2138), null, null, "+92", "🇵🇰", false, "Pakistan", null, null });
 
             migrationBuilder.InsertData(
                 table: "EventStatuses",
                 columns: new[] { "ID", "CreatedByUserID", "CreatedDateTime", "DeletedByUserID", "DeletedDateTime", "IsDeleted", "Title", "UpdatedByUserID", "UpdatedDateTime" },
                 values: new object[,]
                 {
-                    { 1, 1, new DateTime(2025, 7, 13, 12, 27, 35, 507, DateTimeKind.Utc).AddTicks(4723), null, null, false, "Active", null, null },
-                    { 2, 1, new DateTime(2025, 7, 13, 12, 27, 35, 507, DateTimeKind.Utc).AddTicks(4726), null, null, false, "Ended", null, null },
-                    { 3, 1, new DateTime(2025, 7, 13, 12, 27, 35, 507, DateTimeKind.Utc).AddTicks(4728), null, null, false, "Postponed", null, null }
+                    { 1, 1, new DateTime(2025, 7, 14, 11, 29, 17, 847, DateTimeKind.Utc).AddTicks(2067), null, null, false, "Active", null, null },
+                    { 2, 1, new DateTime(2025, 7, 14, 11, 29, 17, 847, DateTimeKind.Utc).AddTicks(2070), null, null, false, "Ended", null, null },
+                    { 3, 1, new DateTime(2025, 7, 14, 11, 29, 17, 847, DateTimeKind.Utc).AddTicks(2072), null, null, false, "Postponed", null, null }
                 });
 
             migrationBuilder.InsertData(
@@ -934,9 +929,9 @@ namespace TRSAppUpdated.Migrations
                 columns: new[] { "ID", "CreatedByUserID", "CreatedDateTime", "DeletedByUserID", "DeletedDateTime", "IsDeleted", "Title", "UpdatedByUserID", "UpdatedDateTime" },
                 values: new object[,]
                 {
-                    { 1, 1, new DateTime(2025, 7, 13, 12, 27, 35, 507, DateTimeKind.Utc).AddTicks(4901), null, null, false, "Cash", null, null },
-                    { 2, 1, new DateTime(2025, 7, 13, 12, 27, 35, 507, DateTimeKind.Utc).AddTicks(4903), null, null, false, "Easypaisa/Jazzcash", null, null },
-                    { 3, 1, new DateTime(2025, 7, 13, 12, 27, 35, 507, DateTimeKind.Utc).AddTicks(4905), null, null, false, "Bank Transfer", null, null }
+                    { 1, 1, new DateTime(2025, 7, 14, 11, 29, 17, 847, DateTimeKind.Utc).AddTicks(2235), null, null, false, "Cash", null, null },
+                    { 2, 1, new DateTime(2025, 7, 14, 11, 29, 17, 847, DateTimeKind.Utc).AddTicks(2237), null, null, false, "Easypaisa/Jazzcash", null, null },
+                    { 3, 1, new DateTime(2025, 7, 14, 11, 29, 17, 847, DateTimeKind.Utc).AddTicks(2238), null, null, false, "Bank Transfer", null, null }
                 });
 
             migrationBuilder.InsertData(
@@ -944,10 +939,10 @@ namespace TRSAppUpdated.Migrations
                 columns: new[] { "ID", "CreatedByUserID", "CreatedDateTime", "DeletedByUserID", "DeletedDateTime", "IsDeleted", "Title", "UpdatedByUserID", "UpdatedDateTime" },
                 values: new object[,]
                 {
-                    { 1, 1, new DateTime(2025, 7, 13, 12, 27, 35, 507, DateTimeKind.Utc).AddTicks(4959), null, null, false, "Arrival Pending", null, null },
-                    { 2, 1, new DateTime(2025, 7, 13, 12, 27, 35, 507, DateTimeKind.Utc).AddTicks(4960), null, null, false, "Cancelled", null, null },
-                    { 3, 1, new DateTime(2025, 7, 13, 12, 27, 35, 507, DateTimeKind.Utc).AddTicks(4961), null, null, false, "Closed", null, null },
-                    { 4, 1, new DateTime(2025, 7, 13, 12, 27, 35, 507, DateTimeKind.Utc).AddTicks(4963), null, null, false, "Refunded", null, null }
+                    { 1, 1, new DateTime(2025, 7, 14, 11, 29, 17, 847, DateTimeKind.Utc).AddTicks(2297), null, null, false, "Arrival Pending", null, null },
+                    { 2, 1, new DateTime(2025, 7, 14, 11, 29, 17, 847, DateTimeKind.Utc).AddTicks(2298), null, null, false, "Cancelled", null, null },
+                    { 3, 1, new DateTime(2025, 7, 14, 11, 29, 17, 847, DateTimeKind.Utc).AddTicks(2299), null, null, false, "Closed", null, null },
+                    { 4, 1, new DateTime(2025, 7, 14, 11, 29, 17, 847, DateTimeKind.Utc).AddTicks(2301), null, null, false, "Refunded", null, null }
                 });
 
             migrationBuilder.InsertData(
@@ -955,9 +950,9 @@ namespace TRSAppUpdated.Migrations
                 columns: new[] { "ID", "CountryID", "CreatedByUserID", "CreatedDateTime", "DeletedByUserID", "DeletedDateTime", "IsDeleted", "Title", "UpdatedByUserID", "UpdatedDateTime" },
                 values: new object[,]
                 {
-                    { 1, 1, 1, new DateTime(2025, 7, 13, 12, 27, 35, 507, DateTimeKind.Utc).AddTicks(4852), null, null, false, "Karachi", null, null },
-                    { 2, 1, 1, new DateTime(2025, 7, 13, 12, 27, 35, 507, DateTimeKind.Utc).AddTicks(4854), null, null, false, "Lahore", null, null },
-                    { 3, 1, 1, new DateTime(2025, 7, 13, 12, 27, 35, 507, DateTimeKind.Utc).AddTicks(4857), null, null, false, "Islamabad", null, null }
+                    { 1, 1, 1, new DateTime(2025, 7, 14, 11, 29, 17, 847, DateTimeKind.Utc).AddTicks(2193), null, null, false, "Karachi", null, null },
+                    { 2, 1, 1, new DateTime(2025, 7, 14, 11, 29, 17, 847, DateTimeKind.Utc).AddTicks(2195), null, null, false, "Lahore", null, null },
+                    { 3, 1, 1, new DateTime(2025, 7, 14, 11, 29, 17, 847, DateTimeKind.Utc).AddTicks(2196), null, null, false, "Islamabad", null, null }
                 });
 
             migrationBuilder.CreateIndex(
@@ -1159,11 +1154,6 @@ namespace TRSAppUpdated.Migrations
                 name: "IX_PaymentModes_UpdatedByUserID",
                 table: "PaymentModes",
                 column: "UpdatedByUserID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ReservationImages_CategoryID",
-                table: "ReservationImages",
-                column: "CategoryID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ReservationImages_CreatedByUserID",
@@ -1527,10 +1517,10 @@ namespace TRSAppUpdated.Migrations
                 name: "ShowExpenses");
 
             migrationBuilder.DropTable(
-                name: "NoteTypes");
+                name: "Categories");
 
             migrationBuilder.DropTable(
-                name: "Categories");
+                name: "NoteTypes");
 
             migrationBuilder.DropTable(
                 name: "Reservations");

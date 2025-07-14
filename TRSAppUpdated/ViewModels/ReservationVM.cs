@@ -28,7 +28,7 @@ namespace TRSAppUpdated.ViewModels
         public double AmountPaid { get; set; }
         public double AmountRemaining { get; set; }
         public bool IsFullyPaid { get; set; } = false;
-        public List<IFormFile>? ImageFiles { get; set; }
+        public IFormFile? ImageFile { get; set; }
         [MinLength(4, ErrorMessage = "Please fill out minimum 4 characters")]
         [StringLength(50, ErrorMessage = "Please fill out maximum 50 characters")]
         public string? TransactionID { get; set; }
