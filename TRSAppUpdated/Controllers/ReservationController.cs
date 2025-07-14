@@ -152,23 +152,27 @@ namespace TRSAppUpdated.Controllers
                             if (_existingRsvs != null && _existingRsvs.Count > 0)
                             {
                                 List<int> _existingTicketIDs = _existingRsvs.Select(x => x.TicketID).ToList();
-                                await _context.Tickets
-                                .Where(x => !x.IsDeleted && _existingTicketIDs.Contains(x.ID))
-                                .BatchUpdateAsync(x => new Ticket
+                                bool _isSameList = Model.TicketIDs.SequenceEqual(_existingTicketIDs);
+                                if (!_isSameList)
                                 {
-                                    CostPrice = x.CostPrice,
-                                    IsReserved = false,
-                                    ReservationDateTime = null,
-                                    IsRefunded = x.IsRefunded,
-                                    RefundDateTime = x.RefundDateTime,
-                                    IsCancelled = x.IsCancelled,
-                                    CancellationDateTime = x.CancellationDateTime,
-                                    SalePrice = 0,
-                                    Discount = 0,
-                                    UpdatedByUserID = _UserID,
-                                    UpdatedDateTime = DateTime.UtcNow.AddHours(5),
-                                });
-                                _context.ReservationTickets.RemoveRange(_existingRsvs);
+                                    await _context.Tickets
+                                    .Where(x => !x.IsDeleted && _existingTicketIDs.Contains(x.ID))
+                                    .BatchUpdateAsync(x => new Ticket
+                                    {
+                                        CostPrice = x.CostPrice,
+                                        IsReserved = false,
+                                        ReservationDateTime = null,
+                                        IsRefunded = x.IsRefunded,
+                                        RefundDateTime = x.RefundDateTime,
+                                        IsCancelled = x.IsCancelled,
+                                        CancellationDateTime = x.CancellationDateTime,
+                                        SalePrice = 0,
+                                        Discount = 0,
+                                        UpdatedByUserID = _UserID,
+                                        UpdatedDateTime = DateTime.UtcNow.AddHours(5),
+                                    });
+                                    _context.ReservationTickets.RemoveRange(_existingRsvs);
+                                }
                             }
                             TempData["Message"] = $"1,{_Title} Successfully Updated";
                         }
