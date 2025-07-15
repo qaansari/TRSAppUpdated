@@ -52,7 +52,7 @@
     border: 1px solid var(--primary);
 }
 
-.preview_venue_img {
+.preview_img {
     width: 80px;
     height: 80px;
     border-radius: 50%;
@@ -208,4 +208,7 @@ span.e-input-group.e-control-wrapper.form-control.form-control-sm.e-ddl.e-lib.e-
 }
 .reservation_textarea {
     max-height: 400px;
+}
+.preview_user_img{
+
 }

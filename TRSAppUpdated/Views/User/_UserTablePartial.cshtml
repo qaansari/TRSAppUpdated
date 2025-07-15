@@ -29,7 +29,15 @@
                         @(item.RoleTitle)
                     </td>
                     <td>
-                        @(item.FullName)
+                        @{
+                            string _src = "no-image-found.png";
+                            if (!string.IsNullOrEmpty(item.ImagePath))
+                            {
+                                _src = $"users/{item.ImagePath}";
+                            }
+                        }
+                        <img src="~/assets/images/@(_src)" alt="" class="tabular_img">
+                        <span>@(item.FullName)</span>
                     </td>
                     <td>
                         @(item.ContactNumber)

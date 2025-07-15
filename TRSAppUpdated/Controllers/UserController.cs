@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
@@ -14,15 +15,18 @@ namespace TRSAppUpdated.Controllers
         private readonly AppDbContext _context;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ILogger<UserController> _logger;
+        private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IRoleService _roleService;
         private readonly string _Title = "User";
         private readonly int _UserID;
         public UserController(AppDbContext context, IHttpContextAccessor httpContextAccessor,
-            ILogger<UserController> logger,IRoleService roleService)
+            ILogger<UserController> logger,IWebHostEnvironment webHostEnvironment,
+            IRoleService roleService)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;
             _logger = logger;
+            _webHostEnvironment = webHostEnvironment;
             _roleService = roleService;
             _UserID = Convert.ToInt32(_httpContextAccessor.HttpContext.User.FindFirstValue("UserID"));
         }
@@ -166,6 +170,26 @@ namespace TRSAppUpdated.Controllers
                         await _context.SaveChangesAsync();
                         TempData["Message"] = $"1,{_Title} Successfully Added";
                     }
+                    if (_item != null && Model.ImageFile != null)
+                    {
+                        var folderPath = Path.Combine(_webHostEnvironment.WebRootPath, "assets", "images", "users");
+                        if (!Directory.Exists(folderPath))
+                        {
+                            Directory.CreateDirectory(folderPath);
+                        }
+                        var _fileName = $"user" + "_" + _item.CreatedDateTime.Value.ToString("yyyyddMMhhmmss") + Path.GetExtension(Model.ImageFile.FileName);
+                        _item.ImagePath = _fileName.Trim();
+                        _item.UpdatedByUserID = _UserID;
+                        _item.UpdatedDateTime = DateTime.UtcNow.AddHours(5);
+                        var _filePath = Path.Combine(folderPath, _fileName);
+                        using (var _stream = new FileStream(_filePath, FileMode.Create))
+                        {
+                            await Model.ImageFile.CopyToAsync(_stream);
+                        }
+                        _context.ChangeTracker.Clear();
+                        _context.Entry(_item).State = EntityState.Modified;
+                        await _context.SaveChangesAsync();
+                    }
                     return RedirectToAction("Index");
                 }
             }
@@ -216,7 +240,7 @@ namespace TRSAppUpdated.Controllers
             try
             {
                 // For AJAX calls
-                var _query = _context.Users.Where(x => !x.IsDeleted && x.RoleID!=1)
+                var _query = _context.Users.Include(x=>x.Role).Where(x => !x.IsDeleted)
                            .Select(x => new UserVM()
                            {
                                ID = x.ID,
@@ -224,10 +248,11 @@ namespace TRSAppUpdated.Controllers
                                LastName = x.LastName,
                                ContactNumber = x.ContactNumber,
                                Email = x.Email,
+                               ImagePath=x.ImagePath,
                                RoleTitle = x.Role.Title,
                            })
                            .AsNoTracking()
-                           .AsQueryable();
+                            .AsEnumerable();
                 if (!string.IsNullOrEmpty(_searchedTerm))
                 {
                     _query = _query
@@ -237,10 +262,10 @@ namespace TRSAppUpdated.Controllers
                         || x.RoleTitle.Trim().ToLower().Contains(_searchedTerm.Trim().ToLower()));
                 }
                 int _skip = (_pageNo - 1) * _pageSize;
-                totalRecords = await _query.CountAsync();
+                totalRecords = _query.Count();
                 _query = _query.Skip(_skip).Take(_pageSize);
-                _result = await _query.OrderByDescending(x => x.ID).ToListAsync();
-            }
+                _result =  _query.OrderByDescending(x => x.ID).ToList();
+          }
             catch (Exception ex)
             {
                 _logger.LogError($"Error occured at GetList in {_Title} Controller due to {ex}");
