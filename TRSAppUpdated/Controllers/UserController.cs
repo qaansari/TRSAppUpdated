@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using TRSAppUpdated.Helpers;
+using TRSAppUpdated.Interfaces;
 using TRSAppUpdated.Models;
 using TRSAppUpdated.ViewModels;
 
@@ -13,14 +14,16 @@ namespace TRSAppUpdated.Controllers
         private readonly AppDbContext _context;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ILogger<UserController> _logger;
+        private readonly IRoleService _roleService;
         private readonly string _Title = "User";
         private readonly int _UserID;
         public UserController(AppDbContext context, IHttpContextAccessor httpContextAccessor,
-            ILogger<UserController> logger)
+            ILogger<UserController> logger,IRoleService roleService)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;
             _logger = logger;
+            _roleService = roleService;
             _UserID = Convert.ToInt32(_httpContextAccessor.HttpContext.User.FindFirstValue("UserID"));
         }
         //Index (Get All)
@@ -70,6 +73,7 @@ namespace TRSAppUpdated.Controllers
             var _item = new UserVM();
             try
             {
+                ViewData["RoleList"] = _roleService.GetAll();
                 if (ID != 0)
                 {
                     _item = _context.Users.Where(x => !x.IsDeleted && x.ID == ID)
@@ -79,6 +83,8 @@ namespace TRSAppUpdated.Controllers
                             FirstName = x.FirstName,
                             LastName=x.LastName,
                             ContactNumber=x.ContactNumber,
+                            Password=x.Password,
+                            ImagePath=x.ImagePath,
                             Email=x.Email,
                             IsActive=x.IsActive,
                             IsVerified=x.IsVerified,
@@ -102,6 +108,7 @@ namespace TRSAppUpdated.Controllers
         {
             try
             {
+                ViewData["RoleList"] = _roleService.GetAll();
                 if (ModelState.IsValid)
                 {
                     var _item = new User();
@@ -209,7 +216,7 @@ namespace TRSAppUpdated.Controllers
             try
             {
                 // For AJAX calls
-                var _query = _context.Users.Where(x => !x.IsDeleted)
+                var _query = _context.Users.Where(x => !x.IsDeleted && x.RoleID!=1)
                            .Select(x => new UserVM()
                            {
                                ID = x.ID,
@@ -217,6 +224,7 @@ namespace TRSAppUpdated.Controllers
                                LastName = x.LastName,
                                ContactNumber = x.ContactNumber,
                                Email = x.Email,
+                               RoleTitle = x.Role.Title,
                            })
                            .AsNoTracking()
                            .AsQueryable();
@@ -225,7 +233,8 @@ namespace TRSAppUpdated.Controllers
                     _query = _query
                         .Where(x => x.FullName.Trim().ToLower().Contains(_searchedTerm.Trim().ToLower())
                         || x.ContactNumber.Trim().ToLower().Contains(_searchedTerm.Trim().ToLower())
-                        || x.Email.Trim().ToLower().Contains(_searchedTerm.Trim().ToLower()));
+                        || x.Email.Trim().ToLower().Contains(_searchedTerm.Trim().ToLower())
+                        || x.RoleTitle.Trim().ToLower().Contains(_searchedTerm.Trim().ToLower()));
                 }
                 int _skip = (_pageNo - 1) * _pageSize;
                 totalRecords = await _query.CountAsync();

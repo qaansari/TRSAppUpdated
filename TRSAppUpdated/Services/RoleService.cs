@@ -20,7 +20,7 @@ namespace TRSAppUpdated.Services
         {
             try
             {
-                var _result = _context.Roles.Where(x => !x.IsDeleted)
+                var _result = _context.Roles.Where(x => !x.IsDeleted && x.ID != 1)
                              .Select(x => new RoleVM()
                              {
                                  ID = x.ID,
