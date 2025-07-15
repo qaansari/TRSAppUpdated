@@ -39,7 +39,7 @@ namespace TRSAppUpdated.ViewModels
         public string? UserToken { get; set; }
         public bool IsActive { get; set; } = false;
         public bool IsDeleted { get; set; } = false;
-        public bool IsVerified { get; set; }
+        public bool IsVerified { get; set; } = false;
         public int? CreatedByUserID { get; set; }
         public int? UpdatedByUserID { get; set; }
         public int? DeletedByUserID { get; set; }
