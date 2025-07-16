@@ -127,8 +127,14 @@ namespace TRSAppUpdated.Models
         public ICollection<Reservation> ReservationsCreated { get; set; }
         [InverseProperty("UpdatedByUser")]
         public ICollection<Reservation> ReservationsUpdated { get; set; }
+
         [InverseProperty("DeletedByUser")]
         public ICollection<Reservation> ReservationsDeleted { get; set; }
+        [InverseProperty("ClosedByUser")]
+        public ICollection<Reservation> ReservationsClosed { get; set; }
+        [InverseProperty("ActionByUser")]
+        public ICollection<Reservation> ReservationsActions { get; set; }
+
         [InverseProperty("CreatedByUser")]
         public ICollection<ReservationImage> ReservationImagesCreated { get; set; }
         [InverseProperty("CreatedByUser")]

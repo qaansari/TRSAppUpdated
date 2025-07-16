@@ -24,6 +24,8 @@
                 <div class="card-body">
                     <form class="separate-form" enctype="multipart/form-data" method="post" asp-action="AddOrEdit">
                         <input type="hidden" asp-for="ID" />
+                        <input type="hidden" asp-for="ClosedByUserID" />
+                        <input type="hidden" asp-for="ClosingDateTime" />
                         <input type="hidden" asp-for="TicketNumber" />
                         <input type="hidden" asp-for="EventID" />
                         <input type="hidden" asp-for="CreatedByUserID" />
@@ -115,6 +117,38 @@
                                     <span asp-validation-for="PaymentModeID"></span>
                                 </div>
                             </div>
+                            @if (isSuperAdmin)
+                            {
+                                <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6 col-6">
+                                    <div class="form-group">
+                                        <div class="checkbox">
+                                            <input id="isApprovedChk" type="checkbox" name="IsApproved" @(Model.IsApproved != null && Model.IsApproved.Value == true ? "checked" : "")>
+                                            <label for="isApprovedChk">Approved</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                                    <div class="form-group">
+                                        <label class="col-form-label">Action By User</label>
+                                        <ejs-dropdownlist cssClass="form-control form-control-sm" dataSource="@(ViewData["UserList"])" placeholder="Select a user"
+                                                          allowFiltering="true" ejs-for="ActionByUserID" popupHeight="220px">
+                                            <e-dropdownlist-fields value="ID" text="FullName"></e-dropdownlist-fields>
+                                        </ejs-dropdownlist>
+                                        <span asp-validation-for="ActionByUserID"></span>
+                                    </div>
+                                </div>
+                                <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                                    <div class="form-group">
+                                        <label class="col-form-label">Approval Date Time</label>
+                                        <ejs-datetimepicker cssClass="form-control" ejs-for="ActionDateTime"></ejs-datetimepicker>
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <input type="hidden" asp-for="ActionByUserID" />
+                                <input type="hidden" asp-for="ActionDateTime" />
+                            }
                             <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
                                 <div class="form-group">
                                     <label class="col-form-label">Booking Date Time</label>
@@ -258,6 +292,18 @@
                 try {
                     $('.optional-row').hide();
                    toggleOptionalRow();
+                        if ($("#isApprovedChk").is(":checked")) {
+                    $("#isApprovedChk").val("true");
+            } else {
+                        $("#isApprovedChk").val("false");
+            }
+             $('#isApprovedChk').change(function() {
+                    if (!$(this).is(':checked')) {
+                        $(this).val(false); // Set to null if unchecked
+                    } else {
+                        $(this).val(true); // Set to true if checked
+                    }
+                });
                     // Ticket change => update cost price
                                 const ticketMulti = document.getElementById('TicketIDs')?.ej2_instances?.[0];
             if (ticketMulti) {
