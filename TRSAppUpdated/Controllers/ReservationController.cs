@@ -1,9 +1,12 @@
-﻿using EFCore.BulkExtensions;
+﻿using DinkToPdf;
+using DinkToPdf.Contracts;
+using EFCore.BulkExtensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Syncfusion.EJ2.Layouts;
+using System.Drawing;
 using System.Security.Claims;
 using TRSAppUpdated.Interfaces;
 using TRSAppUpdated.Models;
@@ -23,13 +26,14 @@ namespace TRSAppUpdated.Controllers
         private readonly ITicketService _ticketService;
         private readonly IPaymentModeService _paymentModeService;
         private readonly IReservationStatusService _reservationStatusService;
+        private readonly IConverter _converter;
         private readonly string _Title = "Reservation";
         private readonly int _UserID;
         public ReservationController(AppDbContext context, IHttpContextAccessor httpContextAccessor,
             IWebHostEnvironment webHostEnvironment, ILogger<ReservationController> logger,
             IReservationService reservationService, IShowService showService,
             ITicketService ticketService, IPaymentModeService paymentModeService,
-            IReservationStatusService reservationStatusService)
+            IReservationStatusService reservationStatusService, IConverter converter)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;
@@ -40,7 +44,7 @@ namespace TRSAppUpdated.Controllers
             _ticketService = ticketService;
             _paymentModeService = paymentModeService;
             _reservationStatusService = reservationStatusService;
-            _logger = logger;
+            _converter = converter;
             _UserID = Convert.ToInt32(_httpContextAccessor.HttpContext.User.FindFirstValue("UserID"));
         }
         [Authorize(Roles = "Super Admin,Admin")]
@@ -239,7 +243,7 @@ namespace TRSAppUpdated.Controllers
                         await _context.SaveChangesAsync();
                         TempData["Message"] = $"1,{_Title} Successfully Added";
                     }
-                   
+
                     if (_item != null && Model.ImageFile != null)
                     {
                         var _eventName = _context.Events.Where(x => !x.IsDeleted && x.ID == Model.EventID).AsNoTracking().Select(x => x.Title).FirstOrDefault();
@@ -364,6 +368,7 @@ namespace TRSAppUpdated.Controllers
             }
             return View(Model);
         }
+        //Details
         [Authorize(Roles = "Super Admin,Admin,Moderator,User")]
         public IActionResult Details(int ID = 0, int EventID = 0)
         {
@@ -379,6 +384,181 @@ namespace TRSAppUpdated.Controllers
                 {
                     _item = _reservationService.GetDetailsByID(ID);
                 }
+            }
+            catch (Exception ex)
+            {
+
+                _logger.LogError($"Error occured at AddOrEdit (GET) in {_Title} Controller due to {ex}");
+            }
+            return View(_item);
+        }
+        [Authorize(Roles = "Super Admin,Admin,Moderator,User")]
+        public async Task<IActionResult> GetPDF(int ID = 0, int EventID = 0)
+        {
+
+            var _item = new ReservationDetailVM();
+            try
+            {
+                if (EventID != 0)
+                {
+                    ViewBag.EventID = EventID;
+                }
+                if (ID != 0)
+                {
+                    _item = _reservationService.GetDetailsByID(ID);
+                }
+                string html = $@"
+<style type='text/css'>
+body {{-webkit - print - color - adjust: exact !important;
+            print-color-adjust: exact !important;
+            background: white;
+        }}
+    .ticket-container {{
+        max-width: 600px;
+        margin: 0;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }}
+    .ticket-header {{
+        background: linear-gradient(135deg, #1aa48b, #45a579);
+        color: white;
+        padding: 20px;
+        text-align: center;
+    }}
+    .ticket-header h2 {{
+        margin: 0;
+        font-size: 24px;
+        font-weight: 600;
+    }}
+    .ticket-body {{
+        padding: 0 15px 0 15px;
+    }}
+    .ticket-info {{
+        margin-bottom: 10px;
+    }}
+    .payment-info {{
+        margin-bottom: 20px;
+    }}
+    .info-row {{
+        display: flex;
+        margin-bottom: 12px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #eee;
+    }}
+    .info-label {{
+        font-weight: 600;
+        width: 150px;
+        color: #130716;
+    }}
+    .info-value {{
+        flex: 1;
+        color: #0a0303;
+    }}
+    .ticket-number {{
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        text-align: center;
+        margin: 20px 0;
+        border: 1px dashed #ddd;
+    }}
+    .ticket-number h3 {{
+        margin: 0;
+        font-size: 28px;
+        color: #1aa48b;
+        letter-spacing: 2px;
+        text-align: center;
+        text-transform: uppercase;
+    }}
+    .payment-info h3 {{
+        margin: 10px;
+        font-size: 18px;
+        color: #1aa48b;
+        letter-spacing: 2px;
+        padding: 5px 10px;
+        text-align: center;
+        text-transform: uppercase;
+    }}
+    .footer {{
+        text-align: center;
+        padding: 15px;
+        color: #999;
+        font-size: 12px;
+        background: #f9f9f9;
+        border-top: 1px solid #eee;
+    }}
+    .seats-badge {{
+        display: inline-block;
+        background: #58ffd9;
+        color: #100c0c;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-weight: 600;
+        margin-right: 5px;
+        margin-bottom: 5px;
+    }}
+</style>
+
+<div class='ticket-container'>
+    <div class='ticket-header'>
+        <h2>E-Ticket</h2>
+    </div>
+    <div class='ticket-body'>
+        <div class='ticket-number'>
+            <h3>{_item.TicketNumber}</h3>
+        </div>
+        <div class='ticket-info'>
+            <div class='info-row'>
+                <div class='info-label'>Event Name:</div>
+                <div class='info-value'>{_item.EventName}</div>
+            </div>
+            <div class='info-row'>
+                <div class='info-label'>Show Date:</div>
+                <div class='info-value'>{_item.ShowDateTime}</div>
+            </div>
+            <div class='info-row'>
+                <div class='info-label'>Customer Name:</div>
+                <div class='info-value'>{_item.CustomerName}</div>
+            </div>
+            <div class='info-row'>
+                <div class='info-label'>Phone Number:</div>
+                <div class='info-value'>{_item.CustomerPhone}</div>
+            </div>
+            <div class='info-row'>
+                <div class='info-label'>Reserved Seats:</div>
+                <div class='info-value'>
+                    {string.Join("", _item.SeatLabels.Split(',').Select(s => $"<span class='seats-badge'>{s.Trim()}</span>"))}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class='footer'>
+        Thank you for your reservation. Please present this ticket at the venue.
+    </div>
+</div>";
+                var pdfDoc = new HtmlToPdfDocument()
+                {
+                    GlobalSettings = new GlobalSettings
+                    {
+                        PaperSize = new PechkinPaperSize("600px", "400px"),
+                        ColorMode = ColorMode.Color,
+                        Orientation = DinkToPdf.Orientation.Portrait,
+                        Margins = new MarginSettings { Top = 0, Bottom = 0, Left = 0, Right = 0 },
+                        DocumentTitle = "E-Ticket"
+                    },
+                    Objects = {
+        new ObjectSettings {
+            HtmlContent = html,
+            WebSettings = new WebSettings
+            {
+                DefaultEncoding = "utf-8",
+            },
+        }
+    }
+                };
+                var pdf = _converter.Convert(pdfDoc);
+                return File(pdf, "application/pdf", $"E-Ticket_#_{_item.TicketNumber}.pdf");
             }
             catch (Exception ex)
             {
