@@ -15,7 +15,9 @@
 <style type="text/css">
     .ticket-container {
         width: 600px;
-        height: 550px;
+        height: 800px;
+        max-width: 600px;
+        max-height: 800px;
         margin: 0;
         background: white;
         border-radius: 10px;
@@ -93,6 +95,14 @@
         text-transform: uppercase;
     }
 
+    .logo_img_section {
+        display:flex;
+        justify-content:center;
+    }
+    .logo_img{
+        width:200px;
+        height:100px;
+    }
     .footer {
         text-align: center;
         padding: 15px;
@@ -131,6 +141,9 @@
         <div class="ticket-body">
             @if (Model.ID != 0)
             {
+                <div class="logo_img_section">
+                    <img src="~/assets/images/web-logo-light.png" class="logo_img" />
+                </div>
                 <div class="ticket-number">
                     <h3>@Model.TicketNumber</h3>
                 </div>
@@ -180,6 +193,9 @@
             <div class="ticket-body">
                 @if (Model.ID != 0)
                 {
+                    <div class="logo_img_section">
+                        <img src="~/assets/images/web-logo-light.png" class="logo_img" />
+                    </div>
                     <div class="ticket-number">
                         <h3>@Model.PaymentModeTitle</h3>
                     </div>
@@ -228,6 +244,9 @@
             <div class="ticket-body">
                 @if (Model.ID != 0)
                 {
+                    <div class="logo_img_section">
+                        <img src="~/assets/images/web-logo-light.png" class="logo_img" />
+                    </div>
                     <div class="ticket-number">
                         <h3>@Model.PaymentModeTitle</h3>
                     </div>

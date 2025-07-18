@@ -302,7 +302,7 @@ namespace TRSAppUpdated.Controllers
                         {
                             if (!string.IsNullOrEmpty(_reservationStatusTitle))
                             {
-                                if (_reservationStatusTitle.ToLower() == "arrivalpending")
+                                if (_reservationStatusTitle.ToLower() == "arrivalpending" || _reservationStatusTitle.ToLower() == "arrival pending")
                                 {
 
                                     foreach (var _ticketID in Model.TicketIDs)
@@ -429,6 +429,7 @@ namespace TRSAppUpdated.Controllers
                 {
                     _item = _reservationService.GetDetailsByID(ID);
                 }
+                string imagePath = Path.Combine(_webHostEnvironment.WebRootPath, "assets", "images", "web-logo-light.png");
                 string html = $@"
 <!DOCTYPE html>
 <html>
@@ -443,7 +444,9 @@ namespace TRSAppUpdated.Controllers
     }}
     .ticket-container {{
         width: 600px;
-        height: 550px;
+        height: 800px;
+        max-width: 600px;
+        max-height: 800px;
         margin: auto;
         background: white;
         border-radius: 10px;
@@ -452,18 +455,31 @@ namespace TRSAppUpdated.Controllers
     }}
     .ticket-header {{
         background: linear-gradient(135deg, #1aa48b, #45a579);
-        color: white;
+       color:#3b4067;
         padding: 20px;
         text-align: center;
     }}
     .ticket-header h2 {{
         margin: 0;
         font-size: 24px;
+        text-transform:uppercase;
         font-weight: 600;
     }}
     .ticket-body {{
         padding: 20px;
     }}
+    .logo_img_section {{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 0;
+}}
+
+.logo_img {{
+    width: 200px;
+    height: 100px;
+    object-fit: contain;
+}}
     .ticket-number {{
         background: #f8f9fa;
         padding: 15px;
@@ -521,6 +537,9 @@ namespace TRSAppUpdated.Controllers
             <h2>E-Ticket</h2>
         </div>
         <div class='ticket-body'>
+        <div class=""logo_img_section"">
+                 <img src='file:///{imagePath.Replace("\\", "/")}' class='logo_img' />
+        </div>
             <div class='ticket-number'>
                 <h3>{_item.TicketNumber}</h3>
             </div>
@@ -557,7 +576,7 @@ namespace TRSAppUpdated.Controllers
                 {
                     GlobalSettings = new GlobalSettings
                     {
-                        PaperSize = new PechkinPaperSize("600px", "550px"),
+                        PaperSize = new PechkinPaperSize("600px", "800px"),
                         ColorMode = ColorMode.Color,
                         Orientation = DinkToPdf.Orientation.Portrait,
                         Margins = new MarginSettings { Top = 0, Bottom = 0, Left = 0, Right = 0 },
@@ -570,18 +589,22 @@ namespace TRSAppUpdated.Controllers
             {
                 DefaultEncoding = "utf-8",
                 LoadImages = true,
-                EnableIntelligentShrinking = true,
             },
+            LoadSettings=new LoadSettings
+            {
+                BlockLocalFileAccess=false
+            }
         }
     }
                 };
                 var pdf = _converter.Convert(pdfDoc);
-                return File(pdf, "application/pdf", $"E-Ticket_#_{_item.TicketNumber}.pdf");
+                var _ticketTitle = _item.UpdatedDateTime.HasValue ? "E-TICKET_"+ _item.TicketNumber + "_" + "UPDATED" : "E-TICKET_" + _item.TicketNumber;
+                return File(pdf, "application/pdf", $"{_ticketTitle}.pdf");
             }
             catch (Exception ex)
             {
 
-                _logger.LogError($"Error occured at AddOrEdit (GET) in {_Title} Controller due to {ex}");
+                _logger.LogError($"Error occured at GetPDF in {_Title} Controller due to {ex}");
             }
             return View(_item);
         }
