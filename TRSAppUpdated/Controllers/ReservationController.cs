@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Npgsql.Internal;
 using Syncfusion.EJ2.Layouts;
 using System.Drawing;
 using System.Security.Claims;
@@ -12,6 +13,7 @@ using TRSAppUpdated.Interfaces;
 using TRSAppUpdated.Models;
 using TRSAppUpdated.Services;
 using TRSAppUpdated.ViewModels;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace TRSAppUpdated.Controllers
 {
@@ -436,38 +438,101 @@ namespace TRSAppUpdated.Controllers
 <head>
 <meta charset='UTF-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-<style type='text/css'>
-    body {{
-        font-family: 'Poppins', sans-serif;
-        margin: 0;
-        padding: 0;
+<style type=""text/css"">
+    body{{
+    font-family:'Poppins',sans-serif;
+    margin:0;
+    padding:0;
     }}
     .ticket-container {{
         width: 600px;
         height: 800px;
         max-width: 600px;
         max-height: 800px;
-        margin: auto;
-        background: white;
+        margin: 10px auto;
+        background: rgb(255,255,255);
         border-radius: 10px;
         box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
     }}
+
     .ticket-header {{
-        background: linear-gradient(135deg, #1aa48b, #45a579);
-       color:#3b4067;
+        background: linear-gradient(135deg, rgb(26,164,139), rgb(69,165,121));
+        color:  rgb(255,255,255);
         padding: 20px;
         text-align: center;
     }}
-    .ticket-header h2 {{
-        margin: 0;
-        font-size: 24px;
-        text-transform:uppercase;
-        font-weight: 600;
-    }}
+
+        .ticket-header h2 {{
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+        }}
+
     .ticket-body {{
-        padding: 20px;
+        padding: 0 15px 0 15px;
     }}
+ .ticket_heading{{
+        text-align:center;
+        text-transform:uppercase;
+    }}
+     .ticket_heading h2{{
+        font-size:24px;
+        color:rgb(26,164,139);
+    }}
+    .ticket-info {{
+        margin-bottom: 10px;
+    }}
+
+    .payment-info {{
+        margin-bottom: 20px;
+    }}
+
+    .info-row {{
+        display: flex;
+        margin-bottom: 12px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid rgb(238,238,238);
+    }}
+
+    .info-label {{
+        font-weight: 600;
+        width: 150px;
+        color: rgb(19, 7, 22);
+    }}
+
+    .info-value {{
+        flex: 1;
+        color: rgb(10, 3, 3);
+    }}
+
+    .ticket-number {{
+        background: rgb(248, 249, 250);
+        padding: 15px;
+        border-radius: 8px;
+        text-align: center;
+        margin: 20px 0;
+        border: 1px dashed rgb(221,221,221);
+    }}
+
+        .ticket-number h3 {{
+            margin: 0;
+            font-size: 28px;
+            color: rgb(26,164,139);
+            letter-spacing: 2px;
+            text-align: center;
+            text-transform: uppercase;
+        }}
+
+    .payment-info h3 {{
+        margin: 10px;
+        font-size: 18px;
+        color: rgb(26,164,139);
+        letter-spacing: 2px;
+        padding: 5px 10px;
+        text-align: center;
+        text-transform: uppercase;
+    }}
+
     .logo_img_section {{
     width: 100%;
     text-align: center;
@@ -476,66 +541,40 @@ namespace TRSAppUpdated.Controllers
     width: 200px;
     height: 100px;
 }}
-    .ticket-number {{
-        background: #f8f9fa;
-        padding: 15px;
-        border-radius: 8px;
+
+    .footer {{
         text-align: center;
-        margin: 20px 0;
-        border: 1px dashed #ddd;
+        padding: 15px;
+        color: rgb(153,153,153);
+        font-size: 12px;
+        background: rgb(249,249,249);
+        border-top: 1px solid rgb(238,238,238);
     }}
-    .ticket-number h3 {{
-        margin: 0;
-        font-size: 28px;
-        color: #1aa48b;
-        letter-spacing: 2px;
-        text-transform: uppercase;
-    }}
-    .info-row {{
-        display: flex;
-        flex-wrap: wrap;
-        margin-bottom: 12px;
-        padding-bottom: 12px;
-        border-bottom: 1px solid #eee;
-    }}
-    .info-label {{
-        font-weight: 600;
-        width: 150px;
-        color: #130716;
-    }}
-    .info-value {{
-        flex: 1;
-        color: #0a0303;
-    }}
+
     .seats-badge {{
         display: inline-block;
-        background: #58ffd9;
-        color: #100c0c;
+        background: rgb(88,255,217);
+        color: rgb(16,12,12);
         padding: 5px 10px;
         border-radius: 5px;
         font-weight: 600;
         margin-right: 5px;
         margin-bottom: 5px;
     }}
-    .footer {{
-        text-align: center;
-        padding: 15px;
-        color: #999;
-        font-size: 12px;
-        background: #f9f9f9;
-        border-top: 1px solid #eee;
-    }}
 </style>
 </head>
 <body>
     <div class='ticket-container'>
-        <div class='ticket-header'>
+        <div class=""ticket-header"">
             <h2>E-Ticket</h2>
         </div>
         <div class='ticket-body'>
         <div class=""logo_img_section"">
                  <img src='file:///{imagePath.Replace("\\", "/")}' class='logo_img' />
         </div>
+        <div class=""ticket_heading"">
+                     <h2>E-Ticket</h2>
+         </div>
             <div class='ticket-number'>
                 <h3>{_item.TicketNumber}</h3>
             </div>
@@ -568,6 +607,7 @@ namespace TRSAppUpdated.Controllers
     </div>
 </body>
 </html>";
+                var _ticketTitle = _item.UpdatedDateTime.HasValue ? "E-TICKET_" + _item.TicketNumber + "_" + "UPDATED" : "E-TICKET_" + _item.TicketNumber;
                 var pdfDoc = new HtmlToPdfDocument()
                 {
                     GlobalSettings = new GlobalSettings
@@ -576,7 +616,7 @@ namespace TRSAppUpdated.Controllers
                         ColorMode = ColorMode.Color,
                         Orientation = DinkToPdf.Orientation.Portrait,
                         Margins = new MarginSettings { Top = 0, Bottom = 0, Left = 0, Right = 0 },
-                        DocumentTitle = "E-Ticket"
+                        DocumentTitle = _ticketTitle
                     },
                     Objects = {
         new ObjectSettings {
@@ -594,7 +634,6 @@ namespace TRSAppUpdated.Controllers
     }
                 };
                 var pdf = _converter.Convert(pdfDoc);
-                var _ticketTitle = _item.UpdatedDateTime.HasValue ? "E-TICKET_"+ _item.TicketNumber + "_" + "UPDATED" : "E-TICKET_" + _item.TicketNumber;
                 return File(pdf, "application/pdf", $"{_ticketTitle}.pdf");
             }
             catch (Exception ex)

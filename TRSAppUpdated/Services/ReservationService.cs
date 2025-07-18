@@ -42,6 +42,7 @@ namespace TRSAppUpdated.Services
                         AmountRemaining = x.AmountRemaining,
                         BookingDateTime = x.BookingDateTime,
                         CreatedDateTime = x.CreatedDateTime,
+                        UpdatedDateTime = x.UpdatedDateTime,
                         SeatLabels = String.Join(",", x.ReservationTickets.Select(x => x.Ticket.Seat.Column.Row.RowLabel + x.Ticket.Seat.SeatNumber).ToList()),
                     }).FirstOrDefault();
             }
