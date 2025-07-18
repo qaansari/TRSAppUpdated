@@ -415,7 +415,7 @@ namespace TRSAppUpdated.Controllers
             return View(_item);
         }
         [Authorize(Roles = "Super Admin,Admin,Moderator,User")]
-        public async Task<IActionResult> GetPDF(int ID = 0, int EventID = 0)
+        public IActionResult GetPDF(int ID = 0, int EventID = 0)
         {
 
             var _item = new ReservationDetailVM();
@@ -438,7 +438,7 @@ namespace TRSAppUpdated.Controllers
 <meta name='viewport' content='width=device-width, initial-scale=1.0'>
 <style type='text/css'>
     body {{
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-family: 'Poppins', sans-serif;
         margin: 0;
         padding: 0;
     }}
@@ -469,16 +469,12 @@ namespace TRSAppUpdated.Controllers
         padding: 20px;
     }}
     .logo_img_section {{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 10px 0;
+    width: 100%;
+    text-align: center;
 }}
-
 .logo_img {{
     width: 200px;
     height: 100px;
-    object-fit: contain;
 }}
     .ticket-number {{
         background: #f8f9fa;

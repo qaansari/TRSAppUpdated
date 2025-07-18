@@ -38,6 +38,7 @@ namespace TRSAppUpdated.Services
                         Discount=x.Discount,
                         SalePrice = x.SalePrice,
                         AmountPaid = x.AmountPaid,
+                        ReservationImages= String.Join(",", (x.ReservationImages.Select(x => x.ImagePath).ToList())),
                         AmountRemaining = x.AmountRemaining,
                         BookingDateTime = x.BookingDateTime,
                         CreatedDateTime = x.CreatedDateTime,
