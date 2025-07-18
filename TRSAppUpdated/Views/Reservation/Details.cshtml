@@ -14,10 +14,10 @@
 }
 <style type="text/css">
     .ticket-container {
-        width: 600px;
-        height: 800px;
-        max-width: 600px;
-        max-height: 800px;
+        width: 540px;
+        height: 660px;
+        max-width: 540px;
+        max-height: 660px;
         margin: 0;
         background: rgb(255,255,255);
         border-radius: 10px;
@@ -66,7 +66,7 @@
 
     .info-label {
         font-weight: 600;
-        width: 150px;
+        width: 200px;
         color: rgb(19, 7, 22);
     }
 
@@ -142,7 +142,8 @@
         </div>
     </div>
 </div>
-<div class="d-flex justify-content-center">
+<div class="row mb-2">
+           <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 mt-2">
     <div class="ticket-container">
         <div class="ticket-header">
             <h2>E-Ticket</h2>
@@ -179,8 +180,14 @@
                         <div class="info-value">@Model.CustomerPhone</div>
                     </div>
                     <div class="info-row">
-                        <div class="info-label">Reserved Seats:</div>
+                        @{
+                                    int _count = Model.SeatLabels.Split(',').Count();
+                         }
+                        <div class="info-label">Reserved Seats:
+                            (@(_count))
+                        </div>
                         <div class="info-value">
+                                
                             @foreach (var seat in Model.SeatLabels.Split(','))
                             {
                                 <span class="seats-badge">@seat.Trim()</span>
@@ -198,9 +205,11 @@
             Thank you for your reservation. Please present this ticket at the venue.
         </div>
     </div>
+    </div>
     @if (isSuperAdmin || isAdmin)
     {
-        <div class="ticket-container ml-2">
+        <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 mt-2">
+        <div class="ticket-container">
             <div class="ticket-header">
                 <h2>Payment Information</h2>
             </div>
@@ -220,6 +229,13 @@
                             <div class="info-value">@Model.BookingDateTime.Value.ToString("dddd, dd MMMM yyyy, hh:mm tt")</div>
                         </div>
                     }
+                    @if (!string.IsNullOrEmpty(Model.TransactionID))
+                        {
+                            <div class="info-row">
+                                <div class="info-label">Trax ID:</div>
+                                <div class="info-value">@Model.TransactionID</div>
+                            </div>
+                        }
                     <div class="ticket-info">
                         <div class="info-row">
                             <div class="info-label">Cost Price:</div>
@@ -240,6 +256,7 @@
                                 <div class="info-value">@Model.AmountRemaining</div>
                             </div>
                         }
+                       
                     </div>
                 }
                 else
@@ -251,12 +268,14 @@
                 Thank you for your reservation. Please present this ticket at the venue.
             </div>
         </div>
+        </div>
         if (!string.IsNullOrEmpty(Model.ReservationImages))
         {
 
             string _formattedEventTitle = Model.EventName.Trim().Contains(" ") ?
             Model.EventName.Trim().Replace(" ", "") : Model.EventName.Trim();
-            <div class="ticket-container ml-2">
+                     <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 mt-2">
+            <div class="ticket-container">
                 <div class="ticket-header">
                     <h2>Payment Transactions</h2>
                 </div>
@@ -264,7 +283,7 @@
                     <div class="row m-2">
                         @foreach (var _img in Model.ReservationImages.Split(','))
                         {
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <img src="~/assets/images/reservations/@(_formattedEventTitle)/@(_img)" class="reservation_image_preview"/>
                             </div>
                         }
@@ -274,7 +293,9 @@
                     Thank you for your reservation. Please present this ticket at the venue.
                 </div>
             </div>
+            </div>
         }
     }
-</div>
+    </div>
+
 

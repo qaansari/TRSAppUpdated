@@ -496,7 +496,7 @@ namespace TRSAppUpdated.Controllers
 
     .info-label {{
         font-weight: 600;
-        width: 150px;
+        width: 200px;
         color: rgb(19, 7, 22);
     }}
 
@@ -595,7 +595,7 @@ namespace TRSAppUpdated.Controllers
                 <div class='info-value'>{_item.CustomerPhone}</div>
             </div>
             <div class='info-row'>
-                <div class='info-label'>Reserved Seats:</div>
+                <div class='info-label'>Reserved Seats: ({_item.SeatLabels.Split(',').Count()})</div>
                 <div class='info-value'>
                     {string.Join("", _item.SeatLabels.Split(',').Select(s => $"<span class='seats-badge'>{s.Trim()}</span>"))}
                 </div>

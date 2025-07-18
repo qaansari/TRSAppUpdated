@@ -41,6 +41,7 @@ namespace TRSAppUpdated.Services
                         ReservationImages= String.Join(",", (x.ReservationImages.Select(x => x.ImagePath).ToList())),
                         AmountRemaining = x.AmountRemaining,
                         BookingDateTime = x.BookingDateTime,
+                        TransactionID=x.TransactionID,
                         CreatedDateTime = x.CreatedDateTime,
                         UpdatedDateTime = x.UpdatedDateTime,
                         SeatLabels = String.Join(",", x.ReservationTickets.Select(x => x.Ticket.Seat.Column.Row.RowLabel + x.Ticket.Seat.SeatNumber).ToList()),
