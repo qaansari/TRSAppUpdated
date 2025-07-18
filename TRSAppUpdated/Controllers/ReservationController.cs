@@ -307,6 +307,12 @@ namespace TRSAppUpdated.Controllers
 
                                     foreach (var _ticketID in Model.TicketIDs)
                                     {
+                                        var _isExists = _context.ReservationTickets.Where(x => x.TicketID == _ticketID
+                                        && x.ReservationID == _item.ID).Any();
+                                        if (_isExists)
+                                        {
+                                            continue;
+                                        }
                                         _context.ReservationTickets.Add(new ReservationTicket()
                                         {
                                             ReservationID = _item.ReservationStatusID,
@@ -314,6 +320,22 @@ namespace TRSAppUpdated.Controllers
                                             CreatedByUserID = _UserID,
                                             CreatedDateTime = DateTime.UtcNow.AddHours(5)
                                         });
+                                        await _context.Tickets
+                                   .Where(x => !x.IsDeleted && Model.TicketIDs.Contains(x.ID))
+                                   .BatchUpdateAsync(x => new Ticket
+                                   {
+                                       CostPrice = _item.CostPrice / Model.TicketIDs.Count,
+                                       IsReserved = true,
+                                       IsRefunded = x.IsRefunded,
+                                       RefundDateTime = x.RefundDateTime,
+                                       IsCancelled = x.IsCancelled,
+                                       CancellationDateTime = x.CancellationDateTime,
+                                       ReservationDateTime = DateTime.UtcNow.AddHours(5),
+                                       SalePrice = _item.SalePrice / Model.TicketIDs.Count,
+                                       Discount = _item.Discount / Model.TicketIDs.Count,
+                                       UpdatedByUserID = _UserID,
+                                       UpdatedDateTime = DateTime.UtcNow.AddHours(5),
+                                   });
                                     }
                                     await _context.SaveChangesAsync();
                                 }
@@ -408,17 +430,25 @@ namespace TRSAppUpdated.Controllers
                     _item = _reservationService.GetDetailsByID(ID);
                 }
                 string html = $@"
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset='UTF-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0'>
 <style type='text/css'>
-body {{-webkit - print - color - adjust: exact !important;
-            print-color-adjust: exact !important;
-            background: white;
-        }}
-    .ticket-container {{
-        max-width: 600px;
+    body {{
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         margin: 0;
+        padding: 0;
+    }}
+    .ticket-container {{
+        width: 600px;
+        height: 550px;
+        margin: auto;
         background: white;
         border-radius: 10px;
         box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
     }}
     .ticket-header {{
         background: linear-gradient(135deg, #1aa48b, #45a579);
@@ -432,28 +462,7 @@ body {{-webkit - print - color - adjust: exact !important;
         font-weight: 600;
     }}
     .ticket-body {{
-        padding: 0 15px 0 15px;
-    }}
-    .ticket-info {{
-        margin-bottom: 10px;
-    }}
-    .payment-info {{
-        margin-bottom: 20px;
-    }}
-    .info-row {{
-        display: flex;
-        margin-bottom: 12px;
-        padding-bottom: 12px;
-        border-bottom: 1px solid #eee;
-    }}
-    .info-label {{
-        font-weight: 600;
-        width: 150px;
-        color: #130716;
-    }}
-    .info-value {{
-        flex: 1;
-        color: #0a0303;
+        padding: 20px;
     }}
     .ticket-number {{
         background: #f8f9fa;
@@ -468,25 +477,23 @@ body {{-webkit - print - color - adjust: exact !important;
         font-size: 28px;
         color: #1aa48b;
         letter-spacing: 2px;
-        text-align: center;
         text-transform: uppercase;
     }}
-    .payment-info h3 {{
-        margin: 10px;
-        font-size: 18px;
-        color: #1aa48b;
-        letter-spacing: 2px;
-        padding: 5px 10px;
-        text-align: center;
-        text-transform: uppercase;
+    .info-row {{
+        display: flex;
+        flex-wrap: wrap;
+        margin-bottom: 12px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #eee;
     }}
-    .footer {{
-        text-align: center;
-        padding: 15px;
-        color: #999;
-        font-size: 12px;
-        background: #f9f9f9;
-        border-top: 1px solid #eee;
+    .info-label {{
+        font-weight: 600;
+        width: 150px;
+        color: #130716;
+    }}
+    .info-value {{
+        flex: 1;
+        color: #0a0303;
     }}
     .seats-badge {{
         display: inline-block;
@@ -498,17 +505,25 @@ body {{-webkit - print - color - adjust: exact !important;
         margin-right: 5px;
         margin-bottom: 5px;
     }}
+    .footer {{
+        text-align: center;
+        padding: 15px;
+        color: #999;
+        font-size: 12px;
+        background: #f9f9f9;
+        border-top: 1px solid #eee;
+    }}
 </style>
-
-<div class='ticket-container'>
-    <div class='ticket-header'>
-        <h2>E-Ticket</h2>
-    </div>
-    <div class='ticket-body'>
-        <div class='ticket-number'>
-            <h3>{_item.TicketNumber}</h3>
+</head>
+<body>
+    <div class='ticket-container'>
+        <div class='ticket-header'>
+            <h2>E-Ticket</h2>
         </div>
-        <div class='ticket-info'>
+        <div class='ticket-body'>
+            <div class='ticket-number'>
+                <h3>{_item.TicketNumber}</h3>
+            </div>
             <div class='info-row'>
                 <div class='info-label'>Event Name:</div>
                 <div class='info-value'>{_item.EventName}</div>
@@ -532,16 +547,17 @@ body {{-webkit - print - color - adjust: exact !important;
                 </div>
             </div>
         </div>
+        <div class='footer'>
+            Thank you for your reservation. Please present this ticket at the venue.
+        </div>
     </div>
-    <div class='footer'>
-        Thank you for your reservation. Please present this ticket at the venue.
-    </div>
-</div>";
+</body>
+</html>";
                 var pdfDoc = new HtmlToPdfDocument()
                 {
                     GlobalSettings = new GlobalSettings
                     {
-                        PaperSize = new PechkinPaperSize("600px", "400px"),
+                        PaperSize = new PechkinPaperSize("600px", "550px"),
                         ColorMode = ColorMode.Color,
                         Orientation = DinkToPdf.Orientation.Portrait,
                         Margins = new MarginSettings { Top = 0, Bottom = 0, Left = 0, Right = 0 },
@@ -553,6 +569,8 @@ body {{-webkit - print - color - adjust: exact !important;
             WebSettings = new WebSettings
             {
                 DefaultEncoding = "utf-8",
+                LoadImages = true,
+                EnableIntelligentShrinking = true,
             },
         }
     }

@@ -97,7 +97,6 @@ namespace TRSAppUpdated.Controllers
                                     TempData["Message"] = $"0,{_Title} Already Exists";
                                     return View(Model);
                                 }
-
                                 _item = _context.Shows.Where(x => !x.IsDeleted && x.ID == Model.ID)
                                     .AsNoTracking().FirstOrDefault();
                                 if (_item != null)
@@ -131,29 +130,30 @@ namespace TRSAppUpdated.Controllers
                                 _item.CreatedDateTime = DateTime.UtcNow.AddHours(5);
                                 _context.Shows.Add(_item);
                                 await _context.SaveChangesAsync();
-                                var isTicketExists = _context.Tickets.Where(x => !x.IsDeleted && x.ShowID == _item.ID).Any();
-                                if (!isTicketExists)
-                                {
-                                    var _seatIDs = await _context.Seats.Include(x => x.Column)
-                                     .ThenInclude(x => x.Row)
-                                     .ThenInclude(x => x.Auditorium)
-                                     .Where(x => x.Column.Row.AuditoriumID == _event.AuditoriumID)
-                                     .Select(x => x.ID)
-                                     .ToListAsync();
-                                    var _tickets = _seatIDs.Select(seatId => new Ticket
-                                    {
-                                        ShowID = _item.ID,
-                                        SeatID = seatId,
-                                        CostPrice = 0,
-                                        SalePrice = 0,
-                                        Discount = 0,
-                                        CreatedByUserID = _UserID,
-                                        CreatedDateTime = DateTime.UtcNow.AddHours(5),
-                                    }).ToList();
-                                    await _context.Tickets.AddRangeAsync(_tickets);
-                                    await _context.SaveChangesAsync();
-                                }
+                                
                                 TempData["Message"] = $"1,{_Title} Successfully Added";
+                            }
+                            var isTicketExists = _context.Tickets.Where(x => !x.IsDeleted && x.ShowID == _item.ID).Any();
+                            if (!isTicketExists)
+                            {
+                                var _seatIDs = await _context.Seats.Include(x => x.Column)
+                                 .ThenInclude(x => x.Row)
+                                 .ThenInclude(x => x.Auditorium)
+                                 .Where(x => x.Column.Row.AuditoriumID == _event.AuditoriumID)
+                                 .Select(x => x.ID)
+                                 .ToListAsync();
+                                var _tickets = _seatIDs.Select(seatId => new Ticket
+                                {
+                                    ShowID = _item.ID,
+                                    SeatID = seatId,
+                                    CostPrice = 0,
+                                    SalePrice = 0,
+                                    Discount = 0,
+                                    CreatedByUserID = _UserID,
+                                    CreatedDateTime = DateTime.UtcNow.AddHours(5),
+                                }).ToList();
+                                await _context.Tickets.AddRangeAsync(_tickets);
+                                await _context.SaveChangesAsync();
                             }
                         }
                     }

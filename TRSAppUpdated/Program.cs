@@ -62,7 +62,7 @@ namespace TRSAppUpdated
             Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1JEaF5cXmRCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdmWXhedHZWQmlZWE1yXkpWYEk=");
             //Dink To PDF
             builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
-            var wkHtmlToPdfPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/native/libwkhtmltox.dll");
+            var wkHtmlToPdfPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/assets/native/libwkhtmltox.dll");
             var context = new CustomAssemblyLoadContext();
             context.LoadUnmanagedLibrary(wkHtmlToPdfPath);
             var app = builder.Build();

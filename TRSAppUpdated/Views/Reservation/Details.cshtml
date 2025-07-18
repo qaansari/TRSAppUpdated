@@ -14,7 +14,8 @@
 }
 <style type="text/css">
     .ticket-container {
-        max-width: 600px;
+        width: 600px;
+        height: 550px;
         margin: 0;
         background: white;
         border-radius: 10px;
@@ -112,11 +113,11 @@
         margin-bottom: 5px;
     }
 </style>
-<div class="row mb-1">
+<div class="row mb-2">
     <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
         <div class="info w-100">
             <div class="form-group mb-0 float-right my-2 mr-5px">
-                <a class="btn btn-danger" href="@(Url.Action("GetPDF", "Reservation", new { ID = Model.ID, EventID = _EventID }))">Get PDF</a>
+                <a class="btn btn-primary" href="@(Url.Action("GetPDF", "Reservation", new { ID = Model.ID, EventID = _EventID }))">Get PDF</a>
                 <a class="btn btn-danger" href="@(Url.Action("Details", "Event", new { ID = _EventID }))">Back</a>
             </div>
         </div>

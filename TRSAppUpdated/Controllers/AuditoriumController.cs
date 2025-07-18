@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Security.Cryptography.Xml;
 using TRSAppUpdated.Interfaces;
 using TRSAppUpdated.Models;
+using TRSAppUpdated.Services;
 using TRSAppUpdated.ViewModels;
 
 namespace TRSAppUpdated.Controllers
@@ -17,17 +18,22 @@ namespace TRSAppUpdated.Controllers
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly ILogger<AuditoriumController> _logger;
         private readonly IVenueService _venueService;
+        private readonly ICountryService _countryService;
+        private readonly ICityService _cityService;
         private readonly string _Title = "Auditorium";
         private readonly int _UserID;
-        public AuditoriumController(AppDbContext context, IHttpContextAccessor httpContextAccessor, 
-            IWebHostEnvironment webHostEnvironment, ILogger<AuditoriumController> logger, 
-            IVenueService venueService)
+        public AuditoriumController(AppDbContext context, IHttpContextAccessor httpContextAccessor,
+            IWebHostEnvironment webHostEnvironment, ILogger<AuditoriumController> logger,
+            IVenueService venueService, ICountryService countryService,
+            ICityService cityService)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;
             _webHostEnvironment = webHostEnvironment;
             _logger = logger;
             _venueService = venueService;
+            _countryService = countryService;
+            _cityService = cityService;
             _UserID = Convert.ToInt32(_httpContextAccessor.HttpContext.User.FindFirstValue("UserID"));
         }
         //Index (Get All)
@@ -74,6 +80,8 @@ namespace TRSAppUpdated.Controllers
             var _item = new AuditoriumVM();
             try
             {
+                ViewData["CountryList"] = _countryService.GetAll();
+                ViewData["CityList"] = _cityService.GetAll();
                 ViewData["VenueList"] = _venueService.GetAll();
                 if (ID != 0)
                 {
@@ -82,6 +90,8 @@ namespace TRSAppUpdated.Controllers
                         {
                             ID = x.ID,
                             Title = x.Title,
+                            CountryID = x.Venue.City.CountryID,
+                            CityID = x.Venue.CityID,
                             VenueID = x.VenueID,
                             NoOfRows = x.NoOfRows,
                             StartingRow = x.StartingRow,
@@ -104,11 +114,13 @@ namespace TRSAppUpdated.Controllers
         {
             try
             {
+                ViewData["CountryList"] = _countryService.GetAll();
+                ViewData["CityList"] = _cityService.GetAll();
                 ViewData["VenueList"] = _venueService.GetAll();
                 if (ModelState.IsValid)
                 {
                     var _item = new Auditorium();
-                    
+
                     if (Model.ID != 0)
                     {
                         var isExists = _context.Auditoriums.Where(x => !x.IsDeleted
@@ -316,7 +328,7 @@ namespace TRSAppUpdated.Controllers
             try
             {
                 var _rows = _context.Rows
-                        .Where(x =>x.AuditoriumID == AuditoriumId)
+                        .Where(x => x.AuditoriumID == AuditoriumId)
                         .Select(x => new RowWithColumnVM
                         {
                             RowID = x.ID,

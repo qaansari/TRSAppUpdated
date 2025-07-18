@@ -18,6 +18,10 @@ namespace TRSAppUpdated.ViewModels
         public int NoOfRows { get; set; }
         [Required(ErrorMessage = "Please fill out this field")]
         public string StartingRow { get; set; }
+        [Range(1, int.MaxValue, ErrorMessage = "Please fill out this field")]
+        public int CountryID { get; set; }
+        [Range(1, int.MaxValue, ErrorMessage = "Please fill out this field")]
+        public int CityID { get; set; }
         [Range(1,int.MaxValue, ErrorMessage = "Please fill out this field")]
         public int VenueID { get; set; }
         public string? VenueTitle { get; set; }
