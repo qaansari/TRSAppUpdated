@@ -302,7 +302,7 @@ namespace TRSAppUpdated.Controllers
                         {
                             if (!string.IsNullOrEmpty(_reservationStatusTitle))
                             {
-                                if (_reservationStatusTitle.ToLower() == "arrival pending")
+                                if (_reservationStatusTitle.ToLower() == "arrivalpending")
                                 {
 
                                     foreach (var _ticketID in Model.TicketIDs)
