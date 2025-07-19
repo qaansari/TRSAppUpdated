@@ -149,7 +149,7 @@ span.e-input-group.e-control-wrapper.form-control.form-control-sm.e-ddl.e-lib.e-
     min-width: 20px; /* Max seat size */
     max-width: 20px; /* Max seat size */
     height: 20px;
-    background-color: var(--primary);
+    background-color: var(--white);
     border: 1px solid var(--border-color);
     text-align: center;
     line-height: 20px;
@@ -163,13 +163,14 @@ span.e-input-group.e-control-wrapper.form-control.form-control-sm.e-ddl.e-lib.e-
     min-width: 50px; /* Max seat size */
     max-width: 50px; /* Max seat size */
     height: 50px;
-    background-color: var(--primary);
+    background-color: var(--white-color);
     border: 1px solid var(--border-color);
     text-align: center;
     line-height: 50px;
-    font-size: 11px;
+    font-size: 18px;
     border-radius: 5px;
     display: inline-block;
+    color:#080915;
 }
 .column-gap:not(:last-child) {
     width: 30px;

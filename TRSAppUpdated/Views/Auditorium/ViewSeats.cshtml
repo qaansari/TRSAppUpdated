@@ -2,6 +2,7 @@
 @{
     ViewData["Title"] = "Seats";
     Layout = "_EmptyLayout";
+    int _TSeats=Model.Rows.SelectMany(x => x.Columns).SelectMany(x => x.Seats).Count();
 }
 <style>
     .loader{
@@ -16,20 +17,20 @@
             </div>
             <h1 class="fw-bold text-uppercase text-center">@Model.AuditoriumName</h1>
             <h2 class="fw-medium text-uppercase text-center">@Model.VenueName</h2>
-            <h3 class="fw-medium text-uppercase text-center">@(Model.Rows.SelectMany(x => x.Columns).SelectMany(x => x.Seats).Count()) SEATS</h3>
+            <h3 class="fw-medium text-uppercase text-center">@(_TSeats) SEATS</h3>
         </div>
         <div class="w-100">
             @foreach (var row in Model.Rows)
             {
                 <div class="seat-row mt-2">
                     <span class="row_label  mr-5px">@(row.RowLabel)</span>
-                    @foreach (var column in row.Columns)
+                    @foreach (var column in row.Columns.ToList().AsEnumerable().Reverse())
                     {
                         if (column.Seats.Count > 0)
                         {
-                            @foreach (var seat in column.Seats)
+                            @foreach (var seat in column.Seats.ToList().AsEnumerable().Reverse())
                             {
-                                <div class="seat">
+                                <div class="@(_TSeats<=300?"seat_bigger":"seat")">
                                     @seat
                                 </div>
                             }
