@@ -18,6 +18,8 @@ namespace TRSAppUpdated.ViewModels
         public int NoOfRows { get; set; }
         [Required(ErrorMessage = "Please fill out this field")]
         public string StartingRow { get; set; }
+        [StringLength(5, ErrorMessage = "Please fill out maximum 5 characters")]
+        public string Alignment { get; set; } = "Left";
         [Range(1, int.MaxValue, ErrorMessage = "Please fill out this field")]
         public int CountryID { get; set; }
         [Range(1, int.MaxValue, ErrorMessage = "Please fill out this field")]

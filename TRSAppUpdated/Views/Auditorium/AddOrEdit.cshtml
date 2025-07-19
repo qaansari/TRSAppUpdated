@@ -8,6 +8,7 @@
     string _PageTitle = "Auditorium";
     ViewData["Title"] = $"{_fn} {_PageTitle}";
     var _Message = TempData["Message"] as string;
+    var _alignmentList = new List<string> { "Left", "Right" };
 }
 <div class="row">
     <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
@@ -78,6 +79,14 @@
                                     <label class="col-form-label">Starting Row <span class="text-danger">*</span></label>
                                     <input class="form-control" type="text" placeholder="Enter Starting Row" asp-for="StartingRow">
                                     <span asp-validation-for="StartingRow"></span>
+                                </div>
+                            </div>
+                            <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                                <div class="form-group">
+                                    <label class="col-form-label">Alignment</label>
+                                    <ejs-dropdownlist cssClass="form-control form-control-sm" dataSource="@(_alignmentList)" placeholder="Select an alignemnt"
+                                                      allowFiltering="true" ejs-for="Alignment" popupHeight="220px">
+                                    </ejs-dropdownlist>
                                 </div>
                             </div>
                             <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">

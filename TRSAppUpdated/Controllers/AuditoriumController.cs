@@ -95,6 +95,7 @@ namespace TRSAppUpdated.Controllers
                             VenueID = x.VenueID,
                             NoOfRows = x.NoOfRows,
                             StartingRow = x.StartingRow,
+                            Alignment=x.Alignment,
                             ImagePath = x.ImagePath,
                             CreatedByUserID = x.CreatedByUserID,
                             CreatedDateTime = x.CreatedDateTime,
@@ -177,6 +178,7 @@ namespace TRSAppUpdated.Controllers
                             _item.VenueID = Model.VenueID;
                             _item.NoOfRows = Model.NoOfRows;
                             _item.StartingRow = Model.StartingRow.Trim();
+                            _item.Alignment = Model.Alignment.Trim();
                             _item.UpdatedByUserID = _UserID;
                             _item.UpdatedDateTime = DateTime.UtcNow.AddHours(5);
                             _context.Entry(_item).State = EntityState.Modified;
@@ -198,6 +200,7 @@ namespace TRSAppUpdated.Controllers
                         _item.VenueID = Model.VenueID;
                         _item.NoOfRows = Model.NoOfRows;
                         _item.StartingRow = Model.StartingRow.Trim();
+                        _item.Alignment = Model.Alignment.Trim();
                         _item.CreatedByUserID = _UserID;
                         _item.CreatedDateTime = DateTime.UtcNow.AddHours(5);
                         _context.Auditoriums.Add(_item);
@@ -407,6 +410,7 @@ namespace TRSAppUpdated.Controllers
                     {
                         AuditoriumName = x.Title.Trim(),
                         VenueName = x.Venue.Title.Trim(),
+                        AuditoriumAlignment=x.Alignment,
                         Rows = x.Rows.Select(y => new RowVM()
                         {
                             RowLabel = y.RowLabel,

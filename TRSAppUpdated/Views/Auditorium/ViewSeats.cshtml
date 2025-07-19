@@ -13,7 +13,7 @@
     <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
         <div class="info w-100">
             <div class="form-group mb-0 float-right my-2 mr-5px">
-                <a class="btn btn-danger btn-sm" href="@(Url.Action("Index"))">Back</a>
+                @* <a class="btn btn-danger btn-sm" href="@(Url.Action("Index"))">Back</a> *@
             </div>
             <h1 class="fw-bold text-uppercase text-center">@Model.AuditoriumName</h1>
             <h2 class="fw-medium text-uppercase text-center">@Model.VenueName</h2>
@@ -24,11 +24,19 @@
             {
                 <div class="seat-row mt-2">
                     <span class="row_label  mr-5px">@(row.RowLabel)</span>
-                    @foreach (var column in row.Columns.ToList().AsEnumerable().Reverse())
+                    @if (Model.AuditoriumAlignment.ToLower() == "right")
+                    {
+                        row.Columns = row.Columns.ToList().AsEnumerable().Reverse().ToList();
+                    }
+                    @foreach (var column in row.Columns)
                     {
                         if (column.Seats.Count > 0)
                         {
-                            @foreach (var seat in column.Seats.ToList().AsEnumerable().Reverse())
+                            @if (Model.AuditoriumAlignment.ToLower() == "right")
+                            {
+                                column.Seats= column.Seats.ToList().AsEnumerable().Reverse().ToList();
+                            }
+                            @foreach (var seat in column.Seats)
                             {
                                 <div class="@(_TSeats<=300?"seat_bigger":"seat")">
                                     @seat
