@@ -136,7 +136,7 @@
     <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
         <div class="info w-100">
             <div class="form-group mb-0 float-right my-2 mr-5px">
-                <a class="btn btn-primary" href="@(Url.Action("GetPDF", "Reservation", new { ID = Model.ID, EventID = _EventID }))">Get PDF</a>
+                <button type="button" class="btn btn-primary" id="downloadBtn">Get PDF</button>
                 <a class="btn btn-danger" href="@(Url.Action("Details", "Event", new { ID = _EventID }))">Back</a>
             </div>
         </div>
@@ -298,4 +298,24 @@
     }
     </div>
 
+    @section Scripts{
+        <script>
+    $(document).ready(function () {
+        $('#downloadBtn').click(function (e) {
+            e.preventDefault();
 
+            // Show loader
+            $('.loader').fadeIn();
+
+            // Start file download
+            const downloadUrl = '@Url.Action("GetPDF", "Reservation")?ID=@Model.ID&EventID=@_EventID';
+            window.location.href = downloadUrl;
+
+            // Hide loader after 5–10 seconds (adjust as needed)
+            setTimeout(function () {
+                $('.loader').fadeOut();
+            }, 500);
+        });
+    });
+</script>
+    }
