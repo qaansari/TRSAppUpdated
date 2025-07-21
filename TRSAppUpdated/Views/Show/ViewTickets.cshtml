@@ -22,10 +22,18 @@
             <div class="w-100">
                 @foreach (var row in Model.Rows)
                 {
+                    @if (Model.AuditoriumAlignment.ToLower() == "right")
+                    {
+                        row.Columns = row.Columns.ToList().AsEnumerable().Reverse().ToList();
+                    }
                     <div class="seat-row mt-2">
                         <span class="row_label mr-5px">@row.RowLabel (@(row.CostPrice))</span>
                         @foreach (var column in row.Columns)
                         {
+                            @if (Model.AuditoriumAlignment.ToLower() == "right")
+                            {
+                                column.SeatTickets = column.SeatTickets.ToList().AsEnumerable().Reverse().ToList();
+                            }
                             foreach (var seat in column.SeatTickets)
                             {
                                 <div class="seat @(seat.IsReserved ? "reserved" : "")" title="Price: @seat.CostPrice">

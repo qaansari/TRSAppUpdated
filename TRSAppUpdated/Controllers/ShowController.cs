@@ -300,6 +300,7 @@ namespace TRSAppUpdated.Controllers
                     AuditoriumName = firstTicket?.Show?.Event?.Auditorium?.Title?.Trim(),
                     VenueName = firstTicket?.Show?.Event?.Auditorium?.Venue?.Title?.Trim(),
                     ShowDate = firstTicket?.Show?.Date,
+                    AuditoriumAlignment = firstTicket?.Show?.Event?.Auditorium?.Alignment?.Trim(),
                     Rows = firstTicket?.Show?.Event?.Auditorium?.Rows.Select(row =>
                     {
                         // Try to find a ticket for any seat in this row to get the price
