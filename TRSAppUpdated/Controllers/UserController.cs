@@ -284,13 +284,15 @@ namespace TRSAppUpdated.Controllers
                     _user.UpdatedDateTime = DateTime.UtcNow.AddHours(5);
                     _context.Entry(_user).State = EntityState.Modified;
                     await _context.SaveChangesAsync();
+                    TempData["Message"] = $"1,{_Title} Successfully Verified";
                 }
+                return RedirectToAction("Verify", "Home", new { IsVerified = _user?.IsVerified });
             }
             catch (Exception ex)
             {
                 _logger.LogError($"Error occured at VerifyEmail in {_Title} Controller due to {ex}");
             }
-            return RedirectToAction("Index","Home");
+            return RedirectToAction("Index");
         }
     }
 }

@@ -34,10 +34,11 @@ namespace TRSAppUpdated.ViewModels
         public string Password { get; set; }
         [Range(1,int.MaxValue,ErrorMessage = "Please fill out this field")]
         public int RoleID { get; set; }
+        public int? CountryID { get; set; }
         public IFormFile? ImageFile { get; set; }
         public string? ImagePath { get; set; }
         public string? UserToken { get; set; }
-        public bool IsActive { get; set; } = false;
+        public bool IsActive { get; set; } = true;
         public bool IsDeleted { get; set; } = false;
         public bool IsVerified { get; set; } = false;
         public int? CreatedByUserID { get; set; }
