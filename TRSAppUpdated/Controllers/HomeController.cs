@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using NetTopologySuite.Index.HPRtree;
 using System.Diagnostics;
 using System.Security.Claims;
 using TRSAppUpdated.Helpers;
@@ -15,7 +16,7 @@ namespace TRSAppUpdated.Controllers
         private readonly AppDbContext _context;
         private readonly ILogger<HomeController> _logger;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        public HomeController(AppDbContext context, ILogger<HomeController> logger, 
+        public HomeController(AppDbContext context, ILogger<HomeController> logger,
             IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
@@ -90,6 +91,37 @@ namespace TRSAppUpdated.Controllers
      });
                 TempData["Message"] = $"1,Welcome {user.FullName}";
                 return RedirectToAction("Index", "Dashboard");
+            }
+            return View(Model);
+        }
+        //Sign up (GET)
+        public IActionResult Signup()
+        {
+            return View(new UserVM() { RoleID = 4 });
+        }
+        public async Task<IActionResult> Signup(UserVM Model)
+        {
+            if (ModelState.IsValid)
+            {
+                var _item = new User();
+                _item.FirstName = Model.FirstName.Trim();
+                _item.LastName = Model.LastName.Trim();
+                _item.ContactNumber = Model.ContactNumber.Trim();
+                _item.RoleID = Model.RoleID;
+                _item.Email = Model.Email.Trim();
+                _item.Password = Model.Password.Trim().HashWithSalt();
+                _item.IsActive = Model.IsActive;
+                _item.IsVerified = Model.IsVerified;
+                _item.UserToken = Guid.NewGuid().ToString();
+                _item.IsTokenExpired = false;
+                _item.CreatedDateTime = DateTime.UtcNow.AddHours(5);
+                _context.Users.Add(_item);
+                await _context.SaveChangesAsync();
+                if (_item.ID != 0)
+                {
+                    string _verificationLink = AppHelper._appUrl+ "User/VerifyEmail?token=" + _item.UserToken;
+                    AppHelper.SendVerificationEmail(_item.Email, "verify email", _verificationLink);
+                }
             }
             return View(Model);
         }

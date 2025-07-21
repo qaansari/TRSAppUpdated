@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using TRSAppUpdated.Helpers;
 using TRSAppUpdated.Interfaces;
 using TRSAppUpdated.Models;
@@ -20,7 +21,7 @@ namespace TRSAppUpdated.Controllers
         private readonly string _Title = "User";
         private readonly int _UserID;
         public UserController(AppDbContext context, IHttpContextAccessor httpContextAccessor,
-            ILogger<UserController> logger,IWebHostEnvironment webHostEnvironment,
+            ILogger<UserController> logger, IWebHostEnvironment webHostEnvironment,
             IRoleService roleService)
         {
             _context = context;
@@ -31,7 +32,7 @@ namespace TRSAppUpdated.Controllers
             _UserID = Convert.ToInt32(_httpContextAccessor.HttpContext.User.FindFirstValue("UserID"));
         }
         //Index (Get All)
-        [Authorize(Roles ="Super Admin")]
+        [Authorize(Roles = "Super Admin")]
         public async Task<IActionResult> Index(int _pageNo = 1, int _pageSize = 10, string _searchedTerm = "")
         {
             try
@@ -85,14 +86,14 @@ namespace TRSAppUpdated.Controllers
                         {
                             ID = x.ID,
                             FirstName = x.FirstName,
-                            LastName=x.LastName,
-                            ContactNumber=x.ContactNumber,
-                            Password=x.Password,
-                            ImagePath=x.ImagePath,
-                            Email=x.Email,
-                            IsActive=x.IsActive,
-                            IsVerified=x.IsVerified,
-                            RoleID=x.RoleID,
+                            LastName = x.LastName,
+                            ContactNumber = x.ContactNumber,
+                            Password = x.Password,
+                            ImagePath = x.ImagePath,
+                            Email = x.Email,
+                            IsActive = x.IsActive,
+                            IsVerified = x.IsVerified,
+                            RoleID = x.RoleID,
                             CreatedByUserID = x.CreatedByUserID,
                             CreatedDateTime = x.CreatedDateTime,
                         })
@@ -240,7 +241,7 @@ namespace TRSAppUpdated.Controllers
             try
             {
                 // For AJAX calls
-                var _query = _context.Users.Include(x=>x.Role).Where(x => !x.IsDeleted)
+                var _query = _context.Users.Include(x => x.Role).Where(x => !x.IsDeleted)
                            .Select(x => new UserVM()
                            {
                                ID = x.ID,
@@ -248,7 +249,7 @@ namespace TRSAppUpdated.Controllers
                                LastName = x.LastName,
                                ContactNumber = x.ContactNumber,
                                Email = x.Email,
-                               ImagePath=x.ImagePath,
+                               ImagePath = x.ImagePath,
                                RoleTitle = x.Role.Title,
                            })
                            .AsNoTracking()
@@ -264,13 +265,32 @@ namespace TRSAppUpdated.Controllers
                 int _skip = (_pageNo - 1) * _pageSize;
                 totalRecords = _query.Count();
                 _query = _query.Skip(_skip).Take(_pageSize);
-                _result =  _query.OrderByDescending(x => x.ID).ToList();
-          }
+                _result = _query.OrderByDescending(x => x.ID).ToList();
+            }
             catch (Exception ex)
             {
                 _logger.LogError($"Error occured at GetList in {_Title} Controller due to {ex}");
             }
             return (_result, totalRecords);
+        }
+        public async Task<IActionResult> VerifyEmail(string token)
+        {
+            try
+            {
+                var _user = _context.Users.Where(x => !x.IsDeleted && x.UserToken == token).FirstOrDefault();
+                if (_user != null)
+                {
+                    _user.IsVerified = true;
+                    _user.UpdatedDateTime = DateTime.UtcNow.AddHours(5);
+                    _context.Entry(_user).State = EntityState.Modified;
+                    await _context.SaveChangesAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error occured at VerifyEmail in {_Title} Controller due to {ex}");
+            }
+            return RedirectToAction("Index","Home");
         }
     }
 }
