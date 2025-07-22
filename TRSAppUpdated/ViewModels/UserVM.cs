@@ -49,5 +49,18 @@ namespace TRSAppUpdated.ViewModels
         public DateTime? UpdatedDateTime { get; set; }
         public DateTime? DeletedDateTime { get; set; }
         public string? RoleTitle { get; set; }
+        // Use this to flag whether we're on the signup form
+        public bool IsSignupRequest { get; set; } = false;
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (IsSignupRequest)
+            {
+                if (!CountryID.HasValue || CountryID.Value < 1)
+                {
+                    yield return new ValidationResult("Please select a valid country.", new[] { nameof(CountryID) });
+                }
+            }
+        }
     }
 }

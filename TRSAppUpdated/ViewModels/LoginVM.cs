@@ -13,7 +13,7 @@ namespace TRSAppUpdated.ViewModels
         public string Password { get; set; }
         public bool IsPersistent { get; set; } = false;
     }
-    public class ResetPasswordVM
+    public class ForgetPasswordVM
     {
         [Required(ErrorMessage = "Please fill out this field")]
         [MinLength(11, ErrorMessage = "Please fill out minimum 11 characters")]

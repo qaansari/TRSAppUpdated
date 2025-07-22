@@ -20,13 +20,16 @@ namespace TRSAppUpdated.Controllers
         private readonly string _Title = "Home";
         private readonly ICountryService _countryService;
         private readonly ILogger<HomeController> _logger;
+        private readonly IUserService _userService;
         private readonly IHttpContextAccessor _httpContextAccessor;
         public HomeController(AppDbContext context, ICountryService countryService,
-            ILogger<HomeController> logger, IHttpContextAccessor httpContextAccessor)
+            ILogger<HomeController> logger, IUserService userService,
+            IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
             _countryService = countryService;
             _logger = logger;
+            _userService = userService;
             _httpContextAccessor = httpContextAccessor;
         }
         //Index (Login) (GET)
@@ -80,6 +83,9 @@ namespace TRSAppUpdated.Controllers
                             if (DateTime.UtcNow.AddHours(5) > user.TokenExpiryTime.Value)
                             {
                                 user.UserToken = Guid.NewGuid().ToString();
+                                user.TokenExpiryTime = DateTime.UtcNow.AddHours(5).AddMinutes(10);
+                                _context.Entry(user).State = EntityState.Modified;
+                                await _context.SaveChangesAsync();
                             }
                         }
                         TempData["Message"] = "1,A verification email has been sent to your email";
@@ -123,7 +129,7 @@ namespace TRSAppUpdated.Controllers
         public IActionResult Signup()
         {
             ViewData["CountryList"] = _countryService.GetAll();
-            return View(new UserVM() { RoleID = 4 });
+            return View(new UserVM() { RoleID = 4,IsSignupRequest=true });
         }
         //Sign up (POST)
         [HttpPost]
@@ -157,6 +163,7 @@ namespace TRSAppUpdated.Controllers
                     _item.LastName = Model.LastName.Trim();
                     _item.ContactNumber = Model.ContactNumber.Trim();
                     _item.RoleID = Model.RoleID;
+                    _item.CountryID = Model.CountryID;
                     _item.Email = Model.Email.Trim();
                     _item.Password = Model.Password.Trim().HashWithSalt();
                     _item.IsActive = Model.IsActive;
@@ -180,11 +187,12 @@ namespace TRSAppUpdated.Controllers
             }
             return View(Model);
         }
+        //Verify Email
         public async Task<IActionResult> VerifyEmail(string token)
         {
             try
             {
-                var _user = _context.Users.Where(x => !x.IsDeleted && x.UserToken == token).FirstOrDefault();
+                var _user = _userService.GetUserByToken(token);
                 if (_user != null)
                 {
                     _user.IsVerified = true;
@@ -226,18 +234,34 @@ namespace TRSAppUpdated.Controllers
         //Forget Password (GET)
         public IActionResult ForgetPassword()
         {
-            return View(new ResetPasswordVM());
+            return View(new ForgetPasswordVM());
         }
         //Reset Password (POST)
-        public IActionResult ResetPassword(ResetPasswordVM Model)
+        public async Task<IActionResult> ResetPassword(ForgetPasswordVM Model)
         {
             try
             {
                 if (ModelState.IsValid)
                 {
-                    TempData["Message"] = "1,A verification email has been sent to your email";
-                    //string _verificationLink = AppHelper._appUrl + "User/VerifyEmail?token=" + _item.UserToken;
-                    //AppHelper.SendVerificationEmail(Model.Email, "verify email", _verificationLink);
+                    var _user = _userService.GetUserByEmail(Model.Email);
+                    if (_user == null)
+                    {
+                        TempData["Message"] = "0,No user found for given email";
+                        return View(Model);
+                    }
+                    if (!string.IsNullOrEmpty(_user.UserToken) && _user.TokenExpiryTime.HasValue)
+                    {
+                        if (DateTime.UtcNow.AddHours(5) > _user.TokenExpiryTime.Value)
+                        {
+                            _user.UserToken = Guid.NewGuid().ToString();
+                            _user.TokenExpiryTime = DateTime.UtcNow.AddHours(5).AddMinutes(10);
+                            _context.Entry(_user).State = EntityState.Modified;
+                            await _context.SaveChangesAsync();
+                        }
+                    }
+                    TempData["Message"] = "1,A reset password link has been sent to your email";
+                    string _verificationLink = AppHelper._appUrl + "Home/ResetPassword?token=" + _user.UserToken;
+                    //AppHelper.SendVerificationEmail(Model.Email, "reset password", _verificationLink);
                 }
             }
             catch (Exception ex)
