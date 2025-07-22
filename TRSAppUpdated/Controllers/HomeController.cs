@@ -129,7 +129,7 @@ namespace TRSAppUpdated.Controllers
         public IActionResult Signup()
         {
             ViewData["CountryList"] = _countryService.GetAll();
-            return View(new UserVM() { RoleID = 4,IsSignupRequest=true });
+            return View(new UserVM() { RoleID = 4});
         }
         //Sign up (POST)
         [HttpPost]
@@ -140,6 +140,11 @@ namespace TRSAppUpdated.Controllers
                 ViewData["CountryList"] = _countryService.GetAll();
                 if (ModelState.IsValid)
                 {
+                    if (Model.CountryID == 0 || Model.CountryID==null)
+                    {
+                        ModelState.AddModelError(nameof(Model.CountryID),"Please select a country");
+                        return View(Model);
+                    }
                     var isEmailExists = _context.Users.Where(x => !x.IsDeleted
                            && x.Email.Trim().ToLower() == Model.Email.Trim().ToLower())
                         .Select(x => x.Email)

@@ -17,7 +17,7 @@ namespace TRSAppUpdated.Controllers
             _context = context;
             _logger = logger;
         }
-        [Authorize(Roles = "Super Admin,Admin")]
+        [Authorize(Roles = "Super Admin,Admin,Moderator,User")]
         public IActionResult Index()
         {
             var _object = new DashboardVM();

@@ -10,6 +10,8 @@
     <link rel="stylesheet" type="text/css" href="~/assets/css/auth.css">
     <!--Custom css-->
     <link rel="stylesheet" type="text/css" href="~/assets/css/custom.css">
+    <!--Syncfusion css-->
+    <link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/30.1.38/bootstrap5-dark.css" />
     <!--Lolibox css-->
     <link rel="stylesheet" href="~/assets/css/lobibox.min.css" />
     <!--Boxicons css-->
@@ -25,10 +27,13 @@
     </div>
     @RenderBody()
     <script src="~/assets/js/jquery.min.js"></script>
+    <!--Syncfusion js-->
+    <script src="https://cdn.syncfusion.com/ej2/30.1.38/dist/ej2.min.js"></script>
     <!--Lolibox js-->
     <script src="~/assets/js/lobibox.min.js"></script>
     <!-- Custom Script -->
     <script src="~/assets/js/custom.js"></script>
+    <ejs-scripts></ejs-scripts>
     @await RenderSectionAsync("Scripts", required: false)
     
 </body>

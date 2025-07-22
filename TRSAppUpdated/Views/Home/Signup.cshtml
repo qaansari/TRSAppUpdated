@@ -49,8 +49,8 @@
                                 </div>
                                 <span asp-validation-for="ContactNumber"></span>
                             </div>
-                            <div class="ad-auth-feilds">
-                                <ejs-dropdownlist cssClass="form-control form-control-sm" dataSource="@(ViewData["CountryList"])" placeholder="Select a country"
+                            <div class="ad-auth-feilds mb-30">
+                                <ejs-dropdownlist cssClass="ad-input" dataSource="@(ViewData["CountryList"])" placeholder="Select a country"
                                                   allowFiltering="true" ejs-for="CountryID" popupHeight="220px">
                                     <e-dropdownlist-fields value="ID" text="Title"></e-dropdownlist-fields>
                                 </ejs-dropdownlist>
