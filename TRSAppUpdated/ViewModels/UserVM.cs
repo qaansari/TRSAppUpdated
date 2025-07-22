@@ -38,6 +38,7 @@ namespace TRSAppUpdated.ViewModels
         public IFormFile? ImageFile { get; set; }
         public string? ImagePath { get; set; }
         public string? UserToken { get; set; }
+        public DateTime? TokenExpiryTime { get; set; }
         public bool IsActive { get; set; } = true;
         public bool IsDeleted { get; set; } = false;
         public bool IsVerified { get; set; } = false;

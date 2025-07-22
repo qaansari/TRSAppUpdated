@@ -35,8 +35,8 @@ namespace TRSAppUpdated.Models
         public string? ImagePath { get; set; }
         [Column(TypeName = "varchar(68)")]
         public string? UserToken { get; set; }
+        public DateTime? TokenExpiryTime { get; set; }
         public bool IsActive { get; set; }
-        public bool IsTokenExpired { get; set; }
         public bool IsDeleted { get; set; }
         public bool IsVerified { get; set; }
         [ForeignKey("UserCreatedByUser")]

@@ -13,4 +13,12 @@ namespace TRSAppUpdated.ViewModels
         public string Password { get; set; }
         public bool IsPersistent { get; set; } = false;
     }
+    public class ResetPasswordVM
+    {
+        [Required(ErrorMessage = "Please fill out this field")]
+        [MinLength(11, ErrorMessage = "Please fill out minimum 11 characters")]
+        [StringLength(320, ErrorMessage = "Please fill out maximum 320 characters")]
+        [DataType(DataType.EmailAddress, ErrorMessage = "Please enter a valid email address")]
+        public string Email { get; set; }
+    }
 }
