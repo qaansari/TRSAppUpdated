@@ -13,7 +13,7 @@ namespace TRSAppUpdated.Helpers
 #else
         public static string _appUrl { get; set; } = "https://localhost:44358/";
 #endif
-        public static List<string> Cities = new List<string> { "Karachi","Lahore","Islamabad","Peshawar","Quetta" };
+        public static List<string> Cities = new List<string> { "Karachi", "Lahore", "Islamabad", "Peshawar", "Quetta" };
         public static string HashWithSalt(this string password)
         {
             string saltstring = "CHYzqeN4plZekNC88Umm1Q==";
@@ -31,13 +31,14 @@ namespace TRSAppUpdated.Helpers
             return hashed;
         }
         //Send Password Reset Email
-        public static void SendVerificationEmail(string emailAddress,string verificationType, string verificationLink)
+        public static void SendVerificationEmail(string emailAddress, string verificationType, string verificationLink)
         {
             // Configure email settings
             string _senderEmail = "eventland28@gmail.com";
             string _senderName = "Event Land ";
             string _logoUrl = "https://i.ibb.co/9kmnH46B/web-logo.png";
-            string _subject = verificationType.ToLower()=="verify email"?"Email Verification":"Reset Password";
+            string _subject = verificationType.ToLower() == "verify email" ? "Email Verification" : "Reset Password";
+            string _btnText = verificationType.ToLower() == "verify email" ? "Login To Continue" : "Reset Password";
             string _body = $@"
 <html>
 <head>
@@ -52,18 +53,18 @@ namespace TRSAppUpdated.Helpers
             font-family: Arial, sans-serif;
             color: #333;
         }}
-
+        .logo{{
+            width: 250px;
+            height:150px;
+        }}
         .header {{
             text-align: center;
             margin-bottom: 30px;
             color:#fff;
         }}
-
-
         .button-container {{
             text-align: center;
         }}
-
         .button {{
             display: inline-block;
             padding: 10px 20px;
@@ -73,11 +74,9 @@ namespace TRSAppUpdated.Helpers
             border-radius: 4px;
             font-weight: bold;
         }}
-
         .button:hover {{
             background-color: #0056b3;
         }}
-
         p {{
             font-weight: 500;
             text-align: center;
@@ -93,7 +92,7 @@ namespace TRSAppUpdated.Helpers
         </div>
         <p>Please click the button below to verify your email:</p>
         <div class='button-container'>
-            <a href='{verificationLink}' class='button'>Login To Continue</a>
+            <a href='{verificationLink}' class='button'>{_btnText}</a>
         </div>
     </div>
 </body>
@@ -130,7 +129,7 @@ namespace TRSAppUpdated.Helpers
 
                 inputStream.Position = 0;
 
-                    int quality = 75;
+                int quality = 75;
                 using (var image = await Image.LoadAsync(inputStream))
                 {
                     var encoder = new JpegEncoder
@@ -156,5 +155,5 @@ namespace TRSAppUpdated.Helpers
             }
         }
     }
-     
-    }
+
+}
