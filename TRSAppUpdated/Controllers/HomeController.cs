@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -19,18 +20,20 @@ namespace TRSAppUpdated.Controllers
         private readonly AppDbContext _context;
         private readonly string _Title = "Home";
         private readonly ICountryService _countryService;
+        private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly ILogger<HomeController> _logger;
         private readonly IUserService _userService;
         private readonly IHttpContextAccessor _httpContextAccessor;
         public HomeController(AppDbContext context, ICountryService countryService,
             ILogger<HomeController> logger, IUserService userService,
-            IHttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor, IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
             _countryService = countryService;
             _logger = logger;
             _userService = userService;
             _httpContextAccessor = httpContextAccessor;
+            _webHostEnvironment = webHostEnvironment;
         }
         //Index (Login) (GET)
         public IActionResult Index()
@@ -178,6 +181,23 @@ namespace TRSAppUpdated.Controllers
                     _item.CreatedDateTime = DateTime.UtcNow.AddHours(5);
                     _context.Users.Add(_item);
                     await _context.SaveChangesAsync();
+                    if (_item != null && Model.ImageFile != null)
+                    {
+                        var folderPath = Path.Combine(_webHostEnvironment.WebRootPath, "assets", "images", "users");
+                        if (!Directory.Exists(folderPath))
+                        {
+                            Directory.CreateDirectory(folderPath);
+                        }
+                        var _fileName = $"user" + "_" + _item.CreatedDateTime.Value.ToString("yyyyddMMhhmmss") + Path.GetExtension(Model.ImageFile.FileName);
+                        _item.ImagePath = _fileName.Trim();
+                        _item.UpdatedDateTime = DateTime.UtcNow.AddHours(5);
+                        var _filePath = Path.Combine(folderPath, _fileName);
+                        var compressedBytes = await AppHelper.CompressImageAsync(Model.ImageFile);
+                        await System.IO.File.WriteAllBytesAsync(_filePath, compressedBytes);
+                        _context.ChangeTracker.Clear();
+                        _context.Entry(_item).State = EntityState.Modified;
+                        await _context.SaveChangesAsync();
+                    }
                     if (_item.ID != 0)
                     {
                         TempData["Message"] = "1,A verification email has been sent to your email";

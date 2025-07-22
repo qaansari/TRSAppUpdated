@@ -183,10 +183,8 @@ namespace TRSAppUpdated.Controllers
                         _item.UpdatedByUserID = _UserID;
                         _item.UpdatedDateTime = DateTime.UtcNow.AddHours(5);
                         var _filePath = Path.Combine(folderPath, _fileName);
-                        using (var _stream = new FileStream(_filePath, FileMode.Create))
-                        {
-                            await Model.ImageFile.CopyToAsync(_stream);
-                        }
+                        var compressedBytes = await AppHelper.CompressImageAsync(Model.ImageFile);
+                        await System.IO.File.WriteAllBytesAsync(_filePath, compressedBytes);
                         _context.ChangeTracker.Clear();
                         _context.Entry(_item).State = EntityState.Modified;
                         await _context.SaveChangesAsync();

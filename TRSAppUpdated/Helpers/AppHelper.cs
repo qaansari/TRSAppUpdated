@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats.Jpeg;
 using System.Net.Mail;
 using System.Text;
 
@@ -115,5 +117,44 @@ namespace TRSAppUpdated.Helpers
                 smtpClient.Send(message);
             }
         }
+        //Compress Size
+        public static async Task<byte[]> CompressImageAsync(IFormFile imageFile, int maxFileSizeInBytes = 1 * 1024 * 1024)
+        {
+            using (var inputStream = new MemoryStream())
+            {
+                await imageFile.CopyToAsync(inputStream);
+
+                // If already under size limit, return original
+                if (inputStream.Length <= maxFileSizeInBytes)
+                    return inputStream.ToArray();
+
+                inputStream.Position = 0;
+
+                    int quality = 75;
+                using (var image = await Image.LoadAsync(inputStream))
+                {
+                    var encoder = new JpegEncoder
+                    {
+                        Quality = quality
+                    };
+
+                    byte[] compressedBytes;
+
+                    using (var outputStream = new MemoryStream())
+                    {
+                        do
+                        {
+                            outputStream.SetLength(0); // clear stream
+                            await image.SaveAsJpegAsync(outputStream, encoder);
+                            compressedBytes = outputStream.ToArray();
+                            quality -= 5;
+
+                        } while (compressedBytes.Length > maxFileSizeInBytes && quality > 30);
+                    }
+                    return compressedBytes;
+                }
+            }
+        }
     }
-}
+     
+    }

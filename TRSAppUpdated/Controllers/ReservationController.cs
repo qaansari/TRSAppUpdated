@@ -9,6 +9,7 @@ using Npgsql.Internal;
 using Syncfusion.EJ2.Layouts;
 using System.Drawing;
 using System.Security.Claims;
+using TRSAppUpdated.Helpers;
 using TRSAppUpdated.Interfaces;
 using TRSAppUpdated.Models;
 using TRSAppUpdated.Services;
@@ -285,10 +286,8 @@ namespace TRSAppUpdated.Controllers
                             counter++;
                         }
                         // Save file
-                        using (var stream = new FileStream(_filePath, FileMode.Create))
-                        {
-                            await Model.ImageFile.CopyToAsync(stream);
-                        }
+                        var compressedBytes = await AppHelper.CompressImageAsync(Model.ImageFile);
+                        await System.IO.File.WriteAllBytesAsync(_filePath, compressedBytes);
                         _context.ReservationImages.Add(new ReservationImage()
                         {
                             ReservationID = _item.ID,
@@ -306,7 +305,6 @@ namespace TRSAppUpdated.Controllers
                             {
                                 if (_reservationStatusTitle.ToLower() == "arrivalpending" || _reservationStatusTitle.ToLower() == "arrival pending")
                                 {
-
                                     foreach (var _ticketID in Model.TicketIDs)
                                     {
                                         var _isExists = _context.ReservationTickets.Where(x => x.TicketID == _ticketID
