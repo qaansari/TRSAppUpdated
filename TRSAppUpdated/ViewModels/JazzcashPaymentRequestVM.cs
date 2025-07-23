@@ -10,6 +10,10 @@
         public string pp_TxnRefNo { get; set; }
         public string pp_Amount { get; set; }
         public string pp_TxnCurrency { get; set; } = "PKR";
-        public string pp_TxnDateTime { get; set; } = "PKR";
+        public string pp_TxnDateTime { get; set; }
+        public string pp_BillReference { get; set; }
+        public string pp_Description { get; set; }
+        public string pp_ReturnURL { get; set; }
+        public string pp_SecureHash { get; set; }
     }
 }
