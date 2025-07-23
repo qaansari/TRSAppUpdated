@@ -132,7 +132,7 @@ namespace TRSAppUpdated.Controllers
         public IActionResult Signup()
         {
             ViewData["CountryList"] = _countryService.GetAll();
-            return View(new UserVM() { RoleID = 4});
+            return View(new UserVM() { RoleID = 4 });
         }
         //Sign up (POST)
         [HttpPost]
@@ -143,9 +143,9 @@ namespace TRSAppUpdated.Controllers
                 ViewData["CountryList"] = _countryService.GetAll();
                 if (ModelState.IsValid)
                 {
-                    if (Model.CountryID == 0 || Model.CountryID==null)
+                    if (Model.CountryID == 0 || Model.CountryID == null)
                     {
-                        ModelState.AddModelError(nameof(Model.CountryID),"Please select a country");
+                        ModelState.AddModelError(nameof(Model.CountryID), "Please select a country");
                         return View(Model);
                     }
                     var isEmailExists = _context.Users.Where(x => !x.IsDeleted
@@ -262,7 +262,7 @@ namespace TRSAppUpdated.Controllers
             return View(new ForgetPasswordVM());
         }
         //Reset Password (POST)
-        public async Task<IActionResult> ResetPassword(ForgetPasswordVM Model)
+        public async Task<IActionResult> ForgetPassword(ForgetPasswordVM Model)
         {
             try
             {
@@ -294,6 +294,10 @@ namespace TRSAppUpdated.Controllers
                 _logger.LogError($"Error occured at ResetPassword (POST) in {_Title} Controller due to {ex}");
             }
             return View(Model);
+        }
+        public IActionResult ResetPassword(string token)
+        {
+            return View(new ResetPasswordVM() { UserToken= token });
         }
     }
 }
