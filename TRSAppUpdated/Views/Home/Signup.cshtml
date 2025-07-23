@@ -4,6 +4,11 @@
     ViewData["Title"] = "Signup";
     var _Message = TempData["Message"] as string;
 }
+<div class="loader">
+    <div class="spinner">
+        <img src="~/assets/images/loader_modified.gif" alt="" />
+    </div>
+</div>
 <div class="ad-auth-wrapper">
     <div class="ad-auth-box">
         <div class="row align-items-center">
@@ -16,7 +21,7 @@
                 <div class="ad-auth-content">
                     <form method="post" asp-action="Signup" enctype="multipart/form-data">
                         <input type="hidden" asp-for="RoleID"/>
-                        <a asp-action="Index" class="ad-auth-logo">
+                        <a href="~/Home/Index" class="ad-auth-logo">
                             <img src="~/assets/images/web-logo.png" alt="">
                         </a>
                         <h2><span class="primary">Hello,</span>Welcome!</h2>
@@ -100,7 +105,7 @@
                         <div class="ad-auth-btn">
                             <button type="submit" class="ad-btn ad-login-member">Sign up</button>
                         </div>
-                        <p class="ad-register-text">Already have an account ? <a asp-action="Index">Login</a></p>
+                        <p class="ad-register-text">Already have an account ? <a href="~/Home/Index">Login</a></p>
                     </form>
                 </div>
             </div>

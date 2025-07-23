@@ -224,7 +224,7 @@ namespace TRSAppUpdated.Controllers
                     _user.UpdatedDateTime = DateTime.UtcNow.AddHours(5);
                     _context.Entry(_user).State = EntityState.Modified;
                     await _context.SaveChangesAsync();
-                    TempData["Message"] = $"1,{_Title} Successfully Verified";
+                    TempData["Message"] = $"1,User Successfully Verified";
                 }
                 return RedirectToAction("Verify", "Home", new { IsVerified = _user?.IsVerified });
             }
@@ -261,7 +261,8 @@ namespace TRSAppUpdated.Controllers
         {
             return View(new ForgetPasswordVM());
         }
-        //Reset Password (POST)
+        //Forget Password (POST)
+        [HttpPost]
         public async Task<IActionResult> ForgetPassword(ForgetPasswordVM Model)
         {
             try
@@ -286,18 +287,37 @@ namespace TRSAppUpdated.Controllers
                     }
                     TempData["Message"] = "1,A reset password link has been sent to your email";
                     string _verificationLink = AppHelper._appUrl + "Home/ResetPassword?token=" + _user.UserToken;
-                    //AppHelper.SendVerificationEmail(Model.Email, "reset password", _verificationLink);
+                    AppHelper.SendVerificationEmail(Model.Email, "reset password", _verificationLink);
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error occured at ResetPassword (POST) in {_Title} Controller due to {ex}");
+                _logger.LogError($"Error occured at ForgetPassword (POST) in {_Title} Controller due to {ex}");
             }
             return View(Model);
         }
+        //Reset Password (GET)
         public IActionResult ResetPassword(string token)
         {
-            return View(new ResetPasswordVM() { UserToken= token });
+            return View(new ResetPasswordVM() { UserToken = token });
+        }
+        //Reset Password (POST)
+        [HttpPost]
+        public async Task <IActionResult> ResetPassword(ResetPasswordVM Model)
+        {
+            if (ModelState.IsValid)
+            {
+                var _user = _userService.GetUserByToken(Model.UserToken);
+                if (_user != null)
+                {
+                    _user.Password = Model.Password.Trim().HashWithSalt();
+                    _context.Entry(_user).State = EntityState.Modified;
+                    await _context.SaveChangesAsync();
+                    TempData["Message"] = "1,Password Successfully Updated";
+                    return RedirectToAction("Index");
+                }
+            }
+            return View(Model);
         }
     }
 }

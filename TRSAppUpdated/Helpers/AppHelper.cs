@@ -39,6 +39,7 @@ namespace TRSAppUpdated.Helpers
             string _logoUrl = "https://i.ibb.co/9kmnH46B/web-logo.png";
             string _subject = verificationType.ToLower() == "verify email" ? "Email Verification" : "Reset Password";
             string _btnText = verificationType.ToLower() == "verify email" ? "Login To Continue" : "Reset Password";
+            string _paraText = verificationType.ToLower() == "verify email" ? "verify your email" : "reset your password";
             string _body = $@"
 <html>
 <head>
@@ -59,7 +60,7 @@ namespace TRSAppUpdated.Helpers
         }}
         .header {{
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 10px;
             color:#fff;
         }}
         .button-container {{
@@ -77,6 +78,9 @@ namespace TRSAppUpdated.Helpers
         .button:hover {{
             background-color: #0056b3;
         }}
+        .para_text{{
+        font-weight:600;
+        }}
         p {{
             font-weight: 500;
             text-align: center;
@@ -90,7 +94,7 @@ namespace TRSAppUpdated.Helpers
         <img src='{_logoUrl}' alt='Logo' class='logo'>
             <h1>{_subject}</h1>
         </div>
-        <p>Please click the button below to verify your email:</p>
+        <p>Please click the button below to <span class='para_text'>{_paraText}</span></p>
         <div class='button-container'>
             <a href='{verificationLink}' class='button'>{_btnText}</a>
         </div>
