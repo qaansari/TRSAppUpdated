@@ -2,6 +2,7 @@
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using System.Net.Mail;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace TRSAppUpdated.Helpers
@@ -13,6 +14,14 @@ namespace TRSAppUpdated.Helpers
 #else
         public static string _appUrl { get; set; } = "https://localhost:44358/";
 #endif
+        //Jazzcash Params Start
+        public static string _MerchantID { get; set; } = "YOUR_MERCHANT_ID";
+        public static string _Password { get; set; } = "YOUR_PASSWORD";
+        public static string _IntegritySalt { get; set; } = "YOUR_INTEGRITY_SALT";
+        public static string _ReturnURL { get; set; } = _appUrl + "Reservation/Success";
+        public static string _SandboxURL { get; set; } = "https://sandbox.jazzcash.com.pk/ApplicationAPI/API/Payment/DoTransaction";
+        public static string _ProductionURL { get; set; } = "https://jazzcash.com.pk/ApplicationAPI/API/Payment/DoTransaction";
+        //Jazzcash Params End
         public static List<string> Cities = new List<string> { "Karachi", "Lahore", "Islamabad", "Peshawar", "Quetta" };
         public static string HashWithSalt(this string password)
         {
