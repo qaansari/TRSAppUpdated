@@ -22,7 +22,6 @@ namespace TRSAppUpdated.Helpers
         public static string _SandboxURL { get; set; } = "https://sandbox.jazzcash.com.pk/ApplicationAPI/API/Payment/DoTransaction";
         public static string _ProductionURL { get; set; } = "https://jazzcash.com.pk/ApplicationAPI/API/Payment/DoTransaction";
         //Jazzcash Params End
-        public static List<string> Cities = new List<string> { "Karachi", "Lahore", "Islamabad", "Peshawar", "Quetta" };
         public static string HashWithSalt(this string password)
         {
             string saltstring = "CHYzqeN4plZekNC88Umm1Q==";
