@@ -27,6 +27,7 @@
                                 <tr>
                                     <th>Row</th>
                                     <th>Price</th>
+                                    <th>Category</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -41,6 +42,10 @@
                                         <td>
                                             <input type="number" asp-for="@Model.TicketRowList[i].Price" class="form-control" />
                                             <span asp-validation-for="@Model.TicketRowList[i].Price"></span>
+                                        </td>
+                                        <td>
+                                            <input type="number" asp-for="@Model.TicketRowList[i].Category" class="form-control" />
+                                            <span asp-validation-for="@Model.TicketRowList[i].Category"></span>
                                         </td>
                                     </tr>
                                 }

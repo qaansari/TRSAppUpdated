@@ -59,6 +59,7 @@ namespace TRSAppUpdated.Services
                     ID = x.FirstOrDefault().ID,
                     ShowID = x.FirstOrDefault().ShowID,
                     CostPrice = (x.FirstOrDefault().CostPrice) * 20 / 100 + x.FirstOrDefault().CostPrice,
+                    Category = x.Key,
                     SalePrice = x.FirstOrDefault().CostPrice,
                     AvailableSeats = x.Count()
                 })

@@ -273,6 +273,49 @@ namespace TRSAppUpdated.Controllers
             }
             return RedirectToAction("Index");
         }
+       
+        //Update Tickets (POST)
+        [Authorize(Roles = "Super Admin,Admin")]
+        [HttpPost]
+        public async Task<IActionResult> UpdateTickets(TicketsBySeatVM Model)
+        {
+            try
+            {
+                // Load all tickets for the given show
+                var tickets = await _context.Tickets
+                    .Include(x => x.Seat)
+                        .ThenInclude(x => x.Column)
+                            .ThenInclude(x => x.Row)
+                    .Where(x => !x.IsDeleted && x.ShowID == Model.ShowID)
+                    .ToListAsync();
+
+                foreach (var row in Model.TicketRowList)
+                {
+                    // Find matching tickets by row label
+                    var matchingTickets = tickets
+                        .Where(t => t.Seat?.Column?.Row?.RowLabel == row.RowLabel)
+                        .ToList();
+                    foreach (var ticket in matchingTickets)
+                    {
+                        // Apply updates
+                        ticket.CostPrice = row.Price;
+                        ticket.Category = row.Category;
+                        ticket.IsRefunded = row.IsRefunded;
+                        ticket.IsReserved = row.IsReserved;
+                        ticket.UpdatedByUserID = _UserID;
+                        ticket.UpdatedDateTime = DateTime.UtcNow.AddHours(5);
+                        _context.Entry(ticket).State = EntityState.Modified;
+                    }
+                }
+                await _context.SaveChangesAsync();
+                TempData["Message"] = "1,Ticket Prices Successfully Updated";
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error occured at UpdateTickets (POST) in {_Title} Controller due to {ex}");
+            }
+            return RedirectToAction("UpdateTickets", _Title, new { ID = Model.ShowID, EventID = Model.EventID });
+        }
         //View Tickets (GET)
         [Authorize(Roles = "Super Admin,Admin,Moderator,User")]
         public IActionResult ViewTickets(int ID, int EventID)
@@ -342,48 +385,6 @@ namespace TRSAppUpdated.Controllers
                 _logger.LogError($"Error occured at UpdateSeats (GET) in {_Title} Controller due to {ex}");
             }
             return View(new SeatVM());
-        }
-        //Update Tickets (POST)
-        [Authorize(Roles = "Super Admin,Admin")]
-        [HttpPost]
-        public async Task<IActionResult> UpdateTickets(TicketsBySeatVM Model)
-        {
-            try
-            {
-                // Load all tickets for the given show
-                var tickets = await _context.Tickets
-                    .Include(x => x.Seat)
-                        .ThenInclude(x => x.Column)
-                            .ThenInclude(x => x.Row)
-                    .Where(x => !x.IsDeleted && x.ShowID == Model.ShowID)
-                    .ToListAsync();
-
-                foreach (var row in Model.TicketRowList)
-                {
-                    // Find matching tickets by row label
-                    var matchingTickets = tickets
-                        .Where(t => t.Seat?.Column?.Row?.RowLabel == row.RowLabel)
-                        .ToList();
-                    foreach (var ticket in matchingTickets)
-                    {
-                        // Apply updates
-                        ticket.CostPrice = row.Price;
-                        ticket.Category = row.Category;
-                        ticket.IsRefunded = row.IsRefunded;
-                        ticket.IsReserved = row.IsReserved;
-                        ticket.UpdatedByUserID = _UserID;
-                        ticket.UpdatedDateTime = DateTime.UtcNow.AddHours(5);
-                        _context.Entry(ticket).State = EntityState.Modified;
-                    }
-                }
-                await _context.SaveChangesAsync();
-                TempData["Message"] = "1,Ticket Prices Successfully Updated";
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error occured at UpdateTickets (POST) in {_Title} Controller due to {ex}");
-            }
-            return RedirectToAction("UpdateTickets", _Title, new { ID = Model.ShowID, EventID = Model.EventID });
         }
     }
 }
