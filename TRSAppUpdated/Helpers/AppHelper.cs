@@ -44,7 +44,7 @@ namespace TRSAppUpdated.Helpers
             // Configure email settings
             string _senderEmail = "eventland28@gmail.com";
             string _senderName = "Event Land ";
-            string _logoUrl = "https://i.ibb.co/9kmnH46B/web-logo.png";
+            string _logoUrl = "https://ik.imagekit.io/mg7bre0yk/web-logo.png";
             string _subject = verificationType.ToLower() == "verify email" ? "Email Verification" : "Reset Password";
             string _btnText = verificationType.ToLower() == "verify email" ? "Login To Continue" : "Reset Password";
             string _paraText = verificationType.ToLower() == "verify email" ? "verify your email" : "reset your password";

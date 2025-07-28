@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Runtime.CompilerServices;
 
 namespace TRSAppUpdated.ViewModels
 {
@@ -19,6 +20,7 @@ namespace TRSAppUpdated.ViewModels
         public int AvailableSeats { get; set; }
         public double CostPrice { get; set; }
         public double SalePrice { get; set; }
+        public int RequiredSeats { get; set; }
         public string Category { get; set; }
     }
     //Seat Ticket Form VM

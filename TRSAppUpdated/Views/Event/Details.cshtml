@@ -279,33 +279,33 @@
                             </h4>
                         </div>
                         <div class="card-body">
-                            <form asp-action="UpdateSeats" method="post">
+                            <form asp-action="AddReservationForUser" asp-controller="Reservation" method="post">
                                 <table class="table">
                                     <thead>
                                         <tr>
                                             <th>Category</th>
                                             <th>Price</th>
                                             <th>Availabe Seats</th>
-                                            <th>Demand</th>
+                                            <th>Req. Seats</th>
                                     </thead>
                                     <tbody>
-                                        @for (int i = 0; i < Model.Count; i++)
+                                        @for (int i = 0; i < _ticketList.Count; i++)
                                         {
                                             <tr>
                                                 <td>
-                                                    @Model[i].RowLabel
-                                                    <input type="hidden" asp-for="@Model[i].RowID" />
-                                                    <input type="hidden" asp-for="@Model[i].RowLabel" />
+                                                    @_ticketList[i].Category
+                                                    <input type="hidden" asp-for="@_ticketList[i].ID" />
+                                                    <input type="hidden" asp-for="@_ticketList[i].Category" />
                                                 </td>
-                                                @for (int j = 0; j < Model[i].Columns.Count; j++)
-                                                {
-                                                    <td>
-                                                        <span>Column # @Model[i].Columns[j].ColumnNumber</span>
-                                                        <input type="hidden" name="[@i].Columns[@j].ColumnID" value="@Model[i].Columns[j].ColumnID" />
-                                                        <input type="number" name="[@i].Columns[@j].SeatCount" value="@Model[i].Columns[j].SeatCount" class="form-control form-control-sm" />
-                                                        <span asp-validation-for="@Model[i].Columns[j].SeatCount"></span>
-                                                    </td>
-                                                }
+                                                <td>
+                                                    <span class="text-decoration-line-through">@_ticketList[i].CostPrice</span> @(_ticketList[i].SalePrice)
+                                                </td>
+                                                <td>
+                                                   @(_ticketList[i].AvailableSeats)
+                                                </td>
+                                                <td>
+                                                    <input type="number" name="@_ticketList[i]." value="@_ticketList[i].RequiredSeats" class="form-control form-control-sm" />
+                                                </td>
                                             </tr>
                                         }
                                     </tbody>
