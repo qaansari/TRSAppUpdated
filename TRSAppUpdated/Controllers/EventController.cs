@@ -357,6 +357,10 @@ namespace TRSAppUpdated.Controllers
             try
             {
                 var _item = await _service.GetDetailsByID(ID);
+                if (!_httpContextAccessor.HttpContext.User.IsInRole("Super Admin"))
+                {
+                    _item.ReservationList = _item.ReservationList.Count > 0 ? _item.ReservationList.Where(x => x.CreatedByUserID == _UserID).ToList():new List<ReservationVM>();
+                }
                 return View(_item ?? new EventVM());
             }
             catch (Exception ex)

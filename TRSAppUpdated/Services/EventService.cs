@@ -133,10 +133,11 @@ namespace TRSAppUpdated.Services
              {
                  ID = r.ID,
                  TicketNumber = r.TicketNumber,
-                 ShowDateTime = r.Show.Date.ToString("dddd, dd MMMM yyyy")+" "
+                 ShowDateTime = r.Show.Date.ToString("dddd, dd MMMM yyyy") + " "
                  + DateTime.Today.Add(r.Show.Time).ToString("hh:mm tt"),
                  CustomerName = r.CustomerName,
                  CustomerPhone = r.CustomerPhone,
+                 CreatedByUserID = r.CreatedByUserID,
              })
              .ToList(),
          ImagePath = x.ImagePath
