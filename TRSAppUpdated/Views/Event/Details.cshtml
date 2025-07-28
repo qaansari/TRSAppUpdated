@@ -270,10 +270,10 @@
             <div class="col-xl-12">
                 @foreach (var item in _ticketList)
                 {
-                    <div class="d-flex">
-                        <div>@(item.CostPrice)</div>
-                        <div>@(item.SalePrice)</div>
-                        <div>@(item.AvailableSeats)</div>
+                    <div class="d-flex justify-content-around">
+                        <div>AP: @(item.CostPrice)</div>
+                        <div>CP :@(item.SalePrice)</div>
+                        <div>AS: @(item.AvailableSeats)</div>
                     </div>
                 }
             </div>

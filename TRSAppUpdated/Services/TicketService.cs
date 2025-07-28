@@ -59,9 +59,10 @@ namespace TRSAppUpdated.Services
                     ID = x.FirstOrDefault().ID,
                     ShowID = x.FirstOrDefault().ShowID,
                     CostPrice = (x.Key) * 20 / 100 + x.Key,
-                    SalePrice = x.FirstOrDefault().SalePrice,
+                    SalePrice = x.FirstOrDefault().CostPrice,
                     AvailableSeats = x.Count()
                 })
+                .OrderByDescending(x => x.CostPrice)
                 .ToList();
             return _ticketList ?? new List<TicketForUsersVM>();
         }
