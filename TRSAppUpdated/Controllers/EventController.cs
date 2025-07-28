@@ -20,6 +20,7 @@ namespace TRSAppUpdated.Controllers
         private readonly ICountryService _countryService;
         private readonly ICityService _cityService;
         private readonly IVenueService _venueService;
+        private readonly ITicketService _ticketService;
         private readonly IAuditoriumService _auditoriumService;
         private readonly IEventStatusService _eventStatusService;
         private readonly ICategoryService _categoryService;
@@ -29,7 +30,8 @@ namespace TRSAppUpdated.Controllers
         public EventController(AppDbContext context, IHttpContextAccessor httpContextAccessor,
             IWebHostEnvironment webHostEnvironment, ILogger<EventController> logger,
             ICountryService countryService, ICityService cityService,
-            IVenueService venueService, IAuditoriumService auditoriumService,
+            IVenueService venueService,
+            ITicketService ticketService,IAuditoriumService auditoriumService,
             IEventStatusService eventStatusService, ICategoryService categoryService, IEventService service)
         {
             _context = context;
@@ -39,6 +41,7 @@ namespace TRSAppUpdated.Controllers
             _countryService = countryService;
             _cityService = cityService;
             _venueService = venueService;
+            _ticketService = ticketService;
             _auditoriumService = auditoriumService;
             _eventStatusService = eventStatusService;
             _categoryService = categoryService;
@@ -356,10 +359,12 @@ namespace TRSAppUpdated.Controllers
         {
             try
             {
-                var _item = await _service.GetDetailsByID(ID);
+
+                ViewData["TicketList"] = _ticketService.GetTicketsForUsersByEventID(ID);
+               var _item = await _service.GetDetailsByID(ID);
                 if (!_httpContextAccessor.HttpContext.User.IsInRole("Super Admin"))
                 {
-                    _item.ReservationList = _item.ReservationList.Count > 0 ? _item.ReservationList.Where(x => x.CreatedByUserID == _UserID).ToList():new List<ReservationVM>();
+                    _item.ReservationList = _item.ReservationList.Count > 0 ? _item.ReservationList.Where(x => x.CreatedByUserID == _UserID).ToList() : new List<ReservationVM>();
                 }
                 return View(_item ?? new EventVM());
             }
