@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TRSAppUpdated.ViewModels
 {
@@ -18,6 +19,7 @@ namespace TRSAppUpdated.ViewModels
         public int AvailableSeats { get; set; }
         public double CostPrice { get; set; }
         public double SalePrice { get; set; }
+        public string Category { get; set; }
     }
     //Seat Ticket Form VM
     public class TicketsBySeatVM
@@ -31,10 +33,12 @@ namespace TRSAppUpdated.ViewModels
     {
         public int ID { get; set; }
         public string RowLabel { get; set; }
-        [Range(1,double.MaxValue,ErrorMessage= "Please fill out this field")]
+        [Range(1, double.MaxValue, ErrorMessage = "Please fill out this field")]
         public double Price { get; set; }
         public bool IsReserved { get; set; } = false;
         public bool IsRefunded { get; set; } = false;
         public bool IsCancelled { get; set; } = false;
+        [Required(ErrorMessage = "Please fill out this field")]
+        public string Category { get; set; }
     }
 }

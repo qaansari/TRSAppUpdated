@@ -17,6 +17,8 @@ namespace TRSAppUpdated.Models
         public bool IsReserved { get; set; }
         public bool IsRefunded { get; set; }
         public bool IsCancelled { get; set; }
+        [Column(TypeName="varchar(50)")]
+        public string Category { get; set; } = string.Empty;
         public DateTime? ReservationDateTime { get; set; }
         public DateTime? RefundDateTime { get; set; }
         public DateTime? CancellationDateTime { get; set; }

@@ -130,7 +130,7 @@ namespace TRSAppUpdated.Controllers
                                 _item.CreatedDateTime = DateTime.UtcNow.AddHours(5);
                                 _context.Shows.Add(_item);
                                 await _context.SaveChangesAsync();
-                                
+
                                 TempData["Message"] = $"1,{_Title} Successfully Added";
                             }
                             var isTicketExists = _context.Tickets.Where(x => !x.IsDeleted && x.ShowID == _item.ID).Any();
@@ -149,6 +149,7 @@ namespace TRSAppUpdated.Controllers
                                     CostPrice = 0,
                                     SalePrice = 0,
                                     Discount = 0,
+                                    Category = string.Empty,
                                     CreatedByUserID = _UserID,
                                     CreatedDateTime = DateTime.UtcNow.AddHours(5),
                                 }).ToList();
@@ -220,6 +221,7 @@ namespace TRSAppUpdated.Controllers
                     x.ID,
                     x.CostPrice,
                     RowLabel = x.Seat.Column.Row.RowLabel,
+                    x.Category,
                     x.IsReserved,
                 })
                     .AsNoTracking()
@@ -229,6 +231,7 @@ namespace TRSAppUpdated.Controllers
                         ID = g.First().ID,
                         RowLabel = g.Key,
                         Price = g.First().CostPrice,
+                        Category = g.First().Category,
                         IsReserved = g.First().IsReserved
                     })
                     .ToListAsync();
@@ -243,7 +246,7 @@ namespace TRSAppUpdated.Controllers
         //End
         [Authorize(Roles = "Super Admin,Admin")]
         [HttpPost]
-        public async Task<IActionResult> End(int ID,int EventID)
+        public async Task<IActionResult> End(int ID, int EventID)
         {
             try
             {
@@ -273,7 +276,7 @@ namespace TRSAppUpdated.Controllers
         //View Tickets (GET)
         [Authorize(Roles = "Super Admin,Admin,Moderator,User")]
         public IActionResult ViewTickets(int ID, int EventID)
-       {
+        {
             // Get all rows with their columns from database
             try
             {
@@ -282,7 +285,7 @@ namespace TRSAppUpdated.Controllers
                     ViewBag.EventID = EventID;
                 }
                 var eventTickets = _context.Tickets
-                    .Where(x=>x.ShowID== ID)
+                    .Where(x => x.ShowID == ID)
      .Include(t => t.Seat)
      .Include(t => t.Show)
          .ThenInclude(s => s.Event)
@@ -311,7 +314,8 @@ namespace TRSAppUpdated.Controllers
                         return new RowVM()
                         {
                             RowLabel = row.RowLabel,
-                            CostPrice = rowPrice.ToString(), // Assign price here
+                            CostPrice = rowPrice.ToString(),
+                            Category = rowTicket?.Category,
                             Columns = row.Columns.Select(col => new ColumnVM()
                             {
                                 ID = col.ID,
@@ -364,6 +368,7 @@ namespace TRSAppUpdated.Controllers
                     {
                         // Apply updates
                         ticket.CostPrice = row.Price;
+                        ticket.Category = row.Category;
                         ticket.IsRefunded = row.IsRefunded;
                         ticket.IsReserved = row.IsReserved;
                         ticket.UpdatedByUserID = _UserID;

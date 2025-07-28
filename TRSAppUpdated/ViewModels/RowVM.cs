@@ -5,6 +5,7 @@
         public int ID { get; set; }
         public string RowLabel { get; set; }
         public string? CostPrice { get; set; }
+        public string? Category { get; set; }
         public List<ColumnVM> Columns { get; set; }
     }
 }

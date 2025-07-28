@@ -53,12 +53,12 @@ namespace TRSAppUpdated.Services
             var _ticketList = _context.Tickets
                 .Where(x => showIDList.Contains(x.ShowID) && !x.IsDeleted && !x.IsReserved)
                 .AsNoTracking()
-                .GroupBy(x => x.CostPrice)
+                .GroupBy(x => x.Category)
                 .Select(x => new TicketForUsersVM()
                 {
                     ID = x.FirstOrDefault().ID,
                     ShowID = x.FirstOrDefault().ShowID,
-                    CostPrice = (x.Key) * 20 / 100 + x.Key,
+                    CostPrice = (x.FirstOrDefault().CostPrice) * 20 / 100 + x.FirstOrDefault().CostPrice,
                     SalePrice = x.FirstOrDefault().CostPrice,
                     AvailableSeats = x.Count()
                 })
