@@ -112,6 +112,7 @@ namespace TRSAppUpdated.Controllers
             }
             return View(_item);
         }
+        [Authorize(Roles = "Super Admin,Admin")]
         //AddOrEdit (POST)
         [HttpPost]
         public async Task<IActionResult> AddOrEdit(ReservationVM Model)
