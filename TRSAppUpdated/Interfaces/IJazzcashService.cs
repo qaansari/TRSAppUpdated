@@ -4,7 +4,7 @@ namespace TRSAppUpdated.Interfaces
 {
     public interface IJazzcashService
     {
-        JazzcashPaymentRequestVM CreatePaymentRequest();
+        JazzcashPaymentRequestVM CreatePaymentRequest(PaymentMethodRequestVM Model);
         
     }
 }

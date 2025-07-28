@@ -16,4 +16,10 @@
         public string pp_ReturnURL { get; set; }
         public string pp_SecureHash { get; set; }
     }
+    public class PaymentMethodRequestVM
+    {
+        public double Amount { get; set; }
+        public int ReservationID { get; set; }
+        public string Description { get; set; } = string.Empty;
+    }
 }
