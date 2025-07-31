@@ -27,7 +27,7 @@ namespace TRSAppUpdated.Services
                     pp_TxnRefNo = $"T{DateTime.UtcNow.AddHours(5).ToString("yyyyMMddHHmmss")}",
                     pp_Amount = Model.Amount.ToString("0"),
                     pp_TxnDateTime = DateTime.UtcNow.AddHours(5).ToString("yyyyMMddHHmmss"),
-                    pp_BillReference = Model.ReservationID.ToString(),
+                    pp_BillReference = Model.TicketNo.ToString(),
                     pp_Description = Model.Description,
                     pp_ReturnURL = AppHelper._ReturnURL
                 };
