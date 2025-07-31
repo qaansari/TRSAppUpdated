@@ -44,28 +44,36 @@ namespace TRSAppUpdated.Services
             }
             return new List<TicketVM>();
         }
-        public List<TicketForUsersVM> GetTicketsForUsersByEventID(int EventID)
+        public TicketBookingVM GetTicketsForUsersByEventID(int EventID,int ShowID)
         {
-            var showIDList = _context.Shows.Where(x => !x.IsDeleted && !x.IsEnded && x.EventID == EventID)
-                                                  .AsNoTracking()
-                                                  .Select(x => x.ID)
-                                                  .ToList();
-            var _ticketList = _context.Tickets
-                .Where(x => showIDList.Contains(x.ShowID) && !x.IsDeleted && !x.IsReserved)
-                .AsNoTracking()
-                .GroupBy(x => x.Category)
-                .Select(x => new TicketForUsersVM()
-                {
-                    ID = x.FirstOrDefault().ID,
-                    ShowID = x.FirstOrDefault().ShowID,
-                    CostPrice = (x.FirstOrDefault().CostPrice) * 20 / 100 + x.FirstOrDefault().CostPrice,
-                    Category = x.Key,
-                    SalePrice = x.FirstOrDefault().CostPrice,
-                    AvailableSeats = x.Count()
-                })
-                .OrderByDescending(x => x.CostPrice)
-                .ToList();
-            return _ticketList ?? new List<TicketForUsersVM>();
+            var _bookingVM = new TicketBookingVM();
+            try
+            {
+                var showIDList = _context.Shows.Where(x => !x.IsDeleted && !x.IsEnded && x.EventID == EventID)
+                                                         .AsNoTracking()
+                                                         .Select(x => x.ID)
+                                                         .ToList();
+                var _ticketList = _context.Tickets
+                    .Where(x =>!x.IsDeleted && !x.IsReserved && x.ShowID== ShowID)
+                    .AsNoTracking()
+                    .GroupBy(x => x.Category)
+                    .Select(x => new TicketForUsersVM()
+                    {
+                        ID = x.FirstOrDefault().ID,
+                        CostPrice = (x.FirstOrDefault().CostPrice) * 20 / 100 + x.FirstOrDefault().CostPrice,
+                        Category = x.Key,
+                        SalePrice = x.FirstOrDefault().CostPrice,
+                        AvailableSeats = x.Count()
+                    })
+                    .OrderByDescending(x => x.CostPrice)
+                    .ToList();
+                _bookingVM.TicketList = _ticketList;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error occured at GetTicketsForUsersByEventID in {_Title} Service due to {ex}");
+            }
+            return _bookingVM;
         }
     }
 }

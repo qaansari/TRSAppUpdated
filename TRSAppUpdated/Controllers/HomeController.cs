@@ -104,6 +104,7 @@ namespace TRSAppUpdated.Controllers
                     var claims = new List<Claim>() {
             new Claim("UserID",user.ID.ToString()),
             new Claim("Username",user.FullName.Trim()),
+            new Claim("ContactNumber",user.ContactNumber.Trim()),
             new Claim("RoleID",user.RoleID.ToString()),
             new Claim(ClaimTypes.Role,!string.IsNullOrEmpty(user.RoleTitle)? user.RoleTitle:""),
             new Claim("Image",!string.IsNullOrEmpty(user.ImagePath)?user.ImagePath.Trim():string.Empty),

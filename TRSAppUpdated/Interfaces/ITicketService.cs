@@ -5,6 +5,6 @@ namespace TRSAppUpdated.Interfaces
     public interface ITicketService
     {
         List<TicketVM> GetTicketsByEventID(int EventID);
-        List<TicketForUsersVM> GetTicketsForUsersByEventID(int EventID);
+        TicketBookingVM GetTicketsForUsersByEventID(int EventID,int ShowID);
     }
 }

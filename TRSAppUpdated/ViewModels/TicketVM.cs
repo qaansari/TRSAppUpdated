@@ -23,6 +23,11 @@ namespace TRSAppUpdated.ViewModels
         public int RequiredSeats { get; set; }
         public string Category { get; set; }
     }
+    public class TicketBookingVM()
+    {
+        public int ShowID { get; set; }
+        public List<TicketForUsersVM> TicketList { get; set; }
+    }
     //Seat Ticket Form VM
     public class TicketsBySeatVM
     {
