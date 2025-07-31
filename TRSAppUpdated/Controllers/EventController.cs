@@ -359,8 +359,8 @@ namespace TRSAppUpdated.Controllers
         {
             try
             {
-
-                ViewData["TicketList"] = _ticketService.GetTicketsForUsersByEventID(ID);
+                var _booKingVM= _ticketService.GetTicketsForUsersByEventID(ID, 1);
+                ViewData["TicketList"] = _booKingVM.TicketList;
                var _item = await _service.GetDetailsByID(ID);
                 if (!_httpContextAccessor.HttpContext.User.IsInRole("Super Admin"))
                 {
