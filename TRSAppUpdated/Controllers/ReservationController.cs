@@ -658,8 +658,6 @@ namespace TRSAppUpdated.Controllers
                     _paymentMethodVM.TicketNumber = (Guid.NewGuid().ToString().Substring(0, 7)).ToUpper();
                     _paymentMethodVM.Amount = (Model.TicketList.Where(x => x.RequiredSeats != 0).Sum(x => x.SalePrice));
                     _paymentMethodVM.TicketList = Model.TicketList.Where(x => x.RequiredSeats != 0).ToList();
-                    _paymentMethodVM.ShowID = Model.ShowID;
-                    _paymentMethodVM.EventID = _context.Shows.Where(x => !x.IsDeleted && x.ID == Model.ShowID).Select(x => x.EventID).FirstOrDefault();
                     _paymentMethodVM.Description = "Booking created through online payment gateway";
                     TempData["PaymentData"] = JsonConvert.SerializeObject(_paymentMethodVM);
                 }
@@ -714,7 +712,6 @@ namespace TRSAppUpdated.Controllers
                 _item.ActionByUserID = _UserID;
                 _item.ActionDateTime = DateTime.UtcNow.AddHours(5);
             }
-            _item.ShowID = Model.ShowID;
             _item.ReservationStatusID = 1;
             _item.CreatedByUserID = _UserID;
             _item.CreatedDateTime = DateTime.UtcNow.AddHours(5);

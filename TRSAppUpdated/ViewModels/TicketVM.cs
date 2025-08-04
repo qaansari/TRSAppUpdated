@@ -16,7 +16,6 @@ namespace TRSAppUpdated.ViewModels
     public class TicketForUsersVM
     {
         public int ID { get; set; }
-        public int ShowID { get; set; }
         public int AvailableSeats { get; set; }
         public double CostPrice { get; set; }
         public double SalePrice { get; set; }
@@ -25,7 +24,6 @@ namespace TRSAppUpdated.ViewModels
     }
     public class TicketBookingVM()
     {
-        public int ShowID { get; set; }
         public List<TicketForUsersVM> TicketList { get; set; }
     }
     //Seat Ticket Form VM

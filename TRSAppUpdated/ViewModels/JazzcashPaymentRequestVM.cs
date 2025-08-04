@@ -20,8 +20,6 @@ namespace TRSAppUpdated.ViewModels
     }
     public class PaymentMethodRequestVM
     {
-        public int ShowID { get; set; }
-        public int EventID { get; set; }
         public double Amount { get; set; }
         public string TicketNumber { get; set; }
         [Required(ErrorMessage = "Please fill out this field")]
