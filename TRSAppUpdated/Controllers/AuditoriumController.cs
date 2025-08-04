@@ -140,8 +140,7 @@ namespace TRSAppUpdated.Controllers
                         {
                             if (_item.NoOfRows != Model.NoOfRows || _item.StartingRow.Trim() != Model.StartingRow.Trim())
                             {
-                                var _rows = _context.Rows.Include(x => x.Columns)
-                                    .ThenInclude(x => x.Seats)
+                                var _rows = _context.Rows
                                     .Where(x => x.AuditoriumID == _item.ID).ToList();
                                 if (_rows.Count > 0)
                                 {
@@ -402,9 +401,6 @@ namespace TRSAppUpdated.Controllers
             try
             {
                 var _object = _context.Auditoriums
-                    .Include(x => x.Venue)
-                    .Include(x => x.Rows)
-                    .ThenInclude(x => x.Columns)
                     .Where(x => !x.IsDeleted && x.ID == AuditoriumId).Select(x => new SeatVM()
                     {
                         AuditoriumName = x.Title.Trim(),
@@ -435,7 +431,7 @@ namespace TRSAppUpdated.Controllers
             // Get all rows with their columns from database
             try
             {
-                var rows = _context.Rows.Include(r => r.Columns).ThenInclude(x => x.Seats)
+                var rows = _context.Rows
                     .Where(r => r.AuditoriumID == AuditoriumId).ToList();
                 var _list = rows.Select(r => new RowSeatInputVM
                 {

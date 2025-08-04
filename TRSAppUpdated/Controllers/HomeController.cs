@@ -53,7 +53,7 @@ namespace TRSAppUpdated.Controllers
                 if (ModelState.IsValid)
                 {
                     var hashedPassword = Model.Password.HashWithSalt();
-                    var user = _context.Users.Include(x => x.Role)
+                    var user = _context.Users
                         .Where(x => !x.IsDeleted
                         && x.Email == Model.Email
                         && x.Password == hashedPassword)

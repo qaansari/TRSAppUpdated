@@ -206,7 +206,7 @@ namespace TRSAppUpdated.Controllers
             try
             {
                 // For AJAX calls
-                var _query = _context.Notes.Include(x => x.NoteType).Where(x => !x.IsDeleted)
+                var _query = _context.Notes.Where(x => !x.IsDeleted)
                            .Select(x => new NoteVM()
                            {
                                ID = x.ID,

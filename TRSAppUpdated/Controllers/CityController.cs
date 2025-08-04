@@ -195,7 +195,7 @@ namespace TRSAppUpdated.Controllers
             try
             {
                 // For AJAX calls
-                var _query = _context.Cities.Include(x => x.Country).Where(x => !x.IsDeleted)
+                var _query = _context.Cities.Where(x => !x.IsDeleted)
                            .Select(x => new CityVM()
                            {
                                ID = x.ID,

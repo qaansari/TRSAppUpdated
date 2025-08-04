@@ -136,9 +136,7 @@ namespace TRSAppUpdated.Controllers
                             var isTicketExists = _context.Tickets.Where(x => !x.IsDeleted && x.ShowID == _item.ID).Any();
                             if (!isTicketExists)
                             {
-                                var _seatIDs = await _context.Seats.Include(x => x.Column)
-                                 .ThenInclude(x => x.Row)
-                                 .ThenInclude(x => x.Auditorium)
+                                var _seatIDs = await _context.Seats
                                  .Where(x => x.Column.Row.AuditoriumID == _event.AuditoriumID)
                                  .Select(x => x.ID)
                                  .ToListAsync();
@@ -283,9 +281,6 @@ namespace TRSAppUpdated.Controllers
             {
                 // Load all tickets for the given show
                 var tickets = await _context.Tickets
-                    .Include(x => x.Seat)
-                        .ThenInclude(x => x.Column)
-                            .ThenInclude(x => x.Row)
                     .Where(x => !x.IsDeleted && x.ShowID == Model.ShowID)
                     .ToListAsync();
 
@@ -329,15 +324,8 @@ namespace TRSAppUpdated.Controllers
                 }
                 var eventTickets = _context.Tickets
                     .Where(x => x.ShowID == ID)
-     .Include(t => t.Seat)
-     .Include(t => t.Show)
-         .ThenInclude(s => s.Event)
-             .ThenInclude(e => e.Auditorium)
-                 .ThenInclude(a => a.Rows)
-                     .ThenInclude(r => r.Columns)
-                     .ThenInclude(r => r.Seats)
-     .Where(t => !t.IsDeleted && t.Show.Event.ID == EventID)
-     .ToList();
+                    .Where(t => !t.IsDeleted && t.Show.Event.ID == EventID)
+                    .ToList();
 
                 var firstTicket = eventTickets.FirstOrDefault();
 

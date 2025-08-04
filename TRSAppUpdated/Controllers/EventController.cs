@@ -31,7 +31,7 @@ namespace TRSAppUpdated.Controllers
             IWebHostEnvironment webHostEnvironment, ILogger<EventController> logger,
             ICountryService countryService, ICityService cityService,
             IVenueService venueService,
-            ITicketService ticketService,IAuditoriumService auditoriumService,
+            ITicketService ticketService, IAuditoriumService auditoriumService,
             IEventStatusService eventStatusService, ICategoryService categoryService, IEventService service)
         {
             _context = context;
@@ -103,11 +103,6 @@ namespace TRSAppUpdated.Controllers
                 if (ID != 0)
                 {
                     _item = _context.Events
-                        .Include(x => x.EventCategories)
-                        .Include(x => x.Auditorium)
-                        .ThenInclude(x => x.Venue)
-                        .ThenInclude(x => x.City)
-                        .ThenInclude(x => x.Country)
                         .Where(x => !x.IsDeleted && x.ID == ID)
                         .Select(x => new EventVM()
                         {
@@ -359,9 +354,9 @@ namespace TRSAppUpdated.Controllers
         {
             try
             {
-                var _booKingVM= _ticketService.GetTicketsForUsersByEventID(ID, 1);
-                ViewData["TicketList"] = _booKingVM.TicketList;
-               var _item = await _service.GetDetailsByID(ID);
+                var _bookingVM = _ticketService.GetTicketsForUsersByEventID(ID, 1);
+                ViewData["TicketBookingModel"] = _bookingVM;
+                var _item = await _service.GetDetailsByID(ID);
                 if (!_httpContextAccessor.HttpContext.User.IsInRole("Super Admin"))
                 {
                     _item.ReservationList = _item.ReservationList.Count > 0 ? _item.ReservationList.Where(x => x.CreatedByUserID == _UserID).ToList() : new List<ReservationVM>();

@@ -6,7 +6,7 @@
     bool isAdmin = (await _authorizationService.AuthorizeAsync(User, "Admin")).Succeeded ? true : false;
     bool isModerator = (await _authorizationService.AuthorizeAsync(User, "Moderator")).Succeeded ? true : false;
     bool isUser = (await _authorizationService.AuthorizeAsync(User, "User")).Succeeded ? true : false;
-    var _ticketList = ViewData["TicketList"] != null ? ViewData["TicketList"] as List<TicketForUsersVM> : new List<TicketForUsersVM>();
+    var _bookingVM = ViewData["TicketBookingModel"] != null ? ViewData["TicketBookingModel"] as TicketBookingVM : new TicketBookingVM();
 }
 @if (isSuperAdmin || isAdmin || isModerator || isUser)
 {
@@ -289,25 +289,29 @@
                                             <th>Req. Seats</th>
                                     </thead>
                                     <tbody>
-                                        @for (int i = 0; i < _ticketList.Count; i++)
+                                                    <input type="hidden" name="ShowID" value="@_bookingVM.ShowID" />
+                                        @for (int i = 0; i < _bookingVM.TicketList.Count; i++)
                                         {
                                             <tr>
                                                 <td>
-                                                    @_ticketList[i].Category
-                                                    <input type="hidden" asp-for="@_ticketList[i].ID" />
-                                                    <input type="hidden" asp-for="@_ticketList[i].Category" />
+                                                    @_bookingVM.TicketList[i].Category
+                                                    <input type="hidden" name="TicketList[@i].ID" value="@_bookingVM.TicketList[i].ID" />
+                                                    <input type="hidden" name="TicketList[@i].Category" value="@_bookingVM.TicketList[i].Category" />
                                                 </td>
                                                 <td>
-                                                    <span class="text-decoration-line-through">@_ticketList[i].CostPrice</span> @(_ticketList[i].SalePrice)
+                                                    <span class="text-decoration-line-through">@_bookingVM.TicketList[i].CostPrice</span> @(_bookingVM.TicketList[i].SalePrice)
+                                                    <input type="hidden" name="TicketList[@i].SalePrice" value="@_bookingVM.TicketList[i].SalePrice" />
                                                 </td>
                                                 <td>
-                                                   @(_ticketList[i].AvailableSeats)
+                                                    <input type="hidden" name="TicketList[@i].AvailableSeats" value="@_bookingVM.TicketList[i].AvailableSeats" />
+                                                    @(_bookingVM.TicketList[i].AvailableSeats)
                                                 </td>
                                                 <td>
-                                                    <input type="number" name="@_ticketList[i]." value="@_ticketList[i].RequiredSeats" class="form-control form-control-sm" />
+                                                    <input type="number" name="TicketList[@i].RequiredSeats" value="@_bookingVM.TicketList[i].RequiredSeats" class="form-control form-control-sm" />
                                                 </td>
                                             </tr>
                                         }
+
                                     </tbody>
                                 </table>
                                 <button type="submit" class="btn btn-primary">Save</button>

@@ -84,7 +84,7 @@ namespace TRSAppUpdated.Controllers
                 ViewData["CityList"] = _cityService.GetAll();
                 if (ID != 0)
                 {
-                    _item = _context.Venues.Include(x=>x.City).Where(x => !x.IsDeleted && x.ID == ID)
+                    _item = _context.Venues.Where(x => !x.IsDeleted && x.ID == ID)
                         .Select(x => new VenueVM()
                         {
                             ID = x.ID,
@@ -230,8 +230,6 @@ namespace TRSAppUpdated.Controllers
             {
                 // For AJAX calls
                 var _query = _context.Venues
-                    .Include(x=>x.City)
-                    .ThenInclude(x=>x.Country)
                     .Where(x => !x.IsDeleted)
                            .Select(x => new VenueVM()
                            {

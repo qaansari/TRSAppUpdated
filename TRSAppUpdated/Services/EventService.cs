@@ -48,11 +48,6 @@ namespace TRSAppUpdated.Services
             {
                 // For AJAX calls
                 var _query = _context.Events
-                    .Include(x => x.EventStatus)
-                    .Include(x => x.Auditorium)
-                    .ThenInclude(x => x.Venue)
-                    .ThenInclude(x => x.City)
-                    .ThenInclude(x => x.Country)
                     .Where(x => !x.IsDeleted)
                            .Select(x => new EventVM()
                            {

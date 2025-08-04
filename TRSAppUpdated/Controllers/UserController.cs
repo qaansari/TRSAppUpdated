@@ -239,7 +239,7 @@ namespace TRSAppUpdated.Controllers
             try
             {
                 // For AJAX calls
-                var _query = _context.Users.Include(x => x.Role).Where(x => !x.IsDeleted)
+                var _query = _context.Users.Where(x => !x.IsDeleted)
                            .Select(x => new UserVM()
                            {
                                ID = x.ID,

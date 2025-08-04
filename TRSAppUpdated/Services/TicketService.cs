@@ -49,10 +49,6 @@ namespace TRSAppUpdated.Services
             var _bookingVM = new TicketBookingVM();
             try
             {
-                var showIDList = _context.Shows.Where(x => !x.IsDeleted && !x.IsEnded && x.EventID == EventID)
-                                                         .AsNoTracking()
-                                                         .Select(x => x.ID)
-                                                         .ToList();
                 var _ticketList = _context.Tickets
                     .Where(x =>!x.IsDeleted && !x.IsReserved && x.ShowID== ShowID)
                     .AsNoTracking()
@@ -68,6 +64,7 @@ namespace TRSAppUpdated.Services
                     .OrderByDescending(x => x.CostPrice)
                     .ToList();
                 _bookingVM.TicketList = _ticketList;
+                _bookingVM.ShowID = ShowID;
             }
             catch (Exception ex)
             {
