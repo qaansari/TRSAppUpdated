@@ -31,7 +31,6 @@ namespace TRSAppUpdated
             builder.Services.AddScoped<IAuditoriumService, AuditoriumService>();
             builder.Services.AddScoped<ICategoryService, CategoryService>();
             builder.Services.AddScoped<ICountryService, CountryService>();
-            builder.Services.AddScoped<IJazzcashService, JazzcashService>();
             builder.Services.AddScoped<ICityService, CityService>();
             builder.Services.AddScoped<IEventStatusService, EventStatusService>();
             builder.Services.AddScoped<IEventService, EventService>();

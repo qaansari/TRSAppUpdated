@@ -6,7 +6,6 @@
     bool isAdmin = (await _authorizationService.AuthorizeAsync(User, "Admin")).Succeeded ? true : false;
     bool isModerator = (await _authorizationService.AuthorizeAsync(User, "Moderator")).Succeeded ? true : false;
     bool isUser = (await _authorizationService.AuthorizeAsync(User, "User")).Succeeded ? true : false;
-    var _bookingVM = ViewData["TicketBookingModel"] != null ? ViewData["TicketBookingModel"] as TicketBookingVM : new TicketBookingVM();
 }
 @if (isSuperAdmin || isAdmin || isModerator || isUser)
 {
@@ -259,65 +258,6 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-danger confirmBtn">Yes</button>
                         <button type="button" class="btn btn-primary" data-bs-dismiss="modal">No</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    }
-    else
-    {
-        <div class="row">
-            <div class="col-xl-12">
-                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4>
-                                @(ViewData["Title"])
-                                <span class="float-right">
-                                    <a href="@(Url.Action("Index"))" class="btn btn-danger btn-sm ml-2">Back</a>
-                                </span>
-                            </h4>
-                        </div>
-                        <div class="card-body">
-                            <form asp-action="AddReservationForUser" asp-controller="Reservation" method="post">
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th>Category</th>
-                                            <th>Price</th>
-                                            <th>Availabe Seats</th>
-                                            <th>Req. Seats</th>
-                                    </thead>
-                                    <tbody>
-                                                    <input type="hidden" name="ShowID" value="@_bookingVM.ShowID" />
-                                        @for (int i = 0; i < _bookingVM.TicketList.Count; i++)
-                                        {
-                                            <tr>
-                                                <td>
-                                                    @_bookingVM.TicketList[i].Category
-                                                    <input type="hidden" name="TicketList[@i].ID" value="@_bookingVM.TicketList[i].ID" />
-                                                    <input type="hidden" name="TicketList[@i].Category" value="@_bookingVM.TicketList[i].Category" />
-                                                </td>
-                                                <td>
-                                                    <span class="text-decoration-line-through">@_bookingVM.TicketList[i].CostPrice</span> @(_bookingVM.TicketList[i].SalePrice)
-                                                    <input type="hidden" name="TicketList[@i].SalePrice" value="@_bookingVM.TicketList[i].SalePrice" />
-                                                </td>
-                                                <td>
-                                                    <input type="hidden" name="TicketList[@i].AvailableSeats" value="@_bookingVM.TicketList[i].AvailableSeats" />
-                                                    @(_bookingVM.TicketList[i].AvailableSeats)
-                                                </td>
-                                                <td>
-                                                    <input type="number" name="TicketList[@i].RequiredSeats" value="@_bookingVM.TicketList[i].RequiredSeats" class="form-control form-control-sm" />
-                                                </td>
-                                            </tr>
-                                        }
-
-                                    </tbody>
-                                </table>
-                                <button type="submit" class="btn btn-primary">Save</button>
-                                <a href="@(Url.Action("Index"))" class="btn btn-danger ml-2">Back</a>
-                            </form>
-                        </div>
                     </div>
                 </div>
             </div>

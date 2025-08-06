@@ -44,45 +44,5 @@ namespace TRSAppUpdated.Services
             }
             return new List<TicketVM>();
         }
-        public TicketBookingVM GetTicketsForUsersByEventID(int EventID)
-        {
-            var _bookingVM = new TicketBookingVM();
-            try
-            {
-                var _showList = _context.Shows
-                    .Where(x => !x.IsDeleted && !x.IsEnded && x.EventID == EventID)
-                    .Select(x => new ShowVM()
-                    {
-                        ID = x.ID,
-                        EventID = x.EventID,
-                        Date = x.Date,
-                        Time = x.Time,
-                    }).OrderBy(x => x.ShowDateTime)
-                    .ToList();
-                if (_showList.Count > 0)
-                {
-                    var _ticketList = _context.Tickets
-                        .Where(x => !x.IsDeleted && !x.IsReserved && _showList.Select(x=>x.ID).Contains(x.ID))
-                        .AsNoTracking()
-                        .GroupBy(x => x.Category)
-                        .Select(x => new TicketForUsersVM()
-                        {
-                            ID = x.FirstOrDefault().ID,
-                            CostPrice = (x.FirstOrDefault().CostPrice) * 20 / 100 + x.FirstOrDefault().CostPrice,
-                            Category = x.Key,
-                            SalePrice = x.FirstOrDefault().CostPrice,
-                            AvailableSeats = x.Count()
-                        })
-                        .OrderByDescending(x => x.CostPrice)
-                        .ToList();
-                    _bookingVM.TicketList = _ticketList;
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error occured at GetTicketsForUsersByEventID in {_Title} Service due to {ex}");
-            }
-            return _bookingVM;
-        }
     }
 }

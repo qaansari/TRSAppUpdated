@@ -13,19 +13,6 @@ namespace TRSAppUpdated.ViewModels
         public string FormattedSeatNumber { get; set; }
         public bool IsReserved { get; set; }
     }
-    public class TicketForUsersVM
-    {
-        public int ID { get; set; }
-        public int AvailableSeats { get; set; }
-        public double CostPrice { get; set; }
-        public double SalePrice { get; set; }
-        public int RequiredSeats { get; set; }
-        public string Category { get; set; }
-    }
-    public class TicketBookingVM()
-    {
-        public List<TicketForUsersVM> TicketList { get; set; }
-    }
     //Seat Ticket Form VM
     public class TicketsBySeatVM
     {

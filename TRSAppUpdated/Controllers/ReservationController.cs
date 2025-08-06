@@ -32,7 +32,6 @@ namespace TRSAppUpdated.Controllers
         private readonly ITicketService _ticketService;
         private readonly IPaymentModeService _paymentModeService;
         private readonly IReservationStatusService _reservationStatusService;
-        private readonly IJazzcashService _jazzcashService;
         private readonly IConverter _converter;
         private readonly string _Title = "Reservation";
         private readonly int _UserID;
@@ -40,7 +39,7 @@ namespace TRSAppUpdated.Controllers
             IWebHostEnvironment webHostEnvironment, ILogger<ReservationController> logger,
             IReservationService reservationService, IShowService showService,
             ITicketService ticketService, IPaymentModeService paymentModeService,
-            IReservationStatusService reservationStatusService, IConverter converter, IJazzcashService jazzcashService)
+            IReservationStatusService reservationStatusService, IConverter converter)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;
@@ -51,7 +50,6 @@ namespace TRSAppUpdated.Controllers
             _ticketService = ticketService;
             _paymentModeService = paymentModeService;
             _reservationStatusService = reservationStatusService;
-            _jazzcashService = jazzcashService;
             _converter = converter;
             _UserID = Convert.ToInt32(_httpContextAccessor.HttpContext.User.FindFirstValue("UserID"));
         }
@@ -644,114 +642,6 @@ namespace TRSAppUpdated.Controllers
                 _logger.LogError($"Error occured at GetPDF in {_Title} Controller due to {ex}");
             }
             return View(_item);
-        }
-        [HttpPost]
-        public async Task<IActionResult> AddReservationForUser(TicketBookingVM Model)
-        {
-            var _paymentMethodVM = new PaymentMethodRequestVM();
-            try
-            {
-                if (ModelState.IsValid)
-                {
-                    _paymentMethodVM.CustomerName = _httpContextAccessor.HttpContext.User.FindFirstValue("Username");
-                    _paymentMethodVM.CustomerPhone = _httpContextAccessor.HttpContext.User.FindFirstValue("ContactNumber");
-                    _paymentMethodVM.TicketNumber = (Guid.NewGuid().ToString().Substring(0, 7)).ToUpper();
-                    _paymentMethodVM.Amount = (Model.TicketList.Where(x => x.RequiredSeats != 0).Sum(x => x.SalePrice));
-                    _paymentMethodVM.TicketList = Model.TicketList.Where(x => x.RequiredSeats != 0).ToList();
-                    _paymentMethodVM.Description = "Booking created through online payment gateway";
-                    TempData["PaymentData"] = JsonConvert.SerializeObject(_paymentMethodVM);
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error occured at AddReservationForUser (POST) in {_Title} Controller due to {ex}");
-            }
-            return RedirectToAction("CheckOut");
-        }
-        //CheckOut
-        public IActionResult CheckOut()
-        {
-            var data = new PaymentMethodRequestVM();
-            if (TempData["PaymentData"] != null)
-            {
-                data = JsonConvert.DeserializeObject<PaymentMethodRequestVM>(TempData["PaymentData"].ToString());
-            }
-            return View(data);
-        }
-        [HttpPost]
-        public async Task<IActionResult> SubmitCheckOut(PaymentMethodRequestVM Model)
-        {
-            var _item = new Reservation();
-            List<int> TicketIDs = Model.TicketList.Select(x => x.ID).ToList();
-            var isExists = _context.ReservationTickets.Where(x => TicketIDs.Contains(x.TicketID))
-                        .Any();
-            if (isExists)
-            {
-                TempData["Message"] = $"0,Invalid Tickets Selected";
-                TempData["PaymentData"] = JsonConvert.SerializeObject(Model);
-                return RedirectToAction("CheckOut");
-            }
-            _item.TicketNumber = Model.TicketNumber.Trim();
-            _item.CustomerName = Model.CustomerName.Trim();
-            _item.CustomerPhone = Model.CustomerPhone.Trim();
-            _item.CostPrice = Model.TicketList.Sum(x => x.SalePrice);
-            _item.SalePrice = Model.Amount;
-            _item.AmountPaid = Model.Amount;
-            _item.Discount = (_item.CostPrice - _item.SalePrice);
-            _item.AmountRemaining = 0;
-            _item.IsFullyPaid = true;
-            var _paymentCompletionRequest = _jazzcashService.CreatePaymentRequest(Model);
-            _item.TransactionID = _paymentCompletionRequest.pp_TxnRefNo;
-            if (!string.IsNullOrEmpty(_paymentCompletionRequest.pp_TxnDateTime))
-            {
-                _item.BookingDateTime = DateTime.ParseExact(_paymentCompletionRequest.pp_TxnDateTime, "yyyyMMddHHmmss", System.Globalization.CultureInfo.InvariantCulture);
-            }
-            _item.IsApproved = true;
-            if (_item.IsApproved.HasValue)
-            {
-                _item.ActionByUserID = _UserID;
-                _item.ActionDateTime = DateTime.UtcNow.AddHours(5);
-            }
-            _item.ReservationStatusID = 1;
-            _item.CreatedByUserID = _UserID;
-            _item.CreatedDateTime = DateTime.UtcNow.AddHours(5);
-            _context.Reservations.Add(_item);
-            foreach (var _ticketID in TicketIDs)
-            {
-                var _isExists = _context.ReservationTickets.Where(x => x.TicketID == _ticketID
-                && x.ReservationID == _item.ID).Any();
-                if (_isExists)
-                {
-                    continue;
-                }
-                _context.ReservationTickets.Add(new ReservationTicket()
-                {
-                    ReservationID = _item.ReservationStatusID,
-                    TicketID = _ticketID,
-                    CreatedByUserID = _UserID,
-                    CreatedDateTime = DateTime.UtcNow.AddHours(5)
-                });
-                await _context.Tickets
-           .Where(x => !x.IsDeleted && TicketIDs.Contains(x.ID))
-           .BatchUpdateAsync(x => new Ticket
-           {
-               CostPrice = _item.CostPrice / TicketIDs.Count,
-               IsReserved = true,
-               IsRefunded = x.IsRefunded,
-               RefundDateTime = x.RefundDateTime,
-               IsCancelled = x.IsCancelled,
-               CancellationDateTime = x.CancellationDateTime,
-               ReservationDateTime = DateTime.UtcNow.AddHours(5),
-               SalePrice = _item.SalePrice / TicketIDs.Count,
-               Discount = _item.Discount / TicketIDs.Count,
-               UpdatedByUserID = _UserID,
-               UpdatedDateTime = DateTime.UtcNow.AddHours(5),
-           });
-            }
-            await _context.SaveChangesAsync();
-            await _context.SaveChangesAsync();
-            TempData["Message"] = $"1,{_Title} Successfully Added";
-            return RedirectToAction("Details", "Event", new { ID = Model.EventID });
         }
     }
 }
