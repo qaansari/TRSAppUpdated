@@ -200,47 +200,6 @@ namespace TRSAppUpdated.Controllers
             }
             return RedirectToAction("Details", "Event", new { ID = EventID });
         }
-        //Update Tickets (GET)
-        [Authorize(Roles = "Super Admin,Admin")]
-        public async Task<IActionResult> UpdateTickets(int ID, int EventID)
-        {
-            var _item = new TicketsBySeatVM();
-            try
-            {
-                if (ID != 0 && EventID != 0)
-                {
-                    _item.ShowID = ID;
-                    _item.EventID = EventID;
-                }
-                var _tickets = await _context.Tickets
-                .Where(x => !x.IsDeleted && x.ShowID == ID)
-                .Select(x => new
-                {
-                    x.ID,
-                    x.CostPrice,
-                    RowLabel = x.Seat.Column.Row.RowLabel,
-                    x.Category,
-                    x.IsReserved,
-                })
-                    .AsNoTracking()
-                    .GroupBy(x => x.RowLabel)
-                    .Select(g => new TicketRowVM
-                    {
-                        ID = g.First().ID,
-                        RowLabel = g.Key,
-                        Price = g.First().CostPrice,
-                        Category = g.First().Category,
-                        IsReserved = g.First().IsReserved
-                    })
-                    .ToListAsync();
-                _item.TicketRowList = _tickets;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error occured at UpdateTickets (GET) in {_Title} Controller due to {ex}");
-            }
-            return View(_item);
-        }
         //End
         [Authorize(Roles = "Super Admin,Admin")]
         [HttpPost]
@@ -271,7 +230,49 @@ namespace TRSAppUpdated.Controllers
             }
             return RedirectToAction("Index");
         }
-       
+        //Update Tickets (GET)
+        [Authorize(Roles = "Super Admin,Admin")]
+        public async Task<IActionResult> UpdateTickets(int ID, int EventID)
+        {
+            var _item = new TicketsBySeatVM();
+            try
+            {
+                if (ID != 0 && EventID != 0)
+                {
+                    _item.ShowID = ID;
+                    _item.EventID = EventID;
+                }
+                var _tickets = await _context.Tickets
+                    .Include(x => x.Seat)
+                    .ThenInclude(x => x.Column)
+                .Where(x => !x.IsDeleted && x.ShowID == ID)
+                .Select(x => new
+                {
+                    x.ID,
+                    x.CostPrice,
+                    RowLabel = x.Seat.Column.Row.RowLabel,
+                    x.Category,
+                    x.IsReserved,
+                })
+                    .AsNoTracking()
+                    .GroupBy(x => x.RowLabel)
+                    .Select(g => new TicketRowVM
+                    {
+                        ID = g.First().ID,
+                        RowLabel = g.Key,
+                        Price = g.First().CostPrice,
+                        Category = g.First().Category,
+                        IsReserved = g.First().IsReserved
+                    })
+                    .ToListAsync();
+                _item.TicketRowList = _tickets;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error occured at UpdateTickets (GET) in {_Title} Controller due to {ex}");
+            }
+            return View(_item);
+        }
         //Update Tickets (POST)
         [Authorize(Roles = "Super Admin,Admin")]
         [HttpPost]
@@ -281,6 +282,9 @@ namespace TRSAppUpdated.Controllers
             {
                 // Load all tickets for the given show
                 var tickets = await _context.Tickets
+                    .Include(x => x.Seat)
+                    .ThenInclude(x => x.Column)
+                    .ThenInclude(x => x.Row)
                     .Where(x => !x.IsDeleted && x.ShowID == Model.ShowID)
                     .ToListAsync();
 
@@ -323,7 +327,19 @@ namespace TRSAppUpdated.Controllers
                     ViewBag.EventID = EventID;
                 }
                 var eventTickets = _context.Tickets
+                    .Include(x => x.Seat)
+                    .Include(x => x.Show)
+                    .ThenInclude(x => x.Event)
+                    .ThenInclude(x => x.Auditorium)
+                    .ThenInclude(x => x.Venue)
+                      .Include(x => x.Show)
+                    .ThenInclude(x => x.Event)
+                    .ThenInclude(x => x.Auditorium)
+                    .ThenInclude(x => x.Rows)
+                    .ThenInclude(x => x.Columns)
+                    .ThenInclude(x => x.Seats)
                     .Where(x => x.ShowID == ID)
+                  
                     .Where(t => !t.IsDeleted && t.Show.Event.ID == EventID)
                     .ToList();
 

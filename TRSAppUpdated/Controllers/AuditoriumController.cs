@@ -432,6 +432,8 @@ namespace TRSAppUpdated.Controllers
             try
             {
                 var rows = _context.Rows
+                    .Include(x=>x.Columns)
+                    .ThenInclude(x=>x.Seats)
                     .Where(r => r.AuditoriumID == AuditoriumId).ToList();
                 var _list = rows.Select(r => new RowSeatInputVM
                 {

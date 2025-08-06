@@ -323,7 +323,8 @@ namespace TRSAppUpdated.Controllers
                                             CreatedByUserID = _UserID,
                                             CreatedDateTime = DateTime.UtcNow.AddHours(5)
                                         });
-                                        await _context.Tickets
+                                    }
+                                    await _context.Tickets
                                    .Where(x => !x.IsDeleted && Model.TicketIDs.Contains(x.ID))
                                    .BatchUpdateAsync(x => new Ticket
                                    {
@@ -339,7 +340,6 @@ namespace TRSAppUpdated.Controllers
                                        UpdatedByUserID = _UserID,
                                        UpdatedDateTime = DateTime.UtcNow.AddHours(5),
                                    });
-                                    }
                                     await _context.SaveChangesAsync();
                                 }
                                 else if (_reservationStatusTitle.ToLower() == "refunded")

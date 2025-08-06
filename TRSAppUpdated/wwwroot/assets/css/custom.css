@@ -215,7 +215,7 @@ span.e-input-group.e-control-wrapper.form-control.form-control-sm.e-ddl.e-lib.e-
     }
 
 .seat.reserved {
-    background-color: var(--warning);
+    background-color: var(--success-light);
 }
 
 .reservation_image_preview {
@@ -225,4 +225,7 @@ span.e-input-group.e-control-wrapper.form-control.form-control-sm.e-ddl.e-lib.e-
 
 .reservation_textarea {
     max-height: 400px;
+}
+.seat_bigger.reserved {
+    background-color: var(--success-light);
 }
