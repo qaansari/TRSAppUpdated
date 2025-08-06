@@ -11,7 +11,6 @@
     var _Message = TempData["Message"] as string;
     bool isSuperAdmin = (await _authorizationService.AuthorizeAsync(User, "SuperAdmin")).Succeeded ? true : false;
     bool isAdmin = (await _authorizationService.AuthorizeAsync(User, "Admin")).Succeeded ? true : false;
-    int _EventID = ViewBag.EventID != null ? ViewBag.EventID : 0;
 }
 @if (isSuperAdmin || isAdmin)
 {
@@ -185,7 +184,7 @@
                             <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
                                 <div class="form-group mb-0 mt-2">
                                     <input class="btn btn-primary" type="submit">
-                                    <a class="btn btn-danger" href="@(Url.Action("Details", "Event", new { ID = _EventID }))">Back</a>
+                                    <a class="btn btn-danger" href="@(Url.Action("Details", "Event", new { ID = Model.EventID }))">Back</a>
                                 </div>
                             </div>
                         </div>
