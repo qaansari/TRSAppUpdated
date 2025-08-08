@@ -143,7 +143,7 @@
     </div>
 </div>
 <div class="row mb-2">
-           <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 mt-2">
+<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
     <div class="ticket-container">
         <div class="ticket-header">
             <h2>E-Ticket</h2>
@@ -200,15 +200,20 @@
             {
                 <p>No reservation details found.</p>
             }
+              @if (!string.IsNullOrEmpty(Model.EventImagePath))
+                    {
+                            <img src="~/assets/images/events/@(Model.EventImagePath)" />
+                    }
         </div>
         <div class="footer">
             Thank you for your reservation. Please present this ticket at the venue.
         </div>
     </div>
     </div>
+    </div>
     @if (isSuperAdmin || isAdmin)
     {
-        <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 mt-2">
+        <div class="row mt-2">
         <div class="ticket-container">
             <div class="ticket-header">
                 <h2>Payment Information</h2>
@@ -256,7 +261,7 @@
                                 <div class="info-value">@Model.AmountRemaining</div>
                             </div>
                         }
-                       
+                     
                     </div>
                 }
                 else
@@ -296,8 +301,6 @@
             </div>
         }
     }
-    </div>
-
     @section Scripts{
         <script>
     $(document).ready(function () {

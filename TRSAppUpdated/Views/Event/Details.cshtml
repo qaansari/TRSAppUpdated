@@ -97,7 +97,7 @@
                                     <div class="tab-pane fade show active" id="shows" role="tabpanel">
                                         <h4 class="card-title mb-2">
                                             Shows For @(Model.Title)
-                                            @if (isSuperAdmin || isAdmin)
+                                            @if (isSuperAdmin)
                                             {
                                                 <span class="float-right mb-2">
                                                     <a asp-action="AddOrEdit" asp-controller="Show" asp-route-ID="0" asp-route-EventID="@(Model.ID)" class="btn btn-primary sm-btn">Add Show</a>
@@ -131,14 +131,11 @@
                                                                     @if (!item.IsEnded)
                                                                     {
                                                                         <a asp-action="ViewTickets" asp-controller="Show" asp-route-ID="@(item.ID)" asp-route-EventID="@(Model.ID)" class="btn btn-primary sm-btn" target="_blank">View Tickets</a>
-                                                                        @if (isSuperAdmin || isAdmin)
+                                                                        @if (isSuperAdmin)
                                                                         {
                                                                             <button type="button" class="btn btn-danger sm-btn endShowBtn" data-id="@(item.ID)">End</button>
                                                                             <a asp-action="UpdateTickets" asp-controller="Show" asp-route-ID="@(item.ID)" asp-route-EventID="@(Model.ID)" class="btn btn-primary sm-btn">Update Tickets</a>
                                                                             <a asp-action="AddOrEdit" asp-controller="Show" asp-route-ID="@(item.ID)" asp-route-EventID="@(Model.ID)" class="btn btn-primary sm-btn">Edit</a>
-                                                                        }
-                                                                        @if (isSuperAdmin)
-                                                                        {
                                                                             <button type="button" class="btn btn-danger sm-btn deleteShowBtn" data-id="@(item.ID)">Delete</button>
                                                                         }
                                                                     }
@@ -251,7 +248,7 @@
                                                                     {
                                                                         <a asp-action="Details" asp-controller="Reservation" asp-route-ID="@(item.ID)" asp-route-EventID="@(Model.ID)" class="btn btn-primary sm-btn" target="_blank">Details</a>
                                                                     }
-                                                                    @if (isSuperAdmin || isAdmin)
+                                                                    @if (isSuperAdmin)
                                                                     {
                                                                         <a asp-action="AddOrEdit" asp-controller="Reservation" asp-route-ID="@(item.ID)" asp-route-EventID="@(Model.ID)" class="btn btn-primary sm-btn">Edit</a>
                                                                     }

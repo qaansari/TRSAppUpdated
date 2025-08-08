@@ -25,7 +25,7 @@ namespace TRSAppUpdated.Controllers
             _logger = logger;
             _UserID = Convert.ToInt32(_httpContextAccessor.HttpContext.User.FindFirstValue("UserID"));
         }
-        [Authorize(Roles = "Super Admin,Admin")]
+        [Authorize(Roles = "Super Admin")]
         public IActionResult AddOrEdit(int ID = 0, int EventID = 0)
         {
             var _item = new ShowVM();
@@ -55,7 +55,7 @@ namespace TRSAppUpdated.Controllers
             return View(_item);
         }
         //AddOrEdit (POST)
-        [Authorize(Roles = "Super Admin,Admin")]
+        [Authorize(Roles = "Super Admin")]
         [HttpPost]
         public async Task<IActionResult> AddOrEdit(ShowVM Model)
         {
@@ -231,7 +231,7 @@ namespace TRSAppUpdated.Controllers
             return RedirectToAction("Index");
         }
         //Update Tickets (GET)
-        [Authorize(Roles = "Super Admin,Admin")]
+        [Authorize(Roles = "Super Admin")]
         public async Task<IActionResult> UpdateTickets(int ID, int EventID)
         {
             var _item = new TicketsBySeatVM();
@@ -274,7 +274,7 @@ namespace TRSAppUpdated.Controllers
             return View(_item);
         }
         //Update Tickets (POST)
-        [Authorize(Roles = "Super Admin,Admin")]
+        [Authorize(Roles = "Super Admin")]
         [HttpPost]
         public async Task<IActionResult> UpdateTickets(TicketsBySeatVM Model)
         {

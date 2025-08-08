@@ -54,6 +54,7 @@ namespace TRSAppUpdated.ViewModels
     {
         public int ID { get; set; }
         public string EventName { get; set; }
+        public string EventImagePath { get; set; } = string.Empty;
         public string TicketNumber { get; set; }
         public string CustomerName { get; set; }
         public string CustomerPhone { get; set; }

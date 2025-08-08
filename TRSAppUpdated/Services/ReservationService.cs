@@ -38,6 +38,7 @@ namespace TRSAppUpdated.Services
                         + DateTime.Today.Add(x.Show.Time).ToString("hh:mm tt"),
                         PaymentModeTitle = x.PaymentMode.Title,
                         ReservationStatusTitle = x.PaymentMode.Title,
+                        EventImagePath = x.Show.Event.ImagePath,
                         IsFullyPaid = x.IsFullyPaid,
                         CostPrice=x.CostPrice,
                         Discount=x.Discount,

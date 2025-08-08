@@ -14,7 +14,7 @@
     bool isModerator = (await _authorizationService.AuthorizeAsync(User, "Moderator")).Succeeded ? true : false;
     bool isUser = (await _authorizationService.AuthorizeAsync(User, "User")).Succeeded ? true : false;
 }
-@if (isSuperAdmin || isAdmin || isModerator || isUser)
+@if (isSuperAdmin || isAdmin)
 {
     <div class="row">
         <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
@@ -22,7 +22,7 @@
                 <div class="card-header pb-0">
                     <h4>
                         @(ViewData["Title"])
-                        @if (isSuperAdmin || isAdmin)
+                        @if (isSuperAdmin)
                         {
                             <span class="float-right">
                                 <a asp-action="AddOrEdit" asp-route-ID="0" class="btn btn-primary sm-btn">Add @_PageTitle</a>

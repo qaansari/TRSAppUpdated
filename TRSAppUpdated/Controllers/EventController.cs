@@ -132,7 +132,7 @@ namespace TRSAppUpdated.Controllers
             return View(_item);
         }
         //AddOrEdit (POST)
-        [Authorize(Roles = "Super Admin,Admin")]
+        [Authorize(Roles = "Super Admin")]
         [HttpPost]
         public async Task<IActionResult> AddOrEdit(EventVM Model)
         {
