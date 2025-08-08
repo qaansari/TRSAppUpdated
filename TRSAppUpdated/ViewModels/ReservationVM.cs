@@ -44,6 +44,7 @@ namespace TRSAppUpdated.ViewModels
         public bool? IsApproved { get; set; }
         public int? ActionByUserID { get; set; }
         public DateTime? ActionDateTime { get; set; }
+        public string? ApprovedByUserName { get; set; }
         public string? PaymentModeTitle { get; set; }
         public string? ReservationStatusTitle { get; set; }
         public string? ShowDateTime { get; set; }

@@ -133,6 +133,9 @@ namespace TRSAppUpdated.Services
                  CustomerName = r.CustomerName,
                  CustomerPhone = r.CustomerPhone,
                  CreatedByUserID = r.CreatedByUserID,
+                 IsApproved = r.IsApproved,
+                 ReservationStatusTitle = r.ReservationStatus.Title,
+                 ApprovedByUserName = r.ActionByUser.FullName,
              })
              .ToList(),
          ImagePath = x.ImagePath

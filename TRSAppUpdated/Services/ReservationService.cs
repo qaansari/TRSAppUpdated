@@ -22,6 +22,11 @@ namespace TRSAppUpdated.Services
             try
             {
                 _VM = _context.Reservations.Where(x => x.ID == ID)
+                    .Include(x=>x.ReservationTickets)
+                    .ThenInclude(x=>x.Ticket)
+                    .ThenInclude(x=>x.Seat)
+                    .ThenInclude(x=>x.Column)
+                    .ThenInclude(x=>x.Row)
                     .AsNoTracking().Select(x => new ReservationDetailVM()
                     {
                         ID = x.ID,

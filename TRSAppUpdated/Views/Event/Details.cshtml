@@ -170,6 +170,15 @@
                                                         <th>Customer Name</th>
                                                         <th>Customer Phone</th>
                                                         <th>Show Date</th>
+                                                        <th>Arrival Status</th>
+                                                        @if (isAdmin || isSuperAdmin)
+                                                        {
+                                                            <th>Booking Status</th>
+                                                        }
+                                                        @if (isSuperAdmin)
+                                                        {
+                                                            <th>Approved By User</th>
+                                                        }
                                                         <th>Action</th>
 
                                                     </tr>
@@ -184,8 +193,39 @@
                                                                 <td>@(item.CustomerName)</td>
                                                                 <td>@(item.CustomerPhone)</td>
                                                                 <td>@(item.ShowDateTime)</td>
+                                                                <td>@(item.ReservationStatusTitle)</td>
+                                                                @if (isAdmin || isSuperAdmin)
+                                                                {
+                                                                    <td>
+                                                                        @{
+                                                                            string _actionStatus = "Pending";
+                                                                            string _bgColor = "warning";
+                                                                            if (item.IsApproved.HasValue)
+                                                                            {
+                                                                                if (item.IsApproved.Value == true)
+                                                                                {
+                                                                                    _actionStatus = "Approved";
+                                                                                    _bgColor = "success";
+                                                                                }
+                                                                                else
+                                                                                {
+                                                                                    _actionStatus = "Rejected";
+                                                                                    _bgColor = "danger";
+                                                                                }
+                                                                            }
+                                                                            <span class="badge bg-@(_bgColor)">@(_actionStatus)</span>
+                                                                        }
+                                                                    </td>
+                                                                }
+                                                                @if (isSuperAdmin)
+                                                                {
+                                                                    <td>@(item.ApprovedByUserName)</td>
+                                                                }
                                                                 <td>
-                                                                    <a asp-action="Details" asp-controller="Reservation" asp-route-ID="@(item.ID)" asp-route-EventID="@(Model.ID)" class="btn btn-primary sm-btn" target="_blank">Details</a>
+                                                                    @if (item.IsApproved.HasValue && item.IsApproved.Value == true)
+                                                                    {
+                                                                        <a asp-action="Details" asp-controller="Reservation" asp-route-ID="@(item.ID)" asp-route-EventID="@(Model.ID)" class="btn btn-primary sm-btn" target="_blank">Details</a>
+                                                                    }
                                                                     @if (isSuperAdmin || isAdmin)
                                                                     {
                                                                         <a asp-action="AddOrEdit" asp-controller="Reservation" asp-route-ID="@(item.ID)" asp-route-EventID="@(Model.ID)" class="btn btn-primary sm-btn">Edit</a>
@@ -196,7 +236,15 @@
                                                     }
                                                     else
                                                     {
-                                                        int _colspan = 8;
+                                                        int _colspan = 5;
+                                                        if (isAdmin)
+                                                        {
+                                                            _colspan = 6;
+                                                        }
+                                                        else if (isSuperAdmin)
+                                                        {
+                                                            _colspan = 7;
+                                                        }
                                                         <tr>
                                                             <td colspan="@(_colspan)" class="text-center">
                                                                 <img class="error_img" src="~/assets/images/no-data.png" />
