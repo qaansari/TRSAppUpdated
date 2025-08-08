@@ -32,6 +32,7 @@ namespace TRSAppUpdated.Controllers
         private readonly ITicketService _ticketService;
         private readonly IPaymentModeService _paymentModeService;
         private readonly IReservationStatusService _reservationStatusService;
+        private readonly IUserService _userService;
         private readonly IConverter _converter;
         private readonly string _Title = "Reservation";
         private readonly int _UserID;
@@ -39,7 +40,7 @@ namespace TRSAppUpdated.Controllers
             IWebHostEnvironment webHostEnvironment, ILogger<ReservationController> logger,
             IReservationService reservationService, IShowService showService,
             ITicketService ticketService, IPaymentModeService paymentModeService,
-            IReservationStatusService reservationStatusService, IConverter converter)
+            IReservationStatusService reservationStatusService, IConverter converter, IUserService userService)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;
@@ -52,6 +53,7 @@ namespace TRSAppUpdated.Controllers
             _reservationStatusService = reservationStatusService;
             _converter = converter;
             _UserID = Convert.ToInt32(_httpContextAccessor.HttpContext.User.FindFirstValue("UserID"));
+            _userService = userService;
         }
         [Authorize(Roles = "Super Admin,Admin")]
         public IActionResult AddOrEdit(int ID = 0, int EventID = 0)
@@ -64,6 +66,7 @@ namespace TRSAppUpdated.Controllers
                 ViewData["ShowList"] = _showService.GeActiveShowsByEventID(EventID);
                 ViewData["PaymentModeList"] = _paymentModeService.GetAll();
                 ViewData["ReservationStatusList"] = _reservationStatusService.GetAll();
+                ViewData["UserList"] = _userService.GetAll();
                 if (EventID != 0)
                 {
                     ViewBag.EventID = EventID;
@@ -126,6 +129,7 @@ namespace TRSAppUpdated.Controllers
                 ViewData["ShowList"] = _showService.GeActiveShowsByEventID(Model.EventID);
                 ViewData["PaymentModeList"] = _paymentModeService.GetAll();
                 ViewData["ReservationStatusList"] = _reservationStatusService.GetAll();
+                ViewData["UserList"] = _userService.GetAll();
                 if (ModelState.IsValid)
                 {
                     var _item = new Reservation();
@@ -301,14 +305,14 @@ namespace TRSAppUpdated.Controllers
                         });
                         await _context.SaveChangesAsync();
                     }
+                    var _existingReservationTickets = _context.ReservationTickets.Where(x => Model.TicketIDs.Contains(x.ID)).ToList();
+                    if (_existingReservationTickets.Count > 0)
+                    {
+                        _context.ReservationTickets.RemoveRange(_existingReservationTickets);
+                    }
+
                     foreach (var _ticketID in Model.TicketIDs)
                     {
-                        var _isExists = _context.ReservationTickets.Where(x => x.TicketID == _ticketID
-                        && x.ReservationID == _item.ID).Any();
-                        if (_isExists)
-                        {
-                            continue;
-                        }
                         _context.ReservationTickets.Add(new ReservationTicket()
                         {
                             ReservationID = _item.ReservationStatusID,
@@ -317,6 +321,7 @@ namespace TRSAppUpdated.Controllers
                             CreatedDateTime = DateTime.UtcNow.AddHours(5)
                         });
                     }
+                    await _context.SaveChangesAsync();
                     if (_item.IsApproved.HasValue && _item.IsApproved.Value)
                     {
                         if (_item != null && Model.TicketIDs != null && Model.TicketIDs.Count > 0)
@@ -341,7 +346,6 @@ namespace TRSAppUpdated.Controllers
                                        UpdatedByUserID = _UserID,
                                        UpdatedDateTime = DateTime.UtcNow.AddHours(5),
                                    });
-                                    await _context.SaveChangesAsync();
                                 }
                                 else if (_reservationStatusTitle.ToLower() == "refunded")
                                 {
@@ -365,11 +369,7 @@ namespace TRSAppUpdated.Controllers
 
                                 else if (_reservationStatusTitle.ToLower() == "cancelled")
                                 {
-                                    var _existingReservationTickets = _context.ReservationTickets.Where(x => Model.TicketIDs.Contains(x.ID)).ToList();
-                                    if (_existingReservationTickets.Count > 0)
-                                    {
-                                        _context.ReservationTickets.RemoveRange(_existingReservationTickets);
-                                    }
+                                   
                                     await _context.Tickets
                                         .Where(x => !x.IsDeleted && Model.TicketIDs.Contains(x.ID))
                                         .BatchUpdateAsync(x => new Ticket

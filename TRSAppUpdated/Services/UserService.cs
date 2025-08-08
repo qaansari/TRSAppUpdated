@@ -1,4 +1,5 @@
-﻿using TRSAppUpdated.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using TRSAppUpdated.Interfaces;
 using TRSAppUpdated.Models;
 using TRSAppUpdated.ViewModels;
 
@@ -13,6 +14,29 @@ namespace TRSAppUpdated.Services
         {
             _context = context;
             _logger = logger;
+        }
+        public List<UserVM> GetAll()
+        {
+            try
+            {
+                var _result = _context.Users.Where(x => !x.IsDeleted)
+                             .Select(x => new UserVM()
+                             {
+                                 ID = x.ID,
+                                 FirstName = x.FirstName,
+                                 LastName = x.LastName,
+                             })
+                             .AsNoTracking()
+                             .AsEnumerable()
+                             .OrderBy(x => x.FullName)
+                             .ToList();
+                return _result ?? new List<UserVM>();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error occured at GetAll in {_Title} Service due to {ex}");
+            }
+            return new List<UserVM>();
         }
         //Get User By Email
         public User GetUserByEmail(string email)
