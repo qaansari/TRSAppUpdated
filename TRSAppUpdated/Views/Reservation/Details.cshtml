@@ -14,9 +14,9 @@
 }
 <style type="text/css">
     .ticket-container {
-        width: 540px;
+        width: 1200px;
         height: 660px;
-        max-width: 540px;
+        max-width: 1200px;
         max-height: 660px;
         margin: 0;
         background: rgb(255,255,255);
@@ -49,8 +49,20 @@
         font-size:24px;
         color:rgb(26,164,139);
     }
+    .ticket-content{
+        display:flex;
+    }
     .ticket-info {
+        width:50%;
         margin-bottom: 10px;
+         height:auto;
+    }
+    .image-info{
+                width:50%;
+                height:auto;
+    }
+    .image-info img{
+        border-radius: 10px;
     }
 
     .payment-info {
@@ -161,7 +173,7 @@
                     <h3>@Model.TicketNumber</h3>
                 </div>
                 
-
+                <div class="ticket-content">
                 <div class="ticket-info">
                     <div class="info-row">
                         <div class="info-label">Event Name:</div>
@@ -195,15 +207,19 @@
                         </div>
                     </div>
                 </div>
+                 @if (!string.IsNullOrEmpty(Model.EventImagePath))
+                    {
+                <div class="image-info">
+                            <img src="~/assets/images/events/@(Model.EventImagePath)" />
+                        </div>
+                    }
+                </div>
             }
             else
             {
                 <p>No reservation details found.</p>
             }
-              @if (!string.IsNullOrEmpty(Model.EventImagePath))
-                    {
-                            <img src="~/assets/images/events/@(Model.EventImagePath)" />
-                    }
+             
         </div>
         <div class="footer">
             Thank you for your reservation. Please present this ticket at the venue.

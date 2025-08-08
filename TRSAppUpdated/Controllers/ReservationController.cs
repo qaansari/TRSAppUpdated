@@ -7,8 +7,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using NetTopologySuite.Index.HPRtree;
+using NetTopologySuite.Utilities;
 using Newtonsoft.Json;
 using Npgsql.Internal;
+using SixLabors.ImageSharp;
+using Syncfusion.EJ2.Buttons;
 using Syncfusion.EJ2.Layouts;
 using System.Drawing;
 using System.Security.Claims;
@@ -337,102 +340,102 @@ namespace TRSAppUpdated.Controllers
                                     }
                                 }
                                 await _context.SaveChangesAsync();
-                                }
-                                if (_item.IsApproved.HasValue && _item.IsApproved.Value)
+                            }
+                            if (_item.IsApproved.HasValue && _item.IsApproved.Value)
+                            {
+                                if (_reservationStatusTitle.ToLower() == "arrivalpending" || _reservationStatusTitle.ToLower() == "arrival pending")
                                 {
-                                    if (_reservationStatusTitle.ToLower() == "arrivalpending" || _reservationStatusTitle.ToLower() == "arrival pending")
-                                    {
-                                        await _context.Tickets
-                                   .Where(x => !x.IsDeleted && Model.TicketIDs.Contains(x.ID))
-                                   .BatchUpdateAsync(x => new Ticket
-                                   {
-                                       CostPrice = _item.CostPrice / Model.TicketIDs.Count,
-                                       IsReserved = true,
-                                       IsRefunded = x.IsRefunded,
-                                       RefundDateTime = x.RefundDateTime,
-                                       IsCancelled = x.IsCancelled,
-                                       CancellationDateTime = x.CancellationDateTime,
-                                       ReservationDateTime = DateTime.UtcNow.AddHours(5),
-                                       SalePrice = _item.SalePrice / Model.TicketIDs.Count,
-                                       Discount = _item.Discount / Model.TicketIDs.Count,
-                                       UpdatedByUserID = _UserID,
-                                       UpdatedDateTime = DateTime.UtcNow.AddHours(5),
-                                   });
-                                    }
-                                    else if (_reservationStatusTitle.ToLower() == "refunded")
-                                    {
-                                        await _context.Tickets
-                                    .Where(x => !x.IsDeleted && Model.TicketIDs.Contains(x.ID))
-                                    .BatchUpdateAsync(x => new Ticket
-                                    {
-                                        CostPrice = _item.CostPrice / Model.TicketIDs.Count,
-                                        IsReserved = x.IsReserved,
-                                        IsRefunded = true,
-                                        RefundDateTime = DateTime.UtcNow.AddHours(5),
-                                        IsCancelled = x.IsCancelled,
-                                        CancellationDateTime = x.CancellationDateTime,
-                                        ReservationDateTime = x.ReservationDateTime,
-                                        SalePrice = _item.SalePrice / Model.TicketIDs.Count,
-                                        Discount = _item.Discount / Model.TicketIDs.Count,
-                                        UpdatedByUserID = _UserID,
-                                        UpdatedDateTime = DateTime.UtcNow.AddHours(5),
-                                    });
-                                    }
-                                    else if (_reservationStatusTitle.ToLower() == "cancelled")
-                                    {
-                                        if (_existingTicketsPerReservation.Count > 0)
-                                        {
-                                            await _context.Tickets
-                                    .Where(x => !x.IsDeleted && _existingTicketsPerReservation.Select(x => x.TicketID).Contains(x.ID))
-                                    .BatchUpdateAsync(x => new Ticket
-                                    {
-                                        CostPrice = x.CostPrice,
-                                        IsReserved = false,
-                                        IsRefunded = x.IsRefunded,
-                                        RefundDateTime = x.RefundDateTime,
-                                        ReservationDateTime = null,
-                                        SalePrice = x.SalePrice,
-                                        Discount = x.Discount,
-                                        UpdatedByUserID = _UserID,
-                                        UpdatedDateTime = DateTime.UtcNow.AddHours(5),
-                                    });
-                                            _context.ReservationTickets.RemoveRange(_existingTicketsPerReservation);
-                                        }
-                                        foreach (var _ticketID in Model.TicketIDs)
-                                        {
-                                            var _isExists = _context.ReservationTickets.Where(x => x.TicketID == _ticketID
-                                            && x.ReservationID == _item.ID).Any();
-                                            if (!_isExists)
-                                            {
-                                                _context.ReservationTickets.Add(new ReservationTicket()
-                                                {
-                                                    ReservationID = _item.ID,
-                                                    TicketID = _ticketID,
-                                                    CreatedByUserID = _UserID,
-                                                    CreatedDateTime = DateTime.UtcNow.AddHours(5)
-                                                });
-                                            }
-                                            else
-                                            {
-                                                continue;
-                                            }
-                                        }
-                                        await _context.Tickets
-                                    .Where(x => !x.IsDeleted && Model.TicketIDs.Contains(x.ID))
-                                    .BatchUpdateAsync(x => new Ticket
-                                    {
-                                        CostPrice = x.CostPrice,
-                                        IsReserved = false,
-                                        IsRefunded = x.IsRefunded,
-                                        RefundDateTime = x.RefundDateTime,
-                                        ReservationDateTime = null,
-                                        SalePrice = x.SalePrice,
-                                        Discount = x.Discount,
-                                        UpdatedByUserID = _UserID,
-                                        UpdatedDateTime = DateTime.UtcNow.AddHours(5),
-                                    });
-                                    }
+                                    await _context.Tickets
+                               .Where(x => !x.IsDeleted && Model.TicketIDs.Contains(x.ID))
+                               .BatchUpdateAsync(x => new Ticket
+                               {
+                                   CostPrice = _item.CostPrice / Model.TicketIDs.Count,
+                                   IsReserved = true,
+                                   IsRefunded = x.IsRefunded,
+                                   RefundDateTime = x.RefundDateTime,
+                                   IsCancelled = x.IsCancelled,
+                                   CancellationDateTime = x.CancellationDateTime,
+                                   ReservationDateTime = DateTime.UtcNow.AddHours(5),
+                                   SalePrice = _item.SalePrice / Model.TicketIDs.Count,
+                                   Discount = _item.Discount / Model.TicketIDs.Count,
+                                   UpdatedByUserID = _UserID,
+                                   UpdatedDateTime = DateTime.UtcNow.AddHours(5),
+                               });
                                 }
+                                else if (_reservationStatusTitle.ToLower() == "refunded")
+                                {
+                                    await _context.Tickets
+                                .Where(x => !x.IsDeleted && Model.TicketIDs.Contains(x.ID))
+                                .BatchUpdateAsync(x => new Ticket
+                                {
+                                    CostPrice = _item.CostPrice / Model.TicketIDs.Count,
+                                    IsReserved = x.IsReserved,
+                                    IsRefunded = true,
+                                    RefundDateTime = DateTime.UtcNow.AddHours(5),
+                                    IsCancelled = x.IsCancelled,
+                                    CancellationDateTime = x.CancellationDateTime,
+                                    ReservationDateTime = x.ReservationDateTime,
+                                    SalePrice = _item.SalePrice / Model.TicketIDs.Count,
+                                    Discount = _item.Discount / Model.TicketIDs.Count,
+                                    UpdatedByUserID = _UserID,
+                                    UpdatedDateTime = DateTime.UtcNow.AddHours(5),
+                                });
+                                }
+                                else if (_reservationStatusTitle.ToLower() == "cancelled")
+                                {
+                                    if (_existingTicketsPerReservation.Count > 0)
+                                    {
+                                        await _context.Tickets
+                                .Where(x => !x.IsDeleted && _existingTicketsPerReservation.Select(x => x.TicketID).Contains(x.ID))
+                                .BatchUpdateAsync(x => new Ticket
+                                {
+                                    CostPrice = x.CostPrice,
+                                    IsReserved = false,
+                                    IsRefunded = x.IsRefunded,
+                                    RefundDateTime = x.RefundDateTime,
+                                    ReservationDateTime = null,
+                                    SalePrice = x.SalePrice,
+                                    Discount = x.Discount,
+                                    UpdatedByUserID = _UserID,
+                                    UpdatedDateTime = DateTime.UtcNow.AddHours(5),
+                                });
+                                        _context.ReservationTickets.RemoveRange(_existingTicketsPerReservation);
+                                    }
+                                    foreach (var _ticketID in Model.TicketIDs)
+                                    {
+                                        var _isExists = _context.ReservationTickets.Where(x => x.TicketID == _ticketID
+                                        && x.ReservationID == _item.ID).Any();
+                                        if (!_isExists)
+                                        {
+                                            _context.ReservationTickets.Add(new ReservationTicket()
+                                            {
+                                                ReservationID = _item.ID,
+                                                TicketID = _ticketID,
+                                                CreatedByUserID = _UserID,
+                                                CreatedDateTime = DateTime.UtcNow.AddHours(5)
+                                            });
+                                        }
+                                        else
+                                        {
+                                            continue;
+                                        }
+                                    }
+                                    await _context.Tickets
+                                .Where(x => !x.IsDeleted && Model.TicketIDs.Contains(x.ID))
+                                .BatchUpdateAsync(x => new Ticket
+                                {
+                                    CostPrice = x.CostPrice,
+                                    IsReserved = false,
+                                    IsRefunded = x.IsRefunded,
+                                    RefundDateTime = x.RefundDateTime,
+                                    ReservationDateTime = null,
+                                    SalePrice = x.SalePrice,
+                                    Discount = x.Discount,
+                                    UpdatedByUserID = _UserID,
+                                    UpdatedDateTime = DateTime.UtcNow.AddHours(5),
+                                });
+                                }
+                            }
 
                             await _context.SaveChangesAsync();
                         }
@@ -472,129 +475,118 @@ namespace TRSAppUpdated.Controllers
         [Authorize(Roles = "Super Admin,Admin,Moderator,User")]
         public IActionResult GetPDF(int ID = 0, int EventID = 0)
         {
-
             var _item = new ReservationDetailVM();
             try
             {
                 if (EventID != 0)
-                {
                     ViewBag.EventID = EventID;
-                }
+
                 if (ID != 0)
-                {
                     _item = _reservationService.GetDetailsByID(ID);
-                }
+
                 string imagePath = Path.Combine(_webHostEnvironment.WebRootPath, "assets", "images", "web-logo-light.png");
+                string eventImagePath = Path.Combine(_webHostEnvironment.WebRootPath, "assets", "images", "events", _item.EventImagePath);
+
                 string html = $@"
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset='UTF-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-<style type=""text/css"">
-    body{{
-    font-family:'Poppins',sans-serif;
-    margin:0;
-    padding:0;
+<style>
+    @page {{
+        size: 1200px 660px;
+        margin: 0;
     }}
-    .ticket-container {{
-        width: 600px;
-        height: 800px;
-        max-width: 600px;
-        max-height: 800px;
-        margin: 10px auto;
-        background: rgb(255,255,255);
-        border-radius: 10px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    html, body {{
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        font-family: 'Poppins', sans-serif;
+        background: #fff;
+        overflow: hidden;
     }}
-
     .ticket-header {{
         background: linear-gradient(135deg, rgb(26,164,139), rgb(69,165,121));
-        color:  rgb(255,255,255);
+        color: #fff;
         padding: 20px;
         text-align: center;
     }}
-
-        .ticket-header h2 {{
-            margin: 0;
-            font-size: 24px;
-            font-weight: 600;
-        }}
-
+    .ticket-header h2 {{
+        margin: 0;
+        font-size: 24px;
+        font-weight: 600;
+    }}
     .ticket-body {{
-        padding: 0 15px 0 15px;
+        padding: 15px;
     }}
- .ticket_heading{{
-        text-align:center;
-        text-transform:uppercase;
+    .ticket_heading {{
+        text-align: center;
+        text-transform: uppercase;
     }}
-     .ticket_heading h2{{
-        font-size:24px;
-        color:rgb(26,164,139);
+    .ticket_heading h2 {{
+        font-size: 24px;
+        color: rgb(26,164,139);
+    }}
+    .ticket-content {{
+        display: inline-block;
+        width: 100%;
+        vertical-align: top;
     }}
     .ticket-info {{
-        margin-bottom: 10px;
+        display: inline-block;
+        width: 48%;
+        vertical-align: top;
     }}
-
-    .payment-info {{
-        margin-bottom: 20px;
+    .image-info {{
+        display: inline-block;
+        width: 48%;
+        vertical-align: top;
+        text-align: right;
     }}
-
+    .image-info img {{
+        border-radius: 10px;
+        max-width: 100%;
+        height: auto;
+    }}
     .info-row {{
         display: flex;
         margin-bottom: 12px;
         padding-bottom: 12px;
         border-bottom: 1px solid rgb(238,238,238);
     }}
-
     .info-label {{
         font-weight: 600;
         width: 200px;
-        color: rgb(19, 7, 22);
+        color: rgb(19,7,22);
     }}
-
     .info-value {{
         flex: 1;
-        color: rgb(10, 3, 3);
+        color: rgb(10,3,3);
     }}
-
     .ticket-number {{
-        background: rgb(248, 249, 250);
+        background: rgb(248,249,250);
         padding: 15px;
         border-radius: 8px;
         text-align: center;
         margin: 20px 0;
         border: 1px dashed rgb(221,221,221);
     }}
-
-        .ticket-number h3 {{
-            margin: 0;
-            font-size: 28px;
-            color: rgb(26,164,139);
-            letter-spacing: 2px;
-            text-align: center;
-            text-transform: uppercase;
-        }}
-
-    .payment-info h3 {{
-        margin: 10px;
-        font-size: 18px;
+    .ticket-number h3 {{
+        margin: 0;
+        font-size: 28px;
         color: rgb(26,164,139);
         letter-spacing: 2px;
-        padding: 5px 10px;
-        text-align: center;
         text-transform: uppercase;
     }}
-
     .logo_img_section {{
-    width: 100%;
-    text-align: center;
-}}
-.logo_img {{
-    width: 200px;
-    height: 100px;
-}}
-
+        text-align: center;
+    }}
+    .logo_img {{
+        width: 200px;
+        height: auto;
+    }}
     .footer {{
         text-align: center;
         padding: 15px;
@@ -603,7 +595,6 @@ namespace TRSAppUpdated.Controllers
         background: rgb(249,249,249);
         border-top: 1px solid rgb(238,238,238);
     }}
-
     .seats-badge {{
         display: inline-block;
         background: rgb(88,255,217);
@@ -618,39 +609,32 @@ namespace TRSAppUpdated.Controllers
 </head>
 <body>
     <div class='ticket-container'>
-        <div class=""ticket-header"">
+        <div class='ticket-header'>
             <h2>E-Ticket</h2>
         </div>
         <div class='ticket-body'>
-        <div class=""logo_img_section"">
-                 <img src='file:///{imagePath.Replace("\\", "/")}' class='logo_img' />
-        </div>
-        <div class=""ticket_heading"">
-                     <h2>E-Ticket</h2>
-         </div>
+            <div class='logo_img_section'>
+               <img src='file:///{imagePath.Replace("\\", "/")}' class='logo_img' />
+            </div>
+            <div class='ticket_heading'>
+                <h2>E-Ticket</h2>
+            </div>
             <div class='ticket-number'>
                 <h3>{_item.TicketNumber}</h3>
             </div>
-            <div class='info-row'>
-                <div class='info-label'>Event Name:</div>
-                <div class='info-value'>{_item.EventName}</div>
-            </div>
-            <div class='info-row'>
-                <div class='info-label'>Show Date:</div>
-                <div class='info-value'>{_item.ShowDateTime}</div>
-            </div>
-            <div class='info-row'>
-                <div class='info-label'>Customer Name:</div>
-                <div class='info-value'>{_item.CustomerName}</div>
-            </div>
-            <div class='info-row'>
-                <div class='info-label'>Phone Number:</div>
-                <div class='info-value'>{_item.CustomerPhone}</div>
-            </div>
-            <div class='info-row'>
-                <div class='info-label'>Reserved Seats: ({_item.SeatLabels.Split(',').Count()})</div>
-                <div class='info-value'>
-                    {string.Join("", _item.SeatLabels.Split(',').Select(s => $"<span class='seats-badge'>{s.Trim()}</span>"))}
+            <div class='ticket-content'>
+                <div class='ticket-info'>
+                    <div class='info-row'><div class='info-label'>Event Name:</div><div class='info-value'>{_item.EventName}</div></div>
+                    <div class='info-row'><div class='info-label'>Show Date:</div><div class='info-value'>{_item.ShowDateTime}</div></div>
+                    <div class='info-row'><div class='info-label'>Customer Name:</div><div class='info-value'>{_item.CustomerName}</div></div>
+                    <div class='info-row'><div class='info-label'>Phone Number:</div><div class='info-value'>{_item.CustomerPhone}</div></div>
+                    <div class='info-row'>
+                        <div class='info-label'>Reserved Seats: ({_item.SeatLabels.Split(',').Count()})</div>
+                        <div class='info-value'>{string.Join("", _item.SeatLabels.Split(',').Select(s => $"<span class='seats-badge'>{s.Trim()}</span>"))}</div>
+                    </div>
+                </div>
+                <div class='image-info'>
+                    <img src='file:///{eventImagePath.Replace("\\", "/")}' />
                 </div>
             </div>
         </div>
@@ -660,41 +644,48 @@ namespace TRSAppUpdated.Controllers
     </div>
 </body>
 </html>";
-                var _ticketTitle = _item.UpdatedDateTime.HasValue ? "E-TICKET_" + _item.TicketNumber + "_" + "UPDATED" : "E-TICKET_" + _item.TicketNumber;
+
+                var _ticketTitle = _item.UpdatedDateTime.HasValue
+                    ? $"E-TICKET_{_item.TicketNumber}_UPDATED"
+                    : $"E-TICKET_{_item.TicketNumber}";
+
                 var pdfDoc = new HtmlToPdfDocument()
                 {
                     GlobalSettings = new GlobalSettings
                     {
-                        PaperSize = new PechkinPaperSize("600px", "800px"),
+                        PaperSize = new PechkinPaperSize("1200px", "660px"), // Exact ticket size
                         ColorMode = ColorMode.Color,
                         Orientation = DinkToPdf.Orientation.Portrait,
                         Margins = new MarginSettings { Top = 0, Bottom = 0, Left = 0, Right = 0 },
-                        DocumentTitle = _ticketTitle
+                        DocumentTitle = _ticketTitle,
+                        DPI = 300
                     },
                     Objects = {
-        new ObjectSettings {
-            HtmlContent = html,
-            WebSettings = new WebSettings
-            {
-                DefaultEncoding = "utf-8",
-                LoadImages = true,
-            },
-            LoadSettings=new LoadSettings
-            {
-                BlockLocalFileAccess=false
+                new ObjectSettings {
+                    HtmlContent = html,
+                    WebSettings = new WebSettings
+                    {
+                        DefaultEncoding = "utf-8",
+                        LoadImages = true,
+                    },
+                    LoadSettings = new LoadSettings
+                    {
+                        BlockLocalFileAccess = false
+                    }
+                }
             }
-        }
-    }
                 };
+
                 var pdf = _converter.Convert(pdfDoc);
                 return File(pdf, "application/pdf", $"{_ticketTitle}.pdf");
             }
             catch (Exception ex)
             {
-
                 _logger.LogError($"Error occured at GetPDF in {_Title} Controller due to {ex}");
             }
             return View(_item);
         }
+
+
     }
 }
