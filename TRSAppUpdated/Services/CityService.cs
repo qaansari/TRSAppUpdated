@@ -5,7 +5,7 @@ using TRSAppUpdated.ViewModels;
 
 namespace TRSAppUpdated.Services
 {
-    public class CityService: ICityService
+    public class CityService : ICityService
     {
         private readonly AppDbContext _context;
         private readonly ILogger<CityService> _logger;

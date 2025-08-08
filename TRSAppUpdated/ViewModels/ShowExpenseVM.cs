@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using TRSAppUpdated.Models;
 
 namespace TRSAppUpdated.ViewModels
@@ -7,7 +6,7 @@ namespace TRSAppUpdated.ViewModels
     public class ShowExpenseVM : CommonModel
     {
         public int ID { get; set; }
-        [Range(1,int.MaxValue,ErrorMessage ="Please fill out this field")]
+        [Range(1, int.MaxValue, ErrorMessage = "Please fill out this field")]
         public int EventID { get; set; }
         [Range(1, int.MaxValue, ErrorMessage = "Please fill out this field")]
         public int ShowID { get; set; }

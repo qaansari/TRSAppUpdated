@@ -2,11 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
-using System.Security.Cryptography.Xml;
 using TRSAppUpdated.Helpers;
 using TRSAppUpdated.Interfaces;
 using TRSAppUpdated.Models;
-using TRSAppUpdated.Services;
 using TRSAppUpdated.ViewModels;
 
 namespace TRSAppUpdated.Controllers
@@ -96,7 +94,7 @@ namespace TRSAppUpdated.Controllers
                             VenueID = x.VenueID,
                             NoOfRows = x.NoOfRows,
                             StartingRow = x.StartingRow,
-                            Alignment=x.Alignment,
+                            Alignment = x.Alignment,
                             ImagePath = x.ImagePath,
                             CreatedByUserID = x.CreatedByUserID,
                             CreatedDateTime = x.CreatedDateTime,
@@ -405,7 +403,7 @@ namespace TRSAppUpdated.Controllers
                     {
                         AuditoriumName = x.Title.Trim(),
                         VenueName = x.Venue.Title.Trim(),
-                        AuditoriumAlignment=x.Alignment,
+                        AuditoriumAlignment = x.Alignment,
                         Rows = x.Rows.Select(y => new RowVM()
                         {
                             RowLabel = y.RowLabel,
@@ -432,8 +430,8 @@ namespace TRSAppUpdated.Controllers
             try
             {
                 var rows = _context.Rows
-                    .Include(x=>x.Columns)
-                    .ThenInclude(x=>x.Seats)
+                    .Include(x => x.Columns)
+                    .ThenInclude(x => x.Seats)
                     .Where(r => r.AuditoriumID == AuditoriumId).ToList();
                 var _list = rows.Select(r => new RowSeatInputVM
                 {

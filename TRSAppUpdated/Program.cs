@@ -48,10 +48,10 @@ namespace TRSAppUpdated
             });
             builder.Services.AddAuthorization(options =>
             {
-                options.AddPolicy("SuperAdmin", policy=>policy.RequireRole("Super Admin"));
-                options.AddPolicy("Admin", policy=>policy.RequireRole("Admin"));
-                options.AddPolicy("Moderator", policy=>policy.RequireRole("Moderator"));
-                options.AddPolicy("User", policy=>policy.RequireRole("User"));
+                options.AddPolicy("SuperAdmin", policy => policy.RequireRole("Super Admin"));
+                options.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
+                options.AddPolicy("Moderator", policy => policy.RequireRole("Moderator"));
+                options.AddPolicy("User", policy => policy.RequireRole("User"));
             });
             //Json Cycles Ignore
             JsonConvert.DefaultSettings = () => new JsonSerializerSettings

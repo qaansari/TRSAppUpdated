@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using System.Security.Claims;
 using TRSAppUpdated.Interfaces;
 using TRSAppUpdated.Models;
@@ -19,7 +18,7 @@ namespace TRSAppUpdated.Controllers
         private readonly int _UserID;
         public ShowExpenseController(AppDbContext context, IHttpContextAccessor httpContextAccessor,
             ILogger<ShowExpenseController> logger,
-            IExpenseService expenseService,IShowService showService)
+            IExpenseService expenseService, IShowService showService)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;

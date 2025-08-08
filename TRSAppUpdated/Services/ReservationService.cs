@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using TRSAppUpdated.Interfaces;
 using TRSAppUpdated.Models;
 using TRSAppUpdated.ViewModels;
@@ -22,11 +21,11 @@ namespace TRSAppUpdated.Services
             try
             {
                 _VM = _context.Reservations.Where(x => x.ID == ID)
-                    .Include(x=>x.ReservationTickets)
-                    .ThenInclude(x=>x.Ticket)
-                    .ThenInclude(x=>x.Seat)
-                    .ThenInclude(x=>x.Column)
-                    .ThenInclude(x=>x.Row)
+                    .Include(x => x.ReservationTickets)
+                    .ThenInclude(x => x.Ticket)
+                    .ThenInclude(x => x.Seat)
+                    .ThenInclude(x => x.Column)
+                    .ThenInclude(x => x.Row)
                     .AsNoTracking().Select(x => new ReservationDetailVM()
                     {
                         ID = x.ID,
@@ -40,14 +39,14 @@ namespace TRSAppUpdated.Services
                         ReservationStatusTitle = x.PaymentMode.Title,
                         EventImagePath = x.Show.Event.ImagePath,
                         IsFullyPaid = x.IsFullyPaid,
-                        CostPrice=x.CostPrice,
-                        Discount=x.Discount,
+                        CostPrice = x.CostPrice,
+                        Discount = x.Discount,
                         SalePrice = x.SalePrice,
                         AmountPaid = x.AmountPaid,
-                        ReservationImages= String.Join(",", (x.ReservationImages.Select(x => x.ImagePath).ToList())),
+                        ReservationImages = String.Join(",", (x.ReservationImages.Select(x => x.ImagePath).ToList())),
                         AmountRemaining = x.AmountRemaining,
                         BookingDateTime = x.BookingDateTime,
-                        TransactionID=x.TransactionID,
+                        TransactionID = x.TransactionID,
                         CreatedDateTime = x.CreatedDateTime,
                         UpdatedDateTime = x.UpdatedDateTime,
                         SeatLabels = String.Join(",", x.ReservationTickets.Select(x => x.Ticket.Seat.Column.Row.RowLabel + x.Ticket.Seat.SeatNumber).ToList()),

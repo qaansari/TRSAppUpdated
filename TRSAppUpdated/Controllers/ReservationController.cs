@@ -4,23 +4,12 @@ using EFCore.BulkExtensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
-using NetTopologySuite.Index.HPRtree;
-using NetTopologySuite.Utilities;
-using Newtonsoft.Json;
-using Npgsql.Internal;
 using SixLabors.ImageSharp;
-using Syncfusion.EJ2.Buttons;
-using Syncfusion.EJ2.Layouts;
-using System.Drawing;
 using System.Security.Claims;
 using TRSAppUpdated.Helpers;
 using TRSAppUpdated.Interfaces;
 using TRSAppUpdated.Models;
-using TRSAppUpdated.Services;
 using TRSAppUpdated.ViewModels;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace TRSAppUpdated.Controllers
 {

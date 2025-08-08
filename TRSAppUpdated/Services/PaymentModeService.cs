@@ -5,7 +5,7 @@ using TRSAppUpdated.ViewModels;
 
 namespace TRSAppUpdated.Services
 {
-    public class PaymentModeService:IPaymentModeService
+    public class PaymentModeService : IPaymentModeService
     {
         private readonly AppDbContext _context;
         private readonly ILogger<PaymentModeService> _logger;

@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
 using TRSAppUpdated.Models;
 
 namespace TRSAppUpdated.ViewModels
@@ -24,10 +22,10 @@ namespace TRSAppUpdated.ViewModels
         public int CountryID { get; set; }
         [Range(1, int.MaxValue, ErrorMessage = "Please fill out this field")]
         public int CityID { get; set; }
-        [Range(1,int.MaxValue, ErrorMessage = "Please fill out this field")]
+        [Range(1, int.MaxValue, ErrorMessage = "Please fill out this field")]
         public int VenueID { get; set; }
         public string? VenueTitle { get; set; }
         public string? VenueImagePath { get; set; }
-       
+
     }
 }

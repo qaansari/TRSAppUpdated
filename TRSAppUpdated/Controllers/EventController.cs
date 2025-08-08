@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.EntityFrameworkCore;
-using Syncfusion.EJ2.Layouts;
 using System.Security.Claims;
 using TRSAppUpdated.Helpers;
 using TRSAppUpdated.Interfaces;

@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using TRSAppUpdated.Interfaces;
 using TRSAppUpdated.Models;
-using TRSAppUpdated.Services;
 using TRSAppUpdated.ViewModels;
 
 namespace TRSAppUpdated.Controllers
@@ -18,8 +17,8 @@ namespace TRSAppUpdated.Controllers
         private readonly ICountryService _countryService;
         private readonly string _Title = "City";
         private readonly int _UserID;
-        public CityController(AppDbContext context, IHttpContextAccessor httpContextAccessor, 
-           ILogger<CityController> logger,ICountryService countryService)
+        public CityController(AppDbContext context, IHttpContextAccessor httpContextAccessor,
+           ILogger<CityController> logger, ICountryService countryService)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;

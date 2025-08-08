@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using TRSAppUpdated.Controllers;
 using TRSAppUpdated.Interfaces;
 using TRSAppUpdated.Models;
 using TRSAppUpdated.ViewModels;
@@ -26,7 +25,7 @@ namespace TRSAppUpdated.Services
                              {
                                  ID = x.ID,
                                  Title = x.Title,
-                                 CityID= x.CityID,
+                                 CityID = x.CityID,
                              })
                              .AsNoTracking()
                              .OrderBy(x => x.Title)

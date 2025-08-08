@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Syncfusion.EJ2.Layouts;
 using System.Security.Claims;
 using TRSAppUpdated.Interfaces;
 using TRSAppUpdated.Models;
@@ -19,7 +18,7 @@ namespace TRSAppUpdated.Controllers
         private readonly string _Title = "Note Type";
         private readonly int _UserID;
         public NoteTypeController(AppDbContext context, IHttpContextAccessor httpContextAccessor,
-            ILogger<NoteTypeController> logger,INoteService noteService)
+            ILogger<NoteTypeController> logger, INoteService noteService)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;
@@ -243,7 +242,7 @@ namespace TRSAppUpdated.Controllers
                     }
                 }
                 await _context.SaveChangesAsync();
-                TempData["Message"]="1,Notes Sequence Updated Successfully";
+                TempData["Message"] = "1,Notes Sequence Updated Successfully";
             }
             catch (Exception ex)
             {

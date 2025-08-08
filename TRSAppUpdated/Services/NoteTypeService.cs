@@ -5,7 +5,7 @@ using TRSAppUpdated.ViewModels;
 
 namespace TRSAppUpdated.Services
 {
-    public class NoteTypeService: INoteTypeService
+    public class NoteTypeService : INoteTypeService
     {
         private readonly AppDbContext _context;
         private readonly ILogger<NoteTypeService> _logger;

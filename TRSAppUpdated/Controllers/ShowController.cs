@@ -1,10 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using System.Security.Claims;
-using System.Xml.Linq;
-using TRSAppUpdated.Interfaces;
 using TRSAppUpdated.Models;
 using TRSAppUpdated.ViewModels;
 
@@ -339,7 +336,7 @@ namespace TRSAppUpdated.Controllers
                     .ThenInclude(x => x.Columns)
                     .ThenInclude(x => x.Seats)
                     .Where(x => x.ShowID == ID)
-                  
+
                     .Where(t => !t.IsDeleted && t.Show.Event.ID == EventID)
                     .ToList();
 

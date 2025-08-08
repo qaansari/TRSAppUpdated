@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-
-namespace TRSAppUpdated.ViewModels
+﻿namespace TRSAppUpdated.ViewModels
 {
     public class ColumnVM
     {

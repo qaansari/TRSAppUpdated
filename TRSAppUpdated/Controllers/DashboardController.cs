@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Syncfusion.EJ2.Schedule;
 using TRSAppUpdated.Models;
 using TRSAppUpdated.ViewModels;
 

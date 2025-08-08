@@ -5,7 +5,7 @@ using TRSAppUpdated.ViewModels;
 
 namespace TRSAppUpdated.Services
 {
-    public class EventStatusService: IEventStatusService
+    public class EventStatusService : IEventStatusService
     {
         private readonly AppDbContext _context;
         private readonly ILogger<EventStatusService> _logger;

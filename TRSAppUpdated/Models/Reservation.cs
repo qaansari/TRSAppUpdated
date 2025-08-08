@@ -20,7 +20,7 @@ namespace TRSAppUpdated.Models
         public double AmountPaid { get; set; }
         public double AmountRemaining { get; set; }
         public bool IsFullyPaid { get; set; }
-        [Column(TypeName="varchar(50)")]
+        [Column(TypeName = "varchar(50)")]
         public string? TransactionID { get; set; }
         public DateTime? BookingDateTime { get; set; }
         [ForeignKey("Show")]

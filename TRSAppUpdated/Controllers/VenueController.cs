@@ -1,11 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
-using Syncfusion.EJ2.FileManager.Base;
-using Syncfusion.EJ2.Layouts;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using TRSAppUpdated.Helpers;
 using TRSAppUpdated.Interfaces;
 using TRSAppUpdated.Models;
@@ -24,8 +20,8 @@ namespace TRSAppUpdated.Controllers
         private readonly ICountryService _countryService;
         private readonly string _Title = "Venue";
         private readonly int _UserID;
-        public VenueController(AppDbContext context, IHttpContextAccessor httpContextAccessor, 
-            IWebHostEnvironment webHostEnvironment, ILogger<VenueController> logger,ICityService cityService,
+        public VenueController(AppDbContext context, IHttpContextAccessor httpContextAccessor,
+            IWebHostEnvironment webHostEnvironment, ILogger<VenueController> logger, ICityService cityService,
             ICountryService countryService)
         {
             _context = context;
@@ -90,8 +86,8 @@ namespace TRSAppUpdated.Controllers
                             ID = x.ID,
                             Title = x.Title,
                             Address = x.Address,
-                            CountryID=x.City.CountryID,
-                            CityID=x.CityID,
+                            CountryID = x.City.CountryID,
+                            CityID = x.CityID,
                             ImagePath = x.ImagePath,
                             CreatedByUserID = x.CreatedByUserID,
                             CreatedDateTime = x.CreatedDateTime,
@@ -235,8 +231,8 @@ namespace TRSAppUpdated.Controllers
                            {
                                ID = x.ID,
                                Title = x.Title,
-                               CountryTitle=x.City.Country.Title,
-                               CityTitle=x.City.Title,
+                               CountryTitle = x.City.Country.Title,
+                               CityTitle = x.City.Title,
                                Address = x.Address,
                                ImagePath = x.ImagePath,
                            })

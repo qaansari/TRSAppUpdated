@@ -1,11 +1,7 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using NetTopologySuite.Index.HPRtree;
-using Syncfusion.EJ2.Layouts;
 using System.Diagnostics;
 using System.Security.Claims;
 using TRSAppUpdated.Helpers;
@@ -304,7 +300,7 @@ namespace TRSAppUpdated.Controllers
         }
         //Reset Password (POST)
         [HttpPost]
-        public async Task <IActionResult> ResetPassword(ResetPasswordVM Model)
+        public async Task<IActionResult> ResetPassword(ResetPasswordVM Model)
         {
             if (ModelState.IsValid)
             {

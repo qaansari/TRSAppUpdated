@@ -2,7 +2,6 @@
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using System.Net.Mail;
-using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace TRSAppUpdated.Helpers

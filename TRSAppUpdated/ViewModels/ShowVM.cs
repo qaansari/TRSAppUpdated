@@ -1,6 +1,4 @@
-﻿using Syncfusion.EJ2.Layouts;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
 using TRSAppUpdated.Models;
 
 namespace TRSAppUpdated.ViewModels
