@@ -12,7 +12,7 @@ namespace TRSAppUpdated.Helpers
 #if DEBUG
         public static string _appUrl { get; set; } = "https://localhost:44358/";
 #else
-        public static string _appUrl { get; set; } = "https://www.eventland.pk/;
+        public static string _appUrl { get; set; } = "https://www.eventland.pk/";
 #endif
         //Jazzcash Params Start
         public static string _MerchantID { get; set; } = "YOUR_MERCHANT_ID";
