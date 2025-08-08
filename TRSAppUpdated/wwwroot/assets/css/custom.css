@@ -229,3 +229,6 @@ span.e-input-group.e-control-wrapper.form-control.form-control-sm.e-ddl.e-lib.e-
 .seat_bigger.reserved {
     background-color: var(--success-light);
 }
+.buttons-pdf, .buttons-copy, .buttons-csv, .buttons-print {
+    display: none !important;
+}

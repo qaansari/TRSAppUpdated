@@ -305,32 +305,44 @@ namespace TRSAppUpdated.Controllers
                         });
                         await _context.SaveChangesAsync();
                     }
-                    var _existingReservationTickets = _context.ReservationTickets.Where(x => Model.TicketIDs.Contains(x.ID)).ToList();
-                    if (_existingReservationTickets.Count > 0)
+                    if (_item != null && Model.TicketIDs != null && Model.TicketIDs.Count > 0)
                     {
-                        _context.ReservationTickets.RemoveRange(_existingReservationTickets);
-                    }
-
-                    foreach (var _ticketID in Model.TicketIDs)
-                    {
-                        _context.ReservationTickets.Add(new ReservationTicket()
+                        if (!string.IsNullOrEmpty(_reservationStatusTitle))
                         {
-                            ReservationID = _item.ReservationStatusID,
-                            TicketID = _ticketID,
-                            CreatedByUserID = _UserID,
-                            CreatedDateTime = DateTime.UtcNow.AddHours(5)
-                        });
-                    }
-                    await _context.SaveChangesAsync();
-                    if (_item.IsApproved.HasValue && _item.IsApproved.Value)
-                    {
-                        if (_item != null && Model.TicketIDs != null && Model.TicketIDs.Count > 0)
-                        {
-                            if (!string.IsNullOrEmpty(_reservationStatusTitle))
+                            var _existingTicketsPerReservation = _context.ReservationTickets.Where(x => x.ReservationID == _item.ID).ToList();
+                            if (_reservationStatusTitle.ToLower() == "arrivalpending" || _reservationStatusTitle.ToLower() == "arrival pending")
                             {
-                                if (_reservationStatusTitle.ToLower() == "arrivalpending" || _reservationStatusTitle.ToLower() == "arrival pending")
+                                if (_existingTicketsPerReservation.Count > 0)
                                 {
-                                    await _context.Tickets
+                                    _context.ReservationTickets.RemoveRange(_existingTicketsPerReservation);
+                                    await _context.SaveChangesAsync();
+                                }
+                                foreach (var _ticketID in Model.TicketIDs)
+                                {
+                                    var _isExists = _context.ReservationTickets.Where(x => x.TicketID == _ticketID
+                                    && x.ReservationID == _item.ID).Any();
+                                    if (!_isExists)
+                                    {
+                                        _context.ReservationTickets.Add(new ReservationTicket()
+                                        {
+                                            ReservationID = _item.ID,
+                                            TicketID = _ticketID,
+                                            CreatedByUserID = _UserID,
+                                            CreatedDateTime = DateTime.UtcNow.AddHours(5)
+                                        });
+                                    }
+                                    else
+                                    {
+                                        continue;
+                                    }
+                                }
+                                await _context.SaveChangesAsync();
+                                }
+                                if (_item.IsApproved.HasValue && _item.IsApproved.Value)
+                                {
+                                    if (_reservationStatusTitle.ToLower() == "arrivalpending" || _reservationStatusTitle.ToLower() == "arrival pending")
+                                    {
+                                        await _context.Tickets
                                    .Where(x => !x.IsDeleted && Model.TicketIDs.Contains(x.ID))
                                    .BatchUpdateAsync(x => new Ticket
                                    {
@@ -346,10 +358,10 @@ namespace TRSAppUpdated.Controllers
                                        UpdatedByUserID = _UserID,
                                        UpdatedDateTime = DateTime.UtcNow.AddHours(5),
                                    });
-                                }
-                                else if (_reservationStatusTitle.ToLower() == "refunded")
-                                {
-                                    await _context.Tickets
+                                    }
+                                    else if (_reservationStatusTitle.ToLower() == "refunded")
+                                    {
+                                        await _context.Tickets
                                     .Where(x => !x.IsDeleted && Model.TicketIDs.Contains(x.ID))
                                     .BatchUpdateAsync(x => new Ticket
                                     {
@@ -365,32 +377,67 @@ namespace TRSAppUpdated.Controllers
                                         UpdatedByUserID = _UserID,
                                         UpdatedDateTime = DateTime.UtcNow.AddHours(5),
                                     });
+                                    }
+                                    else if (_reservationStatusTitle.ToLower() == "cancelled")
+                                    {
+                                        if (_existingTicketsPerReservation.Count > 0)
+                                        {
+                                            await _context.Tickets
+                                    .Where(x => !x.IsDeleted && _existingTicketsPerReservation.Select(x => x.TicketID).Contains(x.ID))
+                                    .BatchUpdateAsync(x => new Ticket
+                                    {
+                                        CostPrice = x.CostPrice,
+                                        IsReserved = false,
+                                        IsRefunded = x.IsRefunded,
+                                        RefundDateTime = x.RefundDateTime,
+                                        ReservationDateTime = null,
+                                        SalePrice = x.SalePrice,
+                                        Discount = x.Discount,
+                                        UpdatedByUserID = _UserID,
+                                        UpdatedDateTime = DateTime.UtcNow.AddHours(5),
+                                    });
+                                            _context.ReservationTickets.RemoveRange(_existingTicketsPerReservation);
+                                        }
+                                        foreach (var _ticketID in Model.TicketIDs)
+                                        {
+                                            var _isExists = _context.ReservationTickets.Where(x => x.TicketID == _ticketID
+                                            && x.ReservationID == _item.ID).Any();
+                                            if (!_isExists)
+                                            {
+                                                _context.ReservationTickets.Add(new ReservationTicket()
+                                                {
+                                                    ReservationID = _item.ID,
+                                                    TicketID = _ticketID,
+                                                    CreatedByUserID = _UserID,
+                                                    CreatedDateTime = DateTime.UtcNow.AddHours(5)
+                                                });
+                                            }
+                                            else
+                                            {
+                                                continue;
+                                            }
+                                        }
+                                        await _context.Tickets
+                                    .Where(x => !x.IsDeleted && Model.TicketIDs.Contains(x.ID))
+                                    .BatchUpdateAsync(x => new Ticket
+                                    {
+                                        CostPrice = x.CostPrice,
+                                        IsReserved = false,
+                                        IsRefunded = x.IsRefunded,
+                                        RefundDateTime = x.RefundDateTime,
+                                        ReservationDateTime = null,
+                                        SalePrice = x.SalePrice,
+                                        Discount = x.Discount,
+                                        UpdatedByUserID = _UserID,
+                                        UpdatedDateTime = DateTime.UtcNow.AddHours(5),
+                                    });
+                                    }
                                 }
 
-                                else if (_reservationStatusTitle.ToLower() == "cancelled")
-                                {
-                                   
-                                    await _context.Tickets
-                                        .Where(x => !x.IsDeleted && Model.TicketIDs.Contains(x.ID))
-                                        .BatchUpdateAsync(x => new Ticket
-                                        {
-                                            CostPrice = x.CostPrice,
-                                            IsReserved = false,
-                                            IsRefunded = x.IsRefunded,
-                                            RefundDateTime = x.RefundDateTime,
-                                            ReservationDateTime = null,
-                                            SalePrice = x.SalePrice,
-                                            Discount = x.Discount,
-                                            UpdatedByUserID = _UserID,
-                                            UpdatedDateTime = DateTime.UtcNow.AddHours(5),
-                                        });
-                                }
-                                await _context.SaveChangesAsync();
-                            }
+                            await _context.SaveChangesAsync();
                         }
                     }
                 }
-
                 return RedirectToAction("Details", "Event", new { ID = Model.EventID });
             }
             catch (Exception ex)
@@ -398,47 +445,47 @@ namespace TRSAppUpdated.Controllers
                 _logger.LogError($"Error occured at AddOrEdit (POST) in {_Title} Controller due to {ex}");
             }
             return View(Model);
-}
-//Details
-[Authorize(Roles = "Super Admin,Admin,Moderator,User")]
-public IActionResult Details(int ID = 0, int EventID = 0)
-{
+        }
+        //Details
+        [Authorize(Roles = "Super Admin,Admin,Moderator,User")]
+        public IActionResult Details(int ID = 0, int EventID = 0)
+        {
 
-    var _item = new ReservationDetailVM();
-    try
-    {
-        if (EventID != 0)
-        {
-            ViewBag.EventID = EventID;
+            var _item = new ReservationDetailVM();
+            try
+            {
+                if (EventID != 0)
+                {
+                    ViewBag.EventID = EventID;
+                }
+                if (ID != 0)
+                {
+                    _item = _reservationService.GetDetailsByID(ID);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error occured at AddOrEdit (GET) in {_Title} Controller due to {ex}");
+            }
+            return View(_item);
         }
-        if (ID != 0)
+        [Authorize(Roles = "Super Admin,Admin,Moderator,User")]
+        public IActionResult GetPDF(int ID = 0, int EventID = 0)
         {
-            _item = _reservationService.GetDetailsByID(ID);
-        }
-    }
-    catch (Exception ex)
-    {
-        _logger.LogError($"Error occured at AddOrEdit (GET) in {_Title} Controller due to {ex}");
-    }
-    return View(_item);
-}
-[Authorize(Roles = "Super Admin,Admin,Moderator,User")]
-public IActionResult GetPDF(int ID = 0, int EventID = 0)
-{
 
-    var _item = new ReservationDetailVM();
-    try
-    {
-        if (EventID != 0)
-        {
-            ViewBag.EventID = EventID;
-        }
-        if (ID != 0)
-        {
-            _item = _reservationService.GetDetailsByID(ID);
-        }
-        string imagePath = Path.Combine(_webHostEnvironment.WebRootPath, "assets", "images", "web-logo-light.png");
-        string html = $@"
+            var _item = new ReservationDetailVM();
+            try
+            {
+                if (EventID != 0)
+                {
+                    ViewBag.EventID = EventID;
+                }
+                if (ID != 0)
+                {
+                    _item = _reservationService.GetDetailsByID(ID);
+                }
+                string imagePath = Path.Combine(_webHostEnvironment.WebRootPath, "assets", "images", "web-logo-light.png");
+                string html = $@"
 <!DOCTYPE html>
 <html>
 <head>
@@ -613,18 +660,18 @@ public IActionResult GetPDF(int ID = 0, int EventID = 0)
     </div>
 </body>
 </html>";
-        var _ticketTitle = _item.UpdatedDateTime.HasValue ? "E-TICKET_" + _item.TicketNumber + "_" + "UPDATED" : "E-TICKET_" + _item.TicketNumber;
-        var pdfDoc = new HtmlToPdfDocument()
-        {
-            GlobalSettings = new GlobalSettings
-            {
-                PaperSize = new PechkinPaperSize("600px", "800px"),
-                ColorMode = ColorMode.Color,
-                Orientation = DinkToPdf.Orientation.Portrait,
-                Margins = new MarginSettings { Top = 0, Bottom = 0, Left = 0, Right = 0 },
-                DocumentTitle = _ticketTitle
-            },
-            Objects = {
+                var _ticketTitle = _item.UpdatedDateTime.HasValue ? "E-TICKET_" + _item.TicketNumber + "_" + "UPDATED" : "E-TICKET_" + _item.TicketNumber;
+                var pdfDoc = new HtmlToPdfDocument()
+                {
+                    GlobalSettings = new GlobalSettings
+                    {
+                        PaperSize = new PechkinPaperSize("600px", "800px"),
+                        ColorMode = ColorMode.Color,
+                        Orientation = DinkToPdf.Orientation.Portrait,
+                        Margins = new MarginSettings { Top = 0, Bottom = 0, Left = 0, Right = 0 },
+                        DocumentTitle = _ticketTitle
+                    },
+                    Objects = {
         new ObjectSettings {
             HtmlContent = html,
             WebSettings = new WebSettings
@@ -638,16 +685,16 @@ public IActionResult GetPDF(int ID = 0, int EventID = 0)
             }
         }
     }
-        };
-        var pdf = _converter.Convert(pdfDoc);
-        return File(pdf, "application/pdf", $"{_ticketTitle}.pdf");
-    }
-    catch (Exception ex)
-    {
+                };
+                var pdf = _converter.Convert(pdfDoc);
+                return File(pdf, "application/pdf", $"{_ticketTitle}.pdf");
+            }
+            catch (Exception ex)
+            {
 
-        _logger.LogError($"Error occured at GetPDF in {_Title} Controller due to {ex}");
-    }
-    return View(_item);
-}
+                _logger.LogError($"Error occured at GetPDF in {_Title} Controller due to {ex}");
+            }
+            return View(_item);
+        }
     }
 }

@@ -132,10 +132,12 @@ namespace TRSAppUpdated.Services
                  + DateTime.Today.Add(r.Show.Time).ToString("hh:mm tt"),
                  CustomerName = r.CustomerName,
                  CustomerPhone = r.CustomerPhone,
+                 SalePrice = r.SalePrice,
                  CreatedByUserID = r.CreatedByUserID,
                  IsApproved = r.IsApproved,
                  ReservationStatusTitle = r.ReservationStatus.Title,
                  ApprovedByUserName = r.ActionByUser.FullName,
+                 CreatedByUserName = r.CreatedByUser.FullName,
              })
              .ToList(),
          ImagePath = x.ImagePath
