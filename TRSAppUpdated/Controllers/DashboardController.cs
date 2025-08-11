@@ -44,12 +44,17 @@ namespace TRSAppUpdated.Controllers
                     {
                         List<int> showIDList = _context.Shows.Where(x => x.EventID == EventID).Select(x => x.ID).ToList();
                         _object.Expense = _context.ShowExpenses.Where(x => !x.IsDeleted && showIDList.Contains(x.ShowID)).Sum(x => x.Amount);
-                        _object.Revenue = _context.Reservations.Where(x => !x.IsDeleted && showIDList.Contains(x.ShowID)).Sum(x => x.AmountPaid);
+                        _object.Revenue = _context.Reservations.Where(x => !x.IsDeleted 
+                        && x.IsApproved.HasValue 
+                        && x.IsApproved.Value==true 
+                        && showIDList.Contains(x.ShowID)).Sum(x => x.AmountPaid);
                     }
                     else
                     {
                         _object.Expense = _context.ShowExpenses.Where(x => !x.IsDeleted && x.ShowID==ShowID).Sum(x => x.Amount);
-                        _object.Revenue = _context.Reservations.Where(x => !x.IsDeleted && x.ShowID == ShowID).Sum(x => x.AmountPaid);
+                        _object.Revenue = _context.Reservations.Where(x => !x.IsDeleted && x.IsApproved.HasValue
+                        && x.IsApproved.Value == true
+                        && x.ShowID == ShowID).Sum(x => x.AmountPaid);
                     }
                     _object.Profit = _object.Revenue - _object.Expense;
                 }
