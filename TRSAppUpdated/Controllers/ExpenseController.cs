@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using TRSAppUpdated.Models;
@@ -6,6 +7,7 @@ using TRSAppUpdated.ViewModels;
 
 namespace TRSAppUpdated.Controllers
 {
+    [Authorize(Roles = "Super Admin")]
     public class ExpenseController : Controller
     {
         private readonly AppDbContext _context;

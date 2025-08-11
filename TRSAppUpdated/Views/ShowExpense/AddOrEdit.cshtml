@@ -9,7 +9,11 @@
     ViewData["Title"] = $"{_fn} {_PageTitle}";
     var _Message = TempData["Message"] as string;
     int _EventID = ViewBag.EventID != null ? ViewBag.EventID : 0;
+     bool isSuperAdmin = (await _authorizationService.AuthorizeAsync(User, "SuperAdmin")).Succeeded ? true : false;
+    bool isAdmin = (await _authorizationService.AuthorizeAsync(User, "Admin")).Succeeded ? true : false;
 }
+@if(isSuperAdmin || isAdmin)
+{
 <div class="row">
     <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
         <div class="card">
@@ -116,4 +120,10 @@
             </script>
         }
     }
+}
+}
+else
+{
+    Layout = "_EmptyLayout";
+    @(await Html.PartialAsync("~/Views/Shared/_NotAuthorizedView.cshtml"))
 }

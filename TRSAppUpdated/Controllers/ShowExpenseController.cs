@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using TRSAppUpdated.Interfaces;
@@ -7,6 +8,7 @@ using TRSAppUpdated.ViewModels;
 
 namespace TRSAppUpdated.Controllers
 {
+
     public class ShowExpenseController : Controller
     {
         private readonly AppDbContext _context;
@@ -27,6 +29,7 @@ namespace TRSAppUpdated.Controllers
             _showService = showService;
             _UserID = Convert.ToInt32(_httpContextAccessor.HttpContext.User.FindFirstValue("UserID"));
         }
+        [Authorize(Roles = "Super Admin,Admin")]
         //Index (Get All)
         public async Task<IActionResult> Index(int EventID, int _pageNo = 1, int _pageSize = 10, string _searchedTerm = "")
         {
@@ -49,6 +52,7 @@ namespace TRSAppUpdated.Controllers
             }
             return View(new List<ShowExpenseVM>());
         }
+        [Authorize(Roles = "Super Admin,Admin")]
         // GetPartial
         [HttpGet]
         public async Task<IActionResult> GetPartial(int EventID, int _pageNo = 1, int _pageSize = 10, string _searchedTerm = "")
@@ -69,6 +73,7 @@ namespace TRSAppUpdated.Controllers
             }
             return PartialView($"_{_partialViewName}TablePartial", new List<ShowExpenseVM>());
         }
+        [Authorize(Roles = "Super Admin,Admin")]
         //AddOrEdit (GET)
         public IActionResult AddOrEdit(int ID = 0, int EventID = 0)
         {
@@ -110,6 +115,7 @@ namespace TRSAppUpdated.Controllers
             return View(_item);
         }
         //AddOrEdit (POST)
+        [Authorize(Roles = "Super Admin,Admin")]
         [HttpPost]
         public async Task<IActionResult> AddOrEdit(ShowExpenseVM Model)
         {
@@ -169,6 +175,7 @@ namespace TRSAppUpdated.Controllers
             return View(Model);
         }
         [HttpPost]
+        [Authorize(Roles = "Super Admin")]
         public async Task<IActionResult> Delete(int ID, int EventID)
         {
             try

@@ -36,6 +36,7 @@
                     <td>
                         <button type="button" class="btn btn-primary sm-btn descBtn" data-desc="@(item.Description)">Details</button>
                         <a asp-action="AddOrEdit" asp-route-ID="@(item.ID)" asp-route-EventID="@(item.EventID)" class="btn btn-primary sm-btn">Edit</a>
+                        @if()
                         <button type="button" class="btn btn-danger sm-btn deleteBtn" data-id="@(item.ID)">Delete</button>
                     </td>
                 </tr>
