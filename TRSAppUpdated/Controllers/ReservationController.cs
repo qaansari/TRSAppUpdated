@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SixLabors.ImageSharp;
+using Syncfusion.EJ2.FileManager.Base;
+using Syncfusion.EJ2.TreeGrid;
 using System.Security.Claims;
 using TRSAppUpdated.Helpers;
 using TRSAppUpdated.Interfaces;
@@ -17,6 +19,7 @@ namespace TRSAppUpdated.Controllers
     {
         private readonly AppDbContext _context;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IConverter _converter;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly ILogger<ReservationController> _logger;
         private readonly IReservationService _reservationService;
@@ -25,17 +28,17 @@ namespace TRSAppUpdated.Controllers
         private readonly IPaymentModeService _paymentModeService;
         private readonly IReservationStatusService _reservationStatusService;
         private readonly IUserService _userService;
-        private readonly IConverter _converter;
         private readonly string _Title = "Reservation";
         private readonly int _UserID;
-        public ReservationController(AppDbContext context, IHttpContextAccessor httpContextAccessor,
+        public ReservationController(AppDbContext context, IHttpContextAccessor httpContextAccessor,IConverter converter,
             IWebHostEnvironment webHostEnvironment, ILogger<ReservationController> logger,
             IReservationService reservationService, IShowService showService,
             ITicketService ticketService, IPaymentModeService paymentModeService,
-            IReservationStatusService reservationStatusService, IConverter converter, IUserService userService)
+            IReservationStatusService reservationStatusService, IUserService userService)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;
+            _converter = converter;
             _webHostEnvironment = webHostEnvironment;
             _logger = logger;
             _reservationService = reservationService;
@@ -43,7 +46,6 @@ namespace TRSAppUpdated.Controllers
             _ticketService = ticketService;
             _paymentModeService = paymentModeService;
             _reservationStatusService = reservationStatusService;
-            _converter = converter;
             _UserID = Convert.ToInt32(_httpContextAccessor.HttpContext.User.FindFirstValue("UserID"));
             _userService = userService;
         }
@@ -472,10 +474,10 @@ namespace TRSAppUpdated.Controllers
 
                 if (ID != 0)
                     _item = _reservationService.GetDetailsByID(ID);
-
-                string imagePath = Path.Combine(_webHostEnvironment.WebRootPath, "assets", "images", "web-logo-light.png");
-                string eventImagePath = Path.Combine(_webHostEnvironment.WebRootPath, "assets", "images", "events", _item.EventImagePath);
-
+                string _docWidth = "544mm";
+                string _docHeight = "218mm";
+                string logoImageSrc = GetImageSource("web-logo-light.png", "assets/images");
+                string eventImageSrc = GetImageSource(_item.EventImagePath, "assets/images/events");
                 string html = $@"
 <!DOCTYPE html>
 <html>
@@ -483,18 +485,20 @@ namespace TRSAppUpdated.Controllers
 <meta charset='UTF-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0'>
 <style>
-    @page {{
-        size: 1200px 660px;
-        margin: 0;
-    }}
-    html, body {{
-        width: 100%;
-        height: 100%;
+    
+    body {{
         margin: 0;
         padding: 0;
         font-family: 'Poppins', sans-serif;
-        background: #fff;
-        overflow: hidden;
+        background:  rgb(255,255,255);
+    }}
+.ticket-container {{
+        width: {_docWidth};
+        height: {_docHeight};
+        margin: 0 auto;
+        background: rgb(255,255,255);
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
     }}
     .ticket-header {{
         background: linear-gradient(135deg, rgb(26,164,139), rgb(69,165,121));
@@ -528,7 +532,7 @@ namespace TRSAppUpdated.Controllers
         width: 48%;
         vertical-align: top;
     }}
-    .image-info {{
+    .image_info {{
         display: inline-block;
         width: 48%;
         vertical-align: top;
@@ -603,7 +607,7 @@ namespace TRSAppUpdated.Controllers
         </div>
         <div class='ticket-body'>
             <div class='logo_img_section'>
-               <img src='file:///{imagePath.Replace("\\", "/")}' class='logo_img' />
+               <img src='{logoImageSrc}' class=""logo_img"" />
             </div>
             <div class='ticket_heading'>
                 <h2>E-Ticket</h2>
@@ -622,8 +626,8 @@ namespace TRSAppUpdated.Controllers
                         <div class='info-value'>{string.Join("", _item.SeatLabels.Split(',').Select(s => $"<span class='seats-badge'>{s.Trim()}</span>"))}</div>
                     </div>
                 </div>
-                <div class='image-info'>
-                    <img src='file:///{eventImagePath.Replace("\\", "/")}' />
+                <div class='image_info'>
+                    <img src='{eventImageSrc}'/>
                 </div>
             </div>
         </div>
@@ -633,48 +637,61 @@ namespace TRSAppUpdated.Controllers
     </div>
 </body>
 </html>";
-
                 var _ticketTitle = _item.UpdatedDateTime.HasValue
-                    ? $"E-TICKET_{_item.TicketNumber}_UPDATED"
-                    : $"E-TICKET_{_item.TicketNumber}";
-
+                   ? $"E-TICKET_{_item.TicketNumber}_UPDATED"
+                   : $"E-TICKET_{_item.TicketNumber}";
                 var pdfDoc = new HtmlToPdfDocument()
                 {
                     GlobalSettings = new GlobalSettings
                     {
-                        PaperSize = new PechkinPaperSize("1200px", "660px"), // Exact ticket size
                         ColorMode = ColorMode.Color,
-                        Orientation = DinkToPdf.Orientation.Portrait,
-                        Margins = new MarginSettings { Top = 0, Bottom = 0, Left = 0, Right = 0 },
-                        DocumentTitle = _ticketTitle,
-                        DPI = 300
+                        Orientation = Orientation.Portrait,
+                        PaperSize = new PechkinPaperSize(_docWidth, _docHeight),
+                        Margins = new MarginSettings { Top = 5, Bottom = 5,Left= 5, Right= 5 }
                     },
                     Objects = {
-                new ObjectSettings {
-                    HtmlContent = html,
-                    WebSettings = new WebSettings
+                    new ObjectSettings()
                     {
-                        DefaultEncoding = "utf-8",
-                        LoadImages = true,
-                    },
-                    LoadSettings = new LoadSettings
-                    {
-                        BlockLocalFileAccess = false
+                        PagesCount = true,
+                        HtmlContent = html,
+                        WebSettings = { DefaultEncoding = "utf-8", LoadImages = true },
+                        HeaderSettings = { FontSize = 9, Right = "" }
                     }
                 }
-            }
                 };
 
-                var pdf = _converter.Convert(pdfDoc);
+                byte[] pdf = _converter.Convert(pdfDoc);
                 return File(pdf, "application/pdf", $"{_ticketTitle}.pdf");
             }
             catch (Exception ex)
             {
                 _logger.LogError($"Error occured at GetPDF in {_Title} Controller due to {ex}");
             }
-            return View(_item);
+            TempData["Message"] = "0,Error while generating PDF";
+            return RedirectToAction("Details", "Event", new { ID = EventID });
         }
+        private string GetImageSource(string imageName, string relativePath)
+        {
+            try
+            {
+                string imagePath = Path.Combine(_webHostEnvironment.WebRootPath, relativePath, imageName);
 
+                if (!System.IO.File.Exists(imagePath))
+                {
+                    _logger.LogWarning($"Image not found: {imagePath}");
+                    return string.Empty;
+                }
+                // Option 2: Base64 (more reliable)
+                byte[] imageBytes = System.IO.File.ReadAllBytes(imagePath);
+                string extension = Path.GetExtension(imageName).TrimStart('.').ToLower();
+                return $"data:image/{extension};base64,{Convert.ToBase64String(imageBytes)}";
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error loading image {imageName}: {ex.Message}");
+                return string.Empty;
+            }
+        }
 
     }
 }

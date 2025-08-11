@@ -61,11 +61,10 @@ namespace TRSAppUpdated
             };
             //Syncfusion
             Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1JEaF5cXmRCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdmWXhedHZWQmlZWE1yXkpWYEk=");
-            //Dink To PDF
-            builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
-            var wkHtmlToPdfPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/assets/native/libwkhtmltox.dll");
+            // Register DinkToPdf
             var context = new CustomAssemblyLoadContext();
-            context.LoadUnmanagedLibrary(wkHtmlToPdfPath);
+            context.LoadUnmanagedLibrary(Path.Combine(builder.Environment.WebRootPath,"assets","native", "libwkhtmltox.dll"));
+            builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
             var app = builder.Build();
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
