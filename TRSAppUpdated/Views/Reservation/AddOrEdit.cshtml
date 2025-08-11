@@ -12,7 +12,7 @@
     bool isSuperAdmin = (await _authorizationService.AuthorizeAsync(User, "SuperAdmin")).Succeeded ? true : false;
     bool isAdmin = (await _authorizationService.AuthorizeAsync(User, "Admin")).Succeeded ? true : false;
 }
-@if (isSuperAdmin || (isAdmin && Model.ID==0))
+@if (isSuperAdmin || (isAdmin && Model.ID == 0))
 {
     <div class="row">
         <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
@@ -21,7 +21,7 @@
                     <h4>@(ViewData["Title"])</h4>
                 </div>
                 <div class="card-body">
-                    <form class="separate-form" enctype="multipart/form-data" method="post" asp-action="AddOrEdit">
+                    <form class="separate-form rsv_form" enctype="multipart/form-data" method="post" asp-action="AddOrEdit">
                         <input type="hidden" asp-for="ID" />
                         <input type="hidden" asp-for="ClosedByUserID" />
                         <input type="hidden" asp-for="ClosingDateTime" />
@@ -175,7 +175,7 @@
                             </div>
                             <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
                                 <div class="form-group">
-                                    <label class="col-form-label">Extract Text</label>
+                                    <label class="col-form-label">Extracted Text</label>
                                     <textarea class="form-control reservation_textarea" rows="5" id="extractedText"></textarea>
                                 </div>
                             </div>
@@ -183,7 +183,7 @@
                         <div class="row">
                             <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
                                 <div class="form-group mb-0 mt-2">
-                                    <input class="btn btn-primary" type="submit">
+                                    <button class="btn btn-primary rsvSumbitButton" type="button">Save</button>
                                     <a class="btn btn-danger" href="@(Url.Action("Details", "Event", new { ID = Model.EventID }))">Back</a>
                                 </div>
                             </div>
@@ -288,6 +288,9 @@
             }
 
             $(document).ready(function () {
+                $('.rsvSumbitButton').click(function(){
+                    $('.rsv_form').submit();
+                });
                 try {
                     $('.optional-row').hide();
                    toggleOptionalRow();
