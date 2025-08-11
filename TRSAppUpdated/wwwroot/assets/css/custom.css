@@ -157,6 +157,7 @@ span.e-input-group.e-control-wrapper.form-control.form-control-sm.e-ddl.e-lib.e-
     border-radius: 5px;
     display: inline-block;
 }
+
 .seat_bigger {
     flex-grow: 1; /* Allow seats to grow */
     flex-basis: 0; /* Shrinks the seat size to fit */
@@ -170,8 +171,9 @@ span.e-input-group.e-control-wrapper.form-control.form-control-sm.e-ddl.e-lib.e-
     font-size: 18px;
     border-radius: 5px;
     display: inline-block;
-    color:#080915;
+    color: #080915;
 }
+
 .column-gap:not(:last-child) {
     width: 30px;
 }
@@ -226,9 +228,17 @@ span.e-input-group.e-control-wrapper.form-control.form-control-sm.e-ddl.e-lib.e-
 .reservation_textarea {
     max-height: 400px;
 }
+
 .seat_bigger.reserved {
     background-color: var(--success-light);
 }
+
 .buttons-pdf, .buttons-copy, .buttons-csv, .buttons-print {
     display: none !important;
+}
+
+.db_event_image {
+    height: 300px;
+    width: 100%;
+    border-radius:5px;
 }

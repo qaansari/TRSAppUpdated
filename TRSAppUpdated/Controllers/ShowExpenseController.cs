@@ -115,6 +115,7 @@ namespace TRSAppUpdated.Controllers
         {
             try
             {
+                var _viewName = _Title.Contains(" ") ? _Title.Replace(" ", "") : _Title;
                 if (Model.EventID != 0)
                 {
                     ViewBag.EventID = Model.EventID;
@@ -157,7 +158,7 @@ namespace TRSAppUpdated.Controllers
                         await _context.SaveChangesAsync();
                         TempData["Message"] = $"1,{_Title} Successfully Added";
                     }
-                    return RedirectToAction("Index");
+                    return RedirectToAction("Index", _viewName, new { EventID=Model.EventID });
                 }
             }
 

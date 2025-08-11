@@ -60,7 +60,7 @@
                             </div>
                             <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
                                 <div class="form-group">
-                                    <label class="col-form-label">Description</label>
+                                    <label class="col-form-label">Description <span class="text-danger">*</span></label>
                                     <textarea class="form-control" type="text" placeholder="Enter Expense Description"
                                               rows="3" asp-for="Description"></textarea>
                                     <span asp-validation-for="Description"></span>
@@ -69,7 +69,7 @@
                             <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
                                 <div class="form-group mb-0">
                                     <input class="btn btn-primary" type="submit">
-                                    <a class="btn btn-danger" href="@(Url.Action("Index",new {EventID=_EventID}))">Back</a>
+                                    <a class="btn btn-danger" href="@(Url.Action("Index","ShowExpense",new {EventID=_EventID}))">Back</a>
                                 </div>
                             </div>
                         </div>

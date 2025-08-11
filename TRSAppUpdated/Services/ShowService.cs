@@ -15,8 +15,31 @@ namespace TRSAppUpdated.Services
             _context = context;
             _logger = logger;
         }
+        public List<ShowVM> GetAll()
+        {
+            try
+            {
+                var _result = _context.Shows.Where(x => !x.IsDeleted)
+                             .Select(x => new ShowVM()
+                             {
+                                 ID = x.ID,
+                                 Date = x.Date,
+                                 Time = x.Time,
+                                 EventID = x.EventID,
+                             })
+                             .AsNoTracking()
+                             .OrderBy(x => x.EventID)
+                             .ToList();
+                return _result ?? new List<ShowVM>();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error occured at GetAll in {_Title} Service due to {ex}");
+            }
+            return new List<ShowVM>();
+        }
         //Get Active Shows By EventID
-        public List<ShowVM> GeActiveShowsByEventID(int EventID)
+        public List<ShowVM> GetActiveShowsByEventID(int EventID)
         {
             try
             {

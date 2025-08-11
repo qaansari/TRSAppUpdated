@@ -4,7 +4,8 @@ namespace TRSAppUpdated.Interfaces
 {
     public interface IShowService
     {
-        List<ShowVM> GeActiveShowsByEventID(int EventID);
+        List<ShowVM> GetAll();
+        List<ShowVM> GetActiveShowsByEventID(int EventID);
         List<ShowVM> GetAllShowsByEventID(int EventID);
     }
 }
