@@ -41,8 +41,8 @@ namespace TRSAppUpdated.Helpers
         public static void SendVerificationEmail(string emailAddress, string verificationType, string verificationLink)
         {
             // Configure email settings
-            string _senderEmail = "eventland28@gmail.com";
-            string _senderName = "Event Land ";
+            string _senderEmail = "eventlandinformation@gmail.com";
+            string _senderName = "Event Land";
             string _logoUrl = "https://ik.imagekit.io/mg7bre0yk/web-logo.png";
             string _subject = verificationType.ToLower() == "verify email" ? "Email Verification" : "Reset Password";
             string _btnText = verificationType.ToLower() == "verify email" ? "Login To Continue" : "Reset Password";
@@ -121,7 +121,7 @@ namespace TRSAppUpdated.Helpers
             using (SmtpClient smtpClient = new SmtpClient("smtp.gmail.com", 587))
             {
                 smtpClient.UseDefaultCredentials = false;
-                smtpClient.Credentials = new System.Net.NetworkCredential(_senderEmail, "qldgvfcxlvferbjn");
+                smtpClient.Credentials = new System.Net.NetworkCredential(_senderEmail, "ygjjncvsgjplzjwq");
                 smtpClient.EnableSsl = true;
                 // Send the email
                 smtpClient.Send(message);
