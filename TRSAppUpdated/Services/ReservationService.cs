@@ -36,7 +36,7 @@ namespace TRSAppUpdated.Services
                         ShowDateTime = x.Show.Date.ToString("dddd, dd MMMM yyyy") + " "
                         + DateTime.Today.Add(x.Show.Time).ToString("hh:mm tt"),
                         PaymentModeTitle = x.PaymentMode.Title,
-                        ReservationStatusTitle = x.PaymentMode.Title,
+                        ReservationStatusTitle = x.ReservationStatus.Title,
                         EventImagePath = x.Show.Event.ImagePath,
                         IsFullyPaid = x.IsFullyPaid,
                         CostPrice = x.CostPrice,
@@ -49,6 +49,8 @@ namespace TRSAppUpdated.Services
                         TransactionID = x.TransactionID,
                         CreatedDateTime = x.CreatedDateTime,
                         UpdatedDateTime = x.UpdatedDateTime,
+                        ClosedByUserName = x.ClosedByUser != null ? x.ClosedByUser.FullName : "",
+                        ClosedDateTime = x.ClosingDateTime.HasValue ? x.ClosingDateTime.Value.ToString("dddd, dd MMMM yyyy hh:mm tt") : "",
                         SeatLabels = String.Join(",", x.ReservationTickets.Select(x => x.Ticket.Seat.Column.Row.RowLabel + x.Ticket.Seat.SeatNumber).ToList()),
                     }).FirstOrDefault();
             }

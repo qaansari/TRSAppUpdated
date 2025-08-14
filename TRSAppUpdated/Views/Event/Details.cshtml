@@ -97,7 +97,8 @@
                                     <div class="tab-pane fade show active" id="shows" role="tabpanel">
                                         <h4 class="card-title mb-2">
                                             Shows For @(Model.Title)
-                                            @if (isSuperAdmin)
+                                            @if (isSuperAdmin && !string.IsNullOrEmpty(Model.EventStatusTitle)
+                                           && Model.EventStatusTitle.Trim().ToLower() != "ended")
                                             {
                                                 <span class="float-right mb-2">
                                                     <a asp-action="AddOrEdit" asp-controller="Show" asp-route-ID="0" asp-route-EventID="@(Model.ID)" class="btn btn-primary sm-btn">Add Show</a>
@@ -128,16 +129,13 @@
                                                                     @(DateTime.Today.Add(item.Time.Value).ToString("hh:mm tt"))
                                                                 </td>
                                                                 <td>
-                                                                    @if (!item.IsEnded)
+                                                                    <a asp-action="ViewTickets" asp-controller="Show" asp-route-ID="@(item.ID)" asp-route-EventID="@(Model.ID)" class="btn btn-primary sm-btn" target="_blank">View Tickets</a>
+                                                                    @if (isSuperAdmin && !item.IsEnded)
                                                                     {
-                                                                        <a asp-action="ViewTickets" asp-controller="Show" asp-route-ID="@(item.ID)" asp-route-EventID="@(Model.ID)" class="btn btn-primary sm-btn" target="_blank">View Tickets</a>
-                                                                        @if (isSuperAdmin)
-                                                                        {
-                                                                            <button type="button" class="btn btn-danger sm-btn endShowBtn" data-id="@(item.ID)">End</button>
-                                                                            <a asp-action="UpdateTickets" asp-controller="Show" asp-route-ID="@(item.ID)" asp-route-EventID="@(Model.ID)" class="btn btn-primary sm-btn">Update Tickets</a>
-                                                                            <a asp-action="AddOrEdit" asp-controller="Show" asp-route-ID="@(item.ID)" asp-route-EventID="@(Model.ID)" class="btn btn-primary sm-btn">Edit</a>
-                                                                            <button type="button" class="btn btn-danger sm-btn deleteShowBtn" data-id="@(item.ID)">Delete</button>
-                                                                        }
+                                                                        <button type="button" class="btn btn-danger sm-btn endShowBtn" data-id="@(item.ID)">End</button>
+                                                                        <a asp-action="UpdateTickets" asp-controller="Show" asp-route-ID="@(item.ID)" asp-route-EventID="@(Model.ID)" class="btn btn-primary sm-btn">Update Tickets</a>
+                                                                        <a asp-action="AddOrEdit" asp-controller="Show" asp-route-ID="@(item.ID)" asp-route-EventID="@(Model.ID)" class="btn btn-primary sm-btn">Edit</a>
+                                                                        <button type="button" class="btn btn-danger sm-btn deleteShowBtn" data-id="@(item.ID)">Delete</button>
                                                                     }
                                                                 </td>
                                                             </tr>
@@ -172,11 +170,10 @@
                                                 <thead>
                                                     <tr>
                                                         <th>Ticket #</th>
-                                                        <th>Customer Name</th>
-                                                        <th>Customer Phone</th>
-                                                        <th>Show Date</th>
+                                                        <th class="d-none">Customer Name</th>
+                                                        <th class="d-none">Customer Phone</th>
+                                                        <th class="d-none">Show Date</th>
                                                         <th class="d-none">Total Amount</th>
-                                                        <th>Arrival Status</th>
                                                         @if (isAdmin || isSuperAdmin)
                                                         {
                                                             <th>Booking Status</th>
@@ -217,13 +214,10 @@
                                                             }
                                                             <tr class="bg-@(_trBgColor)">
                                                                 <td>@(item.TicketNumber)</td>
-                                                                <td>@(item.CustomerName)</td>
-                                                                <td>@(item.CustomerPhone)</td>
-                                                                <td>@(item.ShowDateTime)</td>
+                                                                <td class="d-none">@(item.CustomerName)</td>
+                                                                <td class="d-none">@(item.CustomerPhone)</td>
+                                                                <td class="d-none">@(item.ShowDateTime)</td>
                                                                 <td class="d-none">@(item.AmountPaid)</td>
-                                                                <td>
-                                                                    @(item.ReservationStatusTitle)
-                                                                </td>
                                                                 @if (isAdmin || isSuperAdmin)
                                                                 {
                                                                     <td>
@@ -259,7 +253,13 @@
                                                                 <td>
                                                                     @if (item.IsApproved.HasValue && item.IsApproved.Value == true)
                                                                     {
+
                                                                         <a asp-action="Details" asp-controller="Reservation" asp-route-ID="@(item.ID)" asp-route-EventID="@(Model.ID)" class="btn btn-primary sm-btn" target="_blank">Details</a>
+                                                                        if (!string.IsNullOrEmpty(Model.EventStatusTitle)
+                                                                        && Model.EventStatusTitle.Trim().ToLower() != "ended")
+                                                                        {
+                                                                            <a class="btn btn-danger sm-btn closeRsvBtn" data-id="@(item.ID)">Close</a>
+                                                                        }
                                                                     }
                                                                     @if (isSuperAdmin)
                                                                     {
@@ -271,14 +271,14 @@
                                                     }
                                                     else
                                                     {
-                                                        int _colspan = 7;
+                                                        int _colspan = 2;
                                                         if (isAdmin)
                                                         {
-                                                            _colspan = 8;
+                                                            _colspan = 3;
                                                         }
                                                         else if (isSuperAdmin)
                                                         {
-                                                            _colspan = 9;
+                                                            _colspan = 5;
                                                         }
                                                         <tr>
                                                             <td colspan="@(_colspan)" class="text-center">
@@ -345,6 +345,30 @@
                 </div>
             </div>
         </div>
+        <!--Close Rsv Modal-->
+        <div class="modal fade" id="closeRsvModal" tabindex="-1" role="dialog" aria-labelledby="closeRsvModalCenterTitle" aria-hidden="true" style="display:none;">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="closeRsvModalCenterTitle">Close Reservation</h5>
+                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <form method="post" asp-action="Close" asp-controller="Reservation" class="close_form">
+                        <div class="modal-body">
+                            <input type="hidden" name="ID" class="selectedIdElement" />
+                            <input type="hidden" name="EventID" value="@(Model.ID)" />
+                            <p class="text-muted">Are you sure you want to close this Reservation?</p>
+                        </div>
+                    </form>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger confirmBtn">Yes</button>
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">No</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     }
     @section Scripts {
     <script src="~/assets/js/jquery.min.js"></script>
@@ -402,6 +426,15 @@
           $("#deleteShowModal .confirmDeleteBtn").click(function(){
             $("#deleteShowModal .delete_form").submit();
             $("#deleteShowModal").modal("hide");
+          });
+          $(document).on('click', '.closeRsvBtn', function(){
+            var selectedID = $(this).data("id");
+            $("#closeRsvModal .selectedIdElement").val(selectedID);
+            $("#closeRsvModal").modal("show");
+          });
+          $("#closeRsvModal .confirmBtn").click(function(){
+            $("#closeRsvModal .close_form").submit();
+            $("#closeRsvModal").modal("hide");
           });
           // End Show functionality
              $(document).on('click', '.endShowBtn', function(){

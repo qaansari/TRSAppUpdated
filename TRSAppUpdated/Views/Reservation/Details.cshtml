@@ -24,7 +24,7 @@
 
     .ticket-header {
         background: linear-gradient(135deg, rgb(26,164,139), rgb(69,165,121));
-        color:  rgb(255,255,255);
+        color: rgb(255,255,255);
         padding: 20px;
         text-align: center;
     }
@@ -39,29 +39,35 @@
     .ticket-body {
         padding: 0 15px 0 15px;
     }
-    .ticket_heading{
-        text-align:center;
-        text-transform:uppercase;
+
+    .ticket_heading {
+        text-align: center;
+        text-transform: uppercase;
     }
-     .ticket_heading h2{
-        font-size:24px;
-        color:rgb(26,164,139);
+
+        .ticket_heading h2 {
+            font-size: 24px;
+            color: rgb(26,164,139);
+        }
+
+    .ticket-content {
+        display: flex;
     }
-    .ticket-content{
-        display:flex;
-    }
+
     .ticket-info {
-        width:50%;
+        width: 50%;
         margin-bottom: 10px;
-         height:auto;
+        height: auto;
     }
-    .image-info{
-                width:50%;
-                height:auto;
+
+    .image-info {
+        width: 50%;
+        height: auto;
     }
-    .image-info img{
-        border-radius: 10px;
-    }
+
+        .image-info img {
+            border-radius: 10px;
+        }
 
     .payment-info {
         margin-bottom: 20px;
@@ -114,13 +120,14 @@
     }
 
     .logo_img_section {
-    width: 100%;
-    text-align: center;
-}
-.logo_img {
-    width: 200px;
-    height: 100px;
-}
+        width: 100%;
+        text-align: center;
+    }
+
+    .logo_img {
+        width: 200px;
+        height: 100px;
+    }
 
     .footer {
         text-align: center;
@@ -153,81 +160,82 @@
     </div>
 </div>
 <div class="row mb-2">
-<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-    <div class="ticket-container">
-        <div class="ticket-header">
-            <h2>E-Ticket</h2>
-        </div>
-        <div class="ticket-body">
-            @if (Model.ID != 0)
-            {
-                <div class="logo_img_section">
-                    <img src="~/assets/images/web-logo-light.png" class="logo_img" />
-                </div>
-                <div class="ticket_heading">
-                     <h2>E-Ticket</h2>
-                </div>
-                <div class="ticket-number">
-                    <h3>@Model.TicketNumber</h3>
-                </div>
-                
-                <div class="ticket-content">
-                <div class="ticket-info">
-                    <div class="info-row">
-                        <div class="info-label">Event Name:</div>
-                        <div class="info-value">@Model.EventName</div>
+    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+        <div class="ticket-container">
+            <div class="ticket-header">
+                <h2>E-Ticket</h2>
+            </div>
+            <div class="ticket-body">
+                @if (Model.ID != 0)
+                {
+                    <div class="logo_img_section">
+                        <img src="~/assets/images/web-logo-light.png" class="logo_img" />
                     </div>
-                    <div class="info-row">
-                        <div class="info-label">Show Date:</div>
-                        <div class="info-value">@Model.ShowDateTime</div>
+                    <div class="ticket_heading">
+                        <h2>E-Ticket</h2>
                     </div>
-                    <div class="info-row">
-                        <div class="info-label">Customer Name:</div>
-                        <div class="info-value">@Model.CustomerName</div>
+                    <div class="ticket-number">
+                        <h3>@Model.TicketNumber</h3>
                     </div>
-                    <div class="info-row">
-                        <div class="info-label">Phone Number:</div>
-                        <div class="info-value">@Model.CustomerPhone</div>
-                    </div>
-                    <div class="info-row">
-                        @{
+
+                    <div class="ticket-content">
+                        <div class="ticket-info">
+                            <div class="info-row">
+                                <div class="info-label">Event Name:</div>
+                                <div class="info-value">@Model.EventName</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Show Date:</div>
+                                <div class="info-value">@Model.ShowDateTime</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Customer Name:</div>
+                                <div class="info-value">@Model.CustomerName</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Phone Number:</div>
+                                <div class="info-value">@Model.CustomerPhone</div>
+                            </div>
+                            <div class="info-row">
+                                @{
                                     int _count = Model.SeatLabels.Split(',').Count();
-                         }
-                        <div class="info-label">Reserved Seats:
-                            (@(_count))
+                                }
+                                <div class="info-label">
+                                    Reserved Seats:
+                                    (@(_count))
+                                </div>
+                                <div class="info-value">
+
+                                    @foreach (var seat in Model.SeatLabels.Split(','))
+                                    {
+                                        <span class="seats-badge">@seat.Trim()</span>
+                                    }
+                                </div>
+                            </div>
                         </div>
-                        <div class="info-value">
-                                
-                            @foreach (var seat in Model.SeatLabels.Split(','))
-                            {
-                                <span class="seats-badge">@seat.Trim()</span>
-                            }
-                        </div>
+                        @if (!string.IsNullOrEmpty(Model.EventImagePath))
+                        {
+                            <div class="image-info">
+                                <img src="~/assets/images/events/@(Model.EventImagePath)" />
+                            </div>
+                        }
                     </div>
-                </div>
-                 @if (!string.IsNullOrEmpty(Model.EventImagePath))
-                    {
-                <div class="image-info">
-                            <img src="~/assets/images/events/@(Model.EventImagePath)" />
-                        </div>
-                    }
-                </div>
-            }
-            else
-            {
-                <p>No reservation details found.</p>
-            }
-             
-        </div>
-        <div class="footer">
-            Thank you for your reservation. Please present this ticket at the venue.
+                }
+                else
+                {
+                    <p>No reservation details found.</p>
+                }
+
+            </div>
+            <div class="footer">
+                Thank you for your reservation. Please present this ticket at the venue.
+            </div>
         </div>
     </div>
-    </div>
-    </div>
-    @if (isSuperAdmin || isAdmin)
-    {
-        <div class="row mt-2">
+</div>
+@if (isSuperAdmin || isAdmin)
+{
+    <div class="row mt-2">
         <div class="ticket-container">
             <div class="ticket-header">
                 <h2>Payment Information</h2>
@@ -249,12 +257,12 @@
                         </div>
                     }
                     @if (!string.IsNullOrEmpty(Model.TransactionID))
-                        {
-                            <div class="info-row">
-                                <div class="info-label">Trax ID:</div>
-                                <div class="info-value">@Model.TransactionID</div>
-                            </div>
-                        }
+                    {
+                        <div class="info-row">
+                            <div class="info-label">Trax ID:</div>
+                            <div class="info-value">@Model.TransactionID</div>
+                        </div>
+                    }
                     <div class="ticket-info">
                         <div class="info-row">
                             <div class="info-label">Cost Price:</div>
@@ -268,6 +276,31 @@
                             <div class="info-label">Amount Paid:</div>
                             <div class="info-value">@Model.AmountPaid</div>
                         </div>
+
+                        @if (!string.IsNullOrEmpty(Model.ReservationStatusTitle))
+                        {
+                            <div class="info-row">
+                                <div class="info-label">Reservation Status:</div>
+                                <div class="info-value">@Model.ReservationStatusTitle</div>
+                            </div>
+                            if (Model.ReservationStatusTitle.Trim().ToLower() == "closed")
+                            {
+                                if (!string.IsNullOrEmpty(Model.ClosedByUserName))
+                                {
+                                    <div class="info-row">
+                                        <div class="info-label">Reservation Closed By:</div>
+                                        <div class="info-value">@Model.ClosedByUserName</div>
+                                    </div>
+                                }
+                                if (!string.IsNullOrEmpty(Model.ClosedDateTime))
+                                {
+                                    <div class="info-row">
+                                        <div class="info-label">Reservation Closed Date:</div>
+                                        <div class="info-value">@Model.ClosedDateTime</div>
+                                    </div>
+                                }
+                            }
+                        }
                         @if (!Model.IsFullyPaid || Model.AmountRemaining > 0)
                         {
                             <div class="info-row">
@@ -275,7 +308,7 @@
                                 <div class="info-value">@Model.AmountRemaining</div>
                             </div>
                         }
-                     
+
                     </div>
                 }
                 else
@@ -287,13 +320,13 @@
                 Thank you for your reservation. Please present this ticket at the venue.
             </div>
         </div>
-        </div>
-        if (!string.IsNullOrEmpty(Model.ReservationImages))
-        {
+    </div>
+    if (!string.IsNullOrEmpty(Model.ReservationImages))
+    {
 
-            string _formattedEventTitle = Model.EventName.Trim().Contains(" ") ?
-            Model.EventName.Trim().Replace(" ", "") : Model.EventName.Trim();
-                     <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 mt-2">
+        string _formattedEventTitle = Model.EventName.Trim().Contains(" ") ?
+        Model.EventName.Trim().Replace(" ", "") : Model.EventName.Trim();
+        <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 mt-2">
             <div class="ticket-container">
                 <div class="ticket-header">
                     <h2>Payment Transactions</h2>
@@ -303,7 +336,7 @@
                         @foreach (var _img in Model.ReservationImages.Split(','))
                         {
                             <div class="col-md-6">
-                                <img src="~/assets/images/reservations/@(_formattedEventTitle)/@(_img)" class="reservation_image_preview"/>
+                                <img src="~/assets/images/reservations/@(_formattedEventTitle)/@(_img)" class="reservation_image_preview" />
                             </div>
                         }
                     </div>
@@ -312,27 +345,27 @@
                     Thank you for your reservation. Please present this ticket at the venue.
                 </div>
             </div>
-            </div>
-        }
+        </div>
     }
-    @section Scripts{
-        <script>
-    $(document).ready(function () {
-        $('#downloadBtn').click(function (e) {
-            e.preventDefault();
+}
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#downloadBtn').click(function (e) {
+                e.preventDefault();
 
-            // Show loader
-            $('.loader').fadeIn();
+                // Show loader
+                $('.loader').fadeIn();
 
-            // Start file download
-            const downloadUrl = '@Url.Action("GetPDF", "Reservation")?ID=@Model.ID&EventID=@_EventID';
-            window.location.href = downloadUrl;
+                // Start file download
+                const downloadUrl = '@Url.Action("GetPDF", "Reservation")?ID=@Model.ID&EventID=@_EventID';
+                window.location.href = downloadUrl;
 
-            // Hide loader after 5–10 seconds (adjust as needed)
-            setTimeout(function () {
-                $('.loader').fadeOut();
-            }, 500);
+                // Hide loader after 5–10 seconds (adjust as needed)
+                setTimeout(function () {
+                    $('.loader').fadeOut();
+                }, 500);
+            });
         });
-    });
-</script>
-    }
+    </script>
+}

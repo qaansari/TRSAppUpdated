@@ -694,7 +694,7 @@ namespace TRSAppUpdated.Controllers
         }
         //Close Reservation
         [HttpPost]
-        public async Task<IActionResult> Close(int ID)
+        public async Task<IActionResult> Close(int ID, int EventID)
         {
             try
             {
@@ -719,7 +719,7 @@ namespace TRSAppUpdated.Controllers
             {
                 _logger.LogError($"Error occured at Delete (POST) in {_Title} Controller due to {ex}");
             }
-            return RedirectToAction("Index");
+            return RedirectToAction("Details", "Event", new { ID = EventID });
         }
 
     }

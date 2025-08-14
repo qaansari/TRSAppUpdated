@@ -70,5 +70,7 @@ namespace TRSAppUpdated.ViewModels
         public string? PaymentModeTitle { get; set; }
         public string? ReservationStatusTitle { get; set; }
         public string? ShowDateTime { get; set; }
+        public string? ClosedByUserName { get; set; }
+        public string? ClosedDateTime{ get; set; }
     }
 }
