@@ -196,6 +196,14 @@ namespace TRSAppUpdated.Models
                     CreatedByUserID = 1,
                     CreatedDateTime = DateTime.UtcNow.AddHours(5),
                     IsDeleted = false,
+                },
+                new ReservationStatus()
+                {
+                    ID = 5,
+                    Title = "Not Attended",
+                    CreatedByUserID = 1,
+                    CreatedDateTime = DateTime.UtcNow.AddHours(5),
+                    IsDeleted = false,
                 });
         }
 

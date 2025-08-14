@@ -30,7 +30,7 @@ namespace TRSAppUpdated.Controllers
         private readonly IUserService _userService;
         private readonly string _Title = "Reservation";
         private readonly int _UserID;
-        public ReservationController(AppDbContext context, IHttpContextAccessor httpContextAccessor,IConverter converter,
+        public ReservationController(AppDbContext context, IHttpContextAccessor httpContextAccessor, IConverter converter,
             IWebHostEnvironment webHostEnvironment, ILogger<ReservationController> logger,
             IReservationService reservationService, IShowService showService,
             ITicketService ticketService, IPaymentModeService paymentModeService,
@@ -647,7 +647,7 @@ namespace TRSAppUpdated.Controllers
                         ColorMode = ColorMode.Color,
                         Orientation = Orientation.Portrait,
                         PaperSize = new PechkinPaperSize(_docWidth, _docHeight),
-                        Margins = new MarginSettings { Top = 5, Bottom = 5,Left= 5, Right= 5 }
+                        Margins = new MarginSettings { Top = 5, Bottom = 5, Left = 5, Right = 5 }
                     },
                     Objects = {
                     new ObjectSettings()
@@ -691,6 +691,35 @@ namespace TRSAppUpdated.Controllers
                 _logger.LogError($"Error loading image {imageName}: {ex.Message}");
                 return string.Empty;
             }
+        }
+        //Close Reservation
+        [HttpPost]
+        public async Task<IActionResult> Close(int ID)
+        {
+            try
+            {
+                var _item = _context.Reservations.Where(x => !x.IsDeleted && x.ID == ID && x.ReservationStatusID != 3)
+                                  .AsNoTracking().FirstOrDefault();
+                if (_item != null)
+                {
+                    _item.ReservationStatusID = 3;
+                    _item.ClosedByUserID = _UserID;
+                    _item.ClosingDateTime = DateTime.UtcNow.AddHours(5);
+                    _context.ChangeTracker.Clear();
+                    _context.Entry(_item).State = EntityState.Modified;
+                    await _context.SaveChangesAsync();
+                    TempData["Message"] = $"1,{_Title} Successfully Closed";
+                }
+                else
+                {
+                    TempData["Message"] = $"0,No {_Title} Found";
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error occured at Delete (POST) in {_Title} Controller due to {ex}");
+            }
+            return RedirectToAction("Index");
         }
 
     }

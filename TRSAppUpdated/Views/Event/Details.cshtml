@@ -195,21 +195,34 @@
                                                     {
                                                         foreach (var item in Model.ReservationList)
                                                         {
-                                                            <tr>
+                                                            string _trBgColor = "primary";
+                                                            if (!string.IsNullOrEmpty(item.ReservationStatusTitle))
+                                                            {
+                                                                if (item.ReservationStatusTitle.Trim().ToLower() == "cancelled")
+                                                                {
+                                                                    _trBgColor = "danger";
+                                                                }
+                                                                else if (item.ReservationStatusTitle.Trim().ToLower() == "refunded")
+                                                                {
+                                                                    _trBgColor = "light";
+                                                                }
+                                                                else if (item.ReservationStatusTitle.Trim().ToLower() == "not attended")
+                                                                {
+                                                                    _trBgColor = "warning";
+                                                                }
+                                                                else if (item.ReservationStatusTitle.Trim().ToLower() == "closed")
+                                                                {
+                                                                    _trBgColor = "success-light";
+                                                                }
+                                                            }
+                                                            <tr class="bg-@(_trBgColor)">
                                                                 <td>@(item.TicketNumber)</td>
                                                                 <td>@(item.CustomerName)</td>
                                                                 <td>@(item.CustomerPhone)</td>
                                                                 <td>@(item.ShowDateTime)</td>
                                                                 <td class="d-none">@(item.AmountPaid)</td>
                                                                 <td>
-                                                                    @{
-                                                                        string _badgeColor = "warning";
-                                                                        if (!string.IsNullOrEmpty(item.ReservationStatusTitle) && (item.ReservationStatusTitle.ToLower() == "not attended" || item.ReservationStatusTitle.ToLower() == "-"))
-                                                                        {
-                                                                            _badgeColor = "danger";
-                                                                        }
-                                                                        <span class="badge bg-@(_badgeColor)">@(!string.IsNullOrEmpty(item.ReservationStatusTitle) ? item.ReservationStatusTitle : "-")</span>
-                                                                    }
+                                                                    @(item.ReservationStatusTitle)
                                                                 </td>
                                                                 @if (isAdmin || isSuperAdmin)
                                                                 {
@@ -334,76 +347,76 @@
         </div>
     }
     @section Scripts {
-        <script src="~/assets/js/jquery.min.js"></script>
-        <script src="~/assets/js/datatables.min.js"></script>
-        <script src="~/assets/js/dataTables.responsive.min.js"></script>
-        <!--Buttons js-->
-        <script src="https://cdn.datatables.net/buttons/1.7.1/js/dataTables.buttons.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
-        <script src="https://cdn.datatables.net/buttons/1.7.1/js/buttons.html5.min.js"></script>
-        <script>
-             document.addEventListener("DOMContentLoaded", function () {
-                    // Retrieve the last active tab from local storage
-                    const lastActiveTab = localStorage.getItem("lastActiveTab");
-                    if (lastActiveTab) {
-                        // Deactivate all tabs and tab contents
-                        document.querySelectorAll('.nav-tabs .nav-link').forEach(tab => tab.classList.remove('active'));
-                        document.querySelectorAll('.tab-pane').forEach(content => content.classList.remove('show', 'active'));
+    <script src="~/assets/js/jquery.min.js"></script>
+    <script src="~/assets/js/datatables.min.js"></script>
+    <script src="~/assets/js/dataTables.responsive.min.js"></script>
+    <!--Buttons js-->
+    <script src="https://cdn.datatables.net/buttons/1.7.1/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.7.1/js/buttons.html5.min.js"></script>
+    <script>
+         document.addEventListener("DOMContentLoaded", function () {
+                // Retrieve the last active tab from local storage
+                const lastActiveTab = localStorage.getItem("lastActiveTab");
+                if (lastActiveTab) {
+                    // Deactivate all tabs and tab contents
+                    document.querySelectorAll('.nav-tabs .nav-link').forEach(tab => tab.classList.remove('active'));
+                    document.querySelectorAll('.tab-pane').forEach(content => content.classList.remove('show', 'active'));
 
-                        // Activate the last active tab and its corresponding content
-                        const activeTab = document.querySelector(`.nav-tabs .nav-link[href="${lastActiveTab}"]`);
-                        const activeContent = document.querySelector(lastActiveTab);
+                    // Activate the last active tab and its corresponding content
+                    const activeTab = document.querySelector(`.nav-tabs .nav-link[href="${lastActiveTab}"]`);
+                    const activeContent = document.querySelector(lastActiveTab);
 
-                        if (activeTab && activeContent) {
-                            activeTab.classList.add('active');
-                            activeContent.classList.add('show', 'active');
-                        }
+                    if (activeTab && activeContent) {
+                        activeTab.classList.add('active');
+                        activeContent.classList.add('show', 'active');
                     }
-                    // Add click event listeners to save the active tab to local storage
-                    document.querySelectorAll('.nav-tabs .nav-link').forEach(tab => {
-                        tab.addEventListener('click', function () {
-                            localStorage.setItem("lastActiveTab", this.getAttribute('href'));
-                        });
+                }
+                // Add click event listeners to save the active tab to local storage
+                document.querySelectorAll('.nav-tabs .nav-link').forEach(tab => {
+                    tab.addEventListener('click', function () {
+                        localStorage.setItem("lastActiveTab", this.getAttribute('href'));
                     });
                 });
-                       $(document).ready(function(){
-              $('#showTable').DataTable({responsive:true});
-              $('#reservationTable').DataTable({
-                              responsive:true,
-                dom: 'Bfrtip', // This defines the position of the buttons
-                buttons: [
-                    {
-                        extend: 'excelHtml5', // This creates an Excel export button
-                        className: 'btn btn-primary',
-                        text: 'Export to Excel', // Button text
-                        title: 'Reservations For @(Model.Title.ToUpper())' // Optional: Title for the Excel file
-                    }
-                ]
             });
-              //Delete Show Functionality
-              $(document).on('click', '.deleteShowBtn', function(){
+                   $(document).ready(function(){
+          $('#showTable').DataTable({responsive:true});
+          $('#reservationTable').DataTable({
+                          responsive:true,
+            dom: 'Bfrtip', // This defines the position of the buttons
+            buttons: [
+                {
+                    extend: 'excelHtml5', // This creates an Excel export button
+                    className: 'btn btn-primary',
+                    text: 'Export to Excel', // Button text
+                    title: 'Reservations For @(Model.Title.ToUpper())' // Optional: Title for the Excel file
+                }
+            ]
+        });
+          //Delete Show Functionality
+          $(document).on('click', '.deleteShowBtn', function(){
+            var selectedID = $(this).data("id");
+            $("#deleteShowModal .selectedIdElement").val(selectedID);
+            $("#deleteShowModal").modal("show");
+          });
+          $("#deleteShowModal .confirmDeleteBtn").click(function(){
+            $("#deleteShowModal .delete_form").submit();
+            $("#deleteShowModal").modal("hide");
+          });
+          // End Show functionality
+             $(document).on('click', '.endShowBtn', function(){
                 var selectedID = $(this).data("id");
-                $("#deleteShowModal .selectedIdElement").val(selectedID);
-                $("#deleteShowModal").modal("show");
-              });
-              $("#deleteShowModal .confirmDeleteBtn").click(function(){
-                $("#deleteShowModal .delete_form").submit();
-                $("#deleteShowModal").modal("hide");
-              });
-              // End Show functionality
-                 $(document).on('click', '.endShowBtn', function(){
-                    var selectedID = $(this).data("id");
-                    $("#endShowModal .selectedIdElement").val(selectedID);
-                    $("#endShowModal").modal("show");
-                });
-                $("#endShowModal .confirmBtn").click(function(){
-                    $("#endShowModal .end_form").submit();
-                    $("#endShowModal").modal("hide");
-                });
+                $("#endShowModal .selectedIdElement").val(selectedID);
+                $("#endShowModal").modal("show");
             });
+            $("#endShowModal .confirmBtn").click(function(){
+                $("#endShowModal .end_form").submit();
+                $("#endShowModal").modal("hide");
+            });
+        });
 
-        </script>
-        @if (_Message != null)
+    </script>
+    @if (_Message != null)
         {
             if (_Message.StartsWith("1"))
             {
