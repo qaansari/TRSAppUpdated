@@ -14,10 +14,10 @@
 }
 <style type="text/css">
     .ticket-container {
-        width: 2065px;
-        height: 835px;
+        width: 100%;
+        height: auto;
         margin: 0;
-        background: rgb(255,255,255);
+        background: rgb(255, 255, 255);
         border-radius: 10px;
         box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
     }
@@ -160,7 +160,6 @@
     </div>
 </div>
 <div class="row mb-2">
-    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
         <div class="ticket-container">
             <div class="ticket-header">
                 <h2>E-Ticket</h2>
@@ -182,19 +181,19 @@
                         <div class="ticket-info">
                             <div class="info-row">
                                 <div class="info-label">Event Name:</div>
-                                <div class="info-value">@Model.EventName</div>
+                            <div class="info-value"><b>@Model.EventName.ToUpper()</b></div>
                             </div>
                             <div class="info-row">
                                 <div class="info-label">Show Date:</div>
-                                <div class="info-value">@Model.ShowDateTime</div>
+                            <div class="info-value"><b>@Model.ShowDateTime.ToUpper()</b></div>
                             </div>
                             <div class="info-row">
                                 <div class="info-label">Customer Name:</div>
-                                <div class="info-value">@Model.CustomerName</div>
+                            <div class="info-value"><b>@Model.CustomerName.ToUpper()</b></div>
                             </div>
                             <div class="info-row">
                                 <div class="info-label">Phone Number:</div>
-                                <div class="info-value">@Model.CustomerPhone</div>
+                            <div class="info-value"><b>@Model.CustomerPhone.ToUpper()</b></div>
                             </div>
                             <div class="info-row">
                                 @{
@@ -231,7 +230,6 @@
                 Thank you for your reservation. Please present this ticket at the venue.
             </div>
         </div>
-    </div>
 </div>
 @if (isSuperAdmin || isAdmin)
 {

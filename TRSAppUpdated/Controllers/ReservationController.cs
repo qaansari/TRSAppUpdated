@@ -474,7 +474,7 @@ namespace TRSAppUpdated.Controllers
 
                 if (ID != 0)
                     _item = _reservationService.GetDetailsByID(ID);
-                string _docWidth = "544mm";
+                string _docWidth = "490mm";
                 string _docHeight = "218mm";
                 string logoImageSrc = GetImageSource("web-logo-light.png", "assets/images");
                 string eventImageSrc = GetImageSource(_item.EventImagePath, "assets/images/events");
@@ -487,14 +487,16 @@ namespace TRSAppUpdated.Controllers
 <style>
     
     body {{
-        margin: 0;
+        margin: 0 auto;
         padding: 0;
         font-family: 'Poppins', sans-serif;
         background:  rgb(255,255,255);
+        width:{_docWidth};
+        height:{_docHeight};
     }}
 .ticket-container {{
-        width: {_docWidth};
-        height: {_docHeight};
+        width: 100%;
+        height: 100%;
         margin: 0 auto;
         background: rgb(255,255,255);
         border-radius: 10px;
@@ -529,19 +531,19 @@ namespace TRSAppUpdated.Controllers
     }}
     .ticket-info {{
         display: inline-block;
-        width: 48%;
+        width: 38%;
         vertical-align: top;
     }}
     .image_info {{
         display: inline-block;
-        width: 48%;
+        width: 60%;
         vertical-align: top;
         text-align: right;
     }}
-    .image-info img {{
+    .event_img {{
         border-radius: 10px;
-        max-width: 100%;
-        height: auto;
+        width: 100%;
+        height: 380px;
     }}
     .info-row {{
         display: flex;
@@ -617,17 +619,17 @@ namespace TRSAppUpdated.Controllers
             </div>
             <div class='ticket-content'>
                 <div class='ticket-info'>
-                    <div class='info-row'><div class='info-label'>Event Name:</div><div class='info-value'>{_item.EventName}</div></div>
-                    <div class='info-row'><div class='info-label'>Show Date:</div><div class='info-value'>{_item.ShowDateTime}</div></div>
-                    <div class='info-row'><div class='info-label'>Customer Name:</div><div class='info-value'>{_item.CustomerName}</div></div>
-                    <div class='info-row'><div class='info-label'>Phone Number:</div><div class='info-value'>{_item.CustomerPhone}</div></div>
+                    <div class='info-row'><div class='info-label'>Event Name:</div><div class='info-value'><b>{_item.EventName.ToUpper()}</b></div></div>
+                    <div class='info-row'><div class='info-label'>Show Date:</div><div class='info-value'><b>{_item.ShowDateTime.ToUpper()}</b></div></div>
+                    <div class='info-row'><div class='info-label'>Customer Name:</div><div class='info-value'><b>{_item.CustomerName.ToUpper()}</b></div></div>
+                    <div class='info-row'><div class='info-label'>Phone Number:</div><div class='info-value'><b>{_item.CustomerPhone.ToUpper()}</b></div></div>
                     <div class='info-row'>
                         <div class='info-label'>Reserved Seats: ({_item.SeatLabels.Split(',').Count()})</div>
                         <div class='info-value'>{string.Join("", _item.SeatLabels.Split(',').Select(s => $"<span class='seats-badge'>{s.Trim()}</span>"))}</div>
                     </div>
                 </div>
                 <div class='image_info'>
-                    <img src='{eventImageSrc}'/>
+                    <img src='{eventImageSrc}' class='event_img'/>
                 </div>
             </div>
         </div>
