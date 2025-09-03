@@ -260,7 +260,7 @@ namespace TRSAppUpdated.Controllers
                         Price = g.First().CostPrice,
                         Category = g.First().Category,
                         IsReserved = g.First().IsReserved
-                    })
+                    }).OrderBy(x => x.RowLabel)
                     .ToListAsync();
                 _item.TicketRowList = _tickets;
             }
