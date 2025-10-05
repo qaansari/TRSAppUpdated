@@ -196,6 +196,10 @@
                                                             string _trBgColor = "primary";
                                                             if (!string.IsNullOrEmpty(item.ReservationStatusTitle))
                                                             {
+                                                                if (item.ReservationStatusTitle.Trim().ToLower() == "arrival pending")
+                                                                {
+                                                                    _trBgColor = "warning";
+                                                                }
                                                                 if (item.ReservationStatusTitle.Trim().ToLower() == "cancelled")
                                                                 {
                                                                     _trBgColor = "danger";
@@ -204,16 +208,12 @@
                                                                 {
                                                                     _trBgColor = "light";
                                                                 }
-                                                                else if (item.ReservationStatusTitle.Trim().ToLower() == "not attended")
-                                                                {
-                                                                    _trBgColor = "warning";
-                                                                }
-                                                                else if (item.ReservationStatusTitle.Trim().ToLower() == "closed")
+                                                                else if (item.ReservationStatusTitle.Trim().ToLower() == "closed" || item.ReservationStatusTitle.Trim().ToLower() == "not attended")
                                                                 {
                                                                     _trBgColor = "success-light";
                                                                 }
                                                             }
-                                                            <tr class="bg-@(_trBgColor)">
+                                                            <tr class="bg bg-@(_trBgColor)">
                                                                 <td>@(item.TicketNumber)</td>
                                                                 <td class="d-none">@(item.CustomerName)</td>
                                                                 <td class="d-none">@(item.CustomerPhone)</td>
@@ -257,7 +257,8 @@
 
                                                                         <a asp-action="Details" asp-controller="Reservation" asp-route-ID="@(item.ID)" asp-route-EventID="@(Model.ID)" class="btn btn-primary sm-btn" target="_blank">Details</a>
                                                                         if (!string.IsNullOrEmpty(Model.EventStatusTitle)
-                                                                        && Model.EventStatusTitle.Trim().ToLower() != "ended")
+                                                                        && Model.EventStatusTitle.Trim().ToLower() != "ended" && !string.IsNullOrEmpty(item.ReservationStatusTitle)
+                                                                        && item.ReservationStatusTitle.Trim().ToLower() != "closed")
                                                                         {
                                                                             <a class="btn btn-danger sm-btn closeRsvBtn" data-id="@(item.ID)">Close</a>
                                                                         }
