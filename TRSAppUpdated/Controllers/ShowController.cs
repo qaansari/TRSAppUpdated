@@ -377,8 +377,6 @@ namespace TRSAppUpdated.Controllers
                         };
                     }).ToList()
                 };
-
-
                 return View(seatVM ?? new SeatVM());
             }
             catch (Exception ex)
