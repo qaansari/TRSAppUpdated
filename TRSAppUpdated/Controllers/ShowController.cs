@@ -225,7 +225,7 @@ namespace TRSAppUpdated.Controllers
             {
                 _logger.LogError($"Error occured at Delete (POST) in {_Title} Controller due to {ex}");
             }
-            return RedirectToAction("Index");
+            return RedirectToAction("Details", "Event", new { ID = EventID });
         }
         //Update Tickets (GET)
         [Authorize(Roles = "Super Admin")]
