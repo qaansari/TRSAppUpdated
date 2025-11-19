@@ -17,8 +17,14 @@
                 <div class="form-group mb-0 float-right my-2 mr-5px">
                     <a class="btn btn-danger btn-sm" href="@Url.Action("Details", "Event", new { ID = _EventID })">Back</a>
                 </div>
-                <h1 class="fw-bold text-uppercase text-center">@(ViewData["Title"]) for @(Model.ShowDate.Value.ToString("dddd, dd MMMM yyyy"))</h1>
-                <h3 class="fw-medium text-uppercase text-center">@(_TSeats) SEATS</h3>
+                <h1 class="fw-bold text-uppercase text-center">@(Model.EventName) dated @(Model.ShowDate.Value.ToString("dddd, dd MMMM yyyy"))</h1>
+                <h1 class="fw-bold text-uppercase text-center">@(Model.AuditoriumName)</h1>
+            </div>
+            <div class="info w-100 my-2">
+                <h5 class="fw-bold text-uppercase text-right">No of Seats: @(_TSeats)</h5>
+                <h5 class="fw-bold text-uppercase text-right">Estd. Revenue: @(Model.EstimatedRevenue)</h5>
+                <h5 class="fw-bold text-uppercase text-right">After Discont: @(Model.AfterDiscountRevenue)</h5>
+                <h5 class="fw-bold text-uppercase text-right">Total Sale: @(Model.AmountReceived)</h5>
             </div>
             <div class="w-100">
                 @foreach (var row in Model.Rows)
@@ -28,7 +34,7 @@
                         row.Columns = row.Columns.ToList().AsEnumerable().Reverse().ToList();
                     }
                     <div class="seat-row mt-2">
-                        <span class="row_label mr-5px">@row.RowLabel (@(row.CostPrice))</span>
+                        <span class="row_label mr-5px fw-bold">@row.RowLabel (@(row.Category) - @(row.CostPrice))</span>
                         @foreach (var column in row.Columns)
                         {
                             @if (Model.AuditoriumAlignment.ToLower() == "right")
@@ -37,13 +43,13 @@
                             }
                             foreach (var seat in column.SeatTickets)
                             {
-                                <div class="@(_TSeats <= 300 ? "seat_bigger" : "seat") @(seat.IsReserved ? "reserved" : "")" title="Price: @seat.CostPrice">
+                                <div class="@(_TSeats <= 450 ? "seat_bigger" : "seat") @(seat.IsReserved ? "reserved" : "")" title="Price: @seat.CostPrice">
                                     @seat.SeatNumber
                                 </div>
                             }
                             <div class="column-gap"></div>
                         }
-                        <span class="row_label">@row.RowLabel (@(row.CostPrice))</span>
+                        <span class="row_label fw-bold">@row.RowLabel (@(row.Category) - @(row.CostPrice))</span>
                     </div>
                 }
 

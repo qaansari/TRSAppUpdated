@@ -7,6 +7,9 @@
         public string? AuditoriumName { get; set; }
         public string? AuditoriumAlignment { get; set; }
         public string? VenueName { get; set; }
+        public double EstimatedRevenue { get; set; }
+        public double AfterDiscountRevenue { get; set; }
+        public double AmountReceived { get; set; }
         public List<RowVM>? Rows { get; set; }
     }
 }

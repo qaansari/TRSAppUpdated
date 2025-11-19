@@ -38,7 +38,7 @@
                             }
                             @foreach (var seat in column.Seats)
                             {
-                                <div class="@(_TSeats<=300?"seat_bigger":"seat")">
+                                <div class="@(_TSeats <= 450 ? "seat_bigger" : "seat")">
                                     @seat
                                 </div>
                             }

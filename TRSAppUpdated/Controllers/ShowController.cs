@@ -345,8 +345,12 @@ namespace TRSAppUpdated.Controllers
                 var seatVM = new SeatVM()
                 {
                     AuditoriumName = firstTicket?.Show?.Event?.Auditorium?.Title?.Trim(),
+                    EventName= firstTicket?.Show?.Event?.Title.Trim(),
                     VenueName = firstTicket?.Show?.Event?.Auditorium?.Venue?.Title?.Trim(),
                     ShowDate = firstTicket?.Show?.Date,
+                    EstimatedRevenue=eventTickets.Sum(x=>x.CostPrice),
+                    AfterDiscountRevenue=eventTickets.Sum(x=>x.CostPrice)*0.8,
+                    AmountReceived=eventTickets.Where(x=>x.IsReserved).Sum(x=>x.SalePrice),
                     AuditoriumAlignment = firstTicket?.Show?.Event?.Auditorium?.Alignment?.Trim(),
                     Rows = firstTicket?.Show?.Event?.Auditorium?.Rows.Select(row =>
                     {
