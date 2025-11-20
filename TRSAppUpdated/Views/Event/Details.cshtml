@@ -202,7 +202,7 @@
                                                                 }
                                                                 if (item.ReservationStatusTitle.Trim().ToLower() == "cancelled")
                                                                 {
-                                                                    _trBgColor = "danger";
+                                                                    _trBgColor = "warning";
                                                                 }
                                                                 else if (item.ReservationStatusTitle.Trim().ToLower() == "refunded")
                                                                 {
@@ -210,7 +210,7 @@
                                                                 }
                                                                 else if (item.ReservationStatusTitle.Trim().ToLower() == "closed" || item.ReservationStatusTitle.Trim().ToLower() == "not attended")
                                                                 {
-                                                                    _trBgColor = "success-light";
+                                                                    _trBgColor = "danger";
                                                                 }
                                                             }
                                                             <tr class="bg bg-@(_trBgColor)">
