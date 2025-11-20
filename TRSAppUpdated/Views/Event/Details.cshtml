@@ -167,6 +167,11 @@
                                         </h4>
                                         @if (Model.ReservationList != null)
                                         {
+                                            <div class="fw-bold my-2">
+                                                <p class="text-muted">Total entries: @(Model.ReservationList.Count())</p>
+                                                <p class="text-muted">Closed entries: @(Model.ReservationList.Where(x => !string.IsNullOrEmpty(x.ReservationStatusTitle) && x.ReservationStatusTitle.ToLower() == "closed").Count())</p>
+                                            </div>
+                                            
                                             <table id="reservationTable" class="table display table-striped table-bordered dt-responsive nowrap mt-2" style="width:100%">
                                                 <thead>
                                                     <tr>
@@ -174,9 +179,11 @@
                                                         <th class="">Customer Name</th>
                                                         <th class="d-none">Customer Phone</th>
                                                         <th class="d-none">Show Date</th>
-                                                        <th class="d-none">Total Amount</th>
+                                                        <th class="d-none">Payable Amount</th>
+                                                        <th class="d-none">Amount Paid</th>
                                                         @if (isAdmin || isSuperAdmin)
                                                         {
+                                                            <th>Arrival Status</th>
                                                             <th>Booking Status</th>
                                                         }
                                                         @if (isSuperAdmin)
@@ -193,34 +200,40 @@
                                                     {
                                                         foreach (var item in Model.ReservationList)
                                                         {
-                                                            string _trBgColor = "primary";
-                                                            if (!string.IsNullOrEmpty(item.ReservationStatusTitle))
-                                                            {
-                                                                if (item.ReservationStatusTitle.Trim().ToLower() == "arrival pending")
-                                                                {
-                                                                    _trBgColor = "warning";
-                                                                }
-                                                                if (item.ReservationStatusTitle.Trim().ToLower() == "cancelled")
-                                                                {
-                                                                    _trBgColor = "warning";
-                                                                }
-                                                                else if (item.ReservationStatusTitle.Trim().ToLower() == "refunded")
-                                                                {
-                                                                    _trBgColor = "light";
-                                                                }
-                                                                else if (item.ReservationStatusTitle.Trim().ToLower() == "closed" || item.ReservationStatusTitle.Trim().ToLower() == "not attended")
-                                                                {
-                                                                    _trBgColor = "danger";
-                                                                }
-                                                            }
-                                                            <tr class="bg bg-@(_trBgColor)">
+                                                            <tr>
                                                                 <td>@(item.TicketNumber)</td>
                                                                 <td>@(item.CustomerName)</td>
                                                                 <td class="d-none">@(item.CustomerPhone)</td>
                                                                 <td class="d-none">@(item.ShowDateTime)</td>
+                                                                <td class="d-none">@(item.SalePrice)</td>
                                                                 <td class="d-none">@(item.AmountPaid)</td>
                                                                 @if (isAdmin || isSuperAdmin)
                                                                 {
+                                                                    <td>
+                                                                        @{
+                                                                            string _BadgeColor = "primary";
+                                                                            if (!string.IsNullOrEmpty(item.ReservationStatusTitle))
+                                                                            {
+                                                                                if (item.ReservationStatusTitle.Trim().ToLower() == "arrival pending")
+                                                                                {
+                                                                                    _BadgeColor = "success-light";
+                                                                                }
+                                                                                if (item.ReservationStatusTitle.Trim().ToLower() == "cancelled")
+                                                                                {
+                                                                                    _BadgeColor = "warning";
+                                                                                }
+                                                                                else if (item.ReservationStatusTitle.Trim().ToLower() == "refunded")
+                                                                                {
+                                                                                    _BadgeColor = "light";
+                                                                                }
+                                                                                else if (item.ReservationStatusTitle.Trim().ToLower() == "closed" || item.ReservationStatusTitle.Trim().ToLower() == "not attended")
+                                                                                {
+                                                                                    _BadgeColor = "danger";
+                                                                                }
+                                                                            }
+                                                                            <span class="badge bg-@(_BadgeColor)">@(item.ReservationStatusTitle)</span>
+                                                                        }
+                                                                    </td>
                                                                     <td>
                                                                         @{
                                                                             string _actionStatus = "Pending";
@@ -277,7 +290,7 @@
                                                         int _colspan = 2;
                                                         if (isAdmin)
                                                         {
-                                                            _colspan = 3;
+                                                            _colspan = 4;
                                                         }
                                                         else if (isSuperAdmin)
                                                         {

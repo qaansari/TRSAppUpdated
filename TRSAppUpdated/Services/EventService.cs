@@ -133,6 +133,7 @@ namespace TRSAppUpdated.Services
                  CustomerPhone = r.CustomerPhone,
                  SalePrice = r.SalePrice,
                  CreatedByUserID = r.CreatedByUserID,
+                 AmountPaid = r.AmountPaid,
                  IsApproved = r.IsApproved,
                  ReservationStatusTitle = r.ReservationStatus.Title,
                  ApprovedByUserName = r.ActionByUser.FullName,
