@@ -113,7 +113,9 @@ namespace TRSAppUpdated.Controllers
          new AuthenticationProperties
          {
              IsPersistent = Model.IsPersistent,
-             ExpiresUtc = Model.IsPersistent ? DateTime.UtcNow.AddHours(5).AddDays(1) : DateTime.UtcNow.AddHours(5).AddHours(1) // Customize as needed
+             ExpiresUtc = Model.IsPersistent
+    ? DateTime.UtcNow.AddHours(5).AddDays(1)
+    : DateTime.UtcNow.AddHours(5).AddHours(1)
          });
                     TempData["Message"] = $"1,Welcome {user.FullName}";
                     return RedirectToAction("Index", "Dashboard");

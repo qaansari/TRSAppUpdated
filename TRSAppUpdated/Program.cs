@@ -1,4 +1,4 @@
-using DinkToPdf;
+﻿using DinkToPdf;
 using DinkToPdf.Contracts;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
@@ -23,7 +23,6 @@ namespace TRSAppUpdated
             });
             builder.Services.AddControllersWithViews();
             builder.Services.AddDistributedMemoryCache();
-            builder.Services.AddSession();
             builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             builder.Services.AddScoped<IExpenseService, ExpenseService>();
             builder.Services.AddScoped<IRoleService, RoleService>();
@@ -42,9 +41,24 @@ namespace TRSAppUpdated
             builder.Services.AddScoped<IShowService, ShowService>();
             builder.Services.AddScoped<ITicketService, TicketService>();
             builder.Services.AddScoped<IUserService, UserService>();
-            builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
+            builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.Cookie.HttpOnly = true;
+        options.Cookie.IsEssential = true;
+        options.LoginPath = "/Home/Index";
+        options.LogoutPath = "/Home/Logout";
+        options.AccessDeniedPath = "/Home/Index";
+        // 👇 Fixes Expiration Issue
+        options.ExpireTimeSpan = TimeSpan.FromHours(24);  // 24 hours cookie
+        // 👇 EXTREMELY IMPORTANT
+        options.SlidingExpiration = true;
+    });
+            builder.Services.AddSession(options =>
             {
-
+                options.IdleTimeout = TimeSpan.FromHours(24);  // session alive for 24 hours
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
             });
             builder.Services.AddAuthorization(options =>
             {
@@ -78,6 +92,7 @@ namespace TRSAppUpdated
             app.UseAuthentication();
             app.UseRouting();
             app.UseAuthorization();
+            app.UseSession();
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
