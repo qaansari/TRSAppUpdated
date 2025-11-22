@@ -38,7 +38,7 @@
                 <div class="card-body">
                     @{
                         string _dateNarration = Model.StartDate.Value.ToString("dddd, dd MMMM yyyy");
-                        if (Model.EndDate.HasValue)
+                        if (Model.EndDate.HasValue && Model.EndDate.Value!=Model.StartDate)
                         {
                             _dateNarration += $" till {Model.EndDate.Value.ToString("dddd, dd MMMM yyyy")}";
                         }
@@ -216,7 +216,7 @@
                                                                             {
                                                                                 if (item.ReservationStatusTitle.Trim().ToLower() == "arrival pending")
                                                                                 {
-                                                                                    _BadgeColor = "success-light";
+                                                                                    _BadgeColor = "success";
                                                                                 }
                                                                                 if (item.ReservationStatusTitle.Trim().ToLower() == "cancelled")
                                                                                 {
