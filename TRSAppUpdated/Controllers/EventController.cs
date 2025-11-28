@@ -182,6 +182,35 @@ namespace TRSAppUpdated.Controllers
                             _item.EndDate = Model.EndDate;
                             _item.Description = !string.IsNullOrEmpty(Model.Description) ? Model.Description.Trim() : Model.Description;
                             _item.IsGeneral = Model.IsGeneral;
+                            if (Model.AuditoriumID != _item.AuditoriumID)
+                            {
+                                var _relatedReservationImages = _context.ReservationImages
+                                 .Where(x => x.Reservation.Show.EventID == _item.ID)
+                                 .AsNoTracking()
+                                 .ToList();
+                                _context.ReservationImages.RemoveRange(_relatedReservationImages);
+                                var _relatedReservationTickets = _context.ReservationTickets
+                                 .Where(x => x.Reservation.Show.EventID == _item.ID)
+                                 .AsNoTracking()
+                                 .ToList();
+                                _context.ReservationTickets.RemoveRange(_relatedReservationTickets);
+                                var _relatedReservations = _context.Reservations
+                                   .Where(x => !x.IsDeleted && x.Show.EventID == _item.ID)
+                                   .AsNoTracking()
+                                   .ToList();
+                                _context.Reservations.RemoveRange(_relatedReservations);
+                                var _relatedTickets = _context.Tickets
+                                  .Where(x => !x.IsDeleted && x.Show.EventID == _item.ID)
+                                  .AsNoTracking()
+                                  .ToList();
+                                _context.Tickets.RemoveRange(_relatedTickets);
+                                var _relatedShows = _context.Shows
+                                    .Where(x => !x.IsDeleted && x.EventID == _item.ID)
+                                    .AsNoTracking()
+                                    .ToList();
+                                _context.Shows.RemoveRange(_relatedShows);
+                                await _context.SaveChangesAsync();
+                            }
                             _item.AuditoriumID = Model.AuditoriumID;
                             _item.EventStatusID = Model.EventStatusID;
                             _item.UpdatedByUserID = _UserID;

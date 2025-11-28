@@ -163,19 +163,19 @@
             city.dataBind();
         }
         function cityChange() {
-            var cityObj = document.getElementById('cityDD').ej2_instances[0];
+            var city = document.getElementById('cityDD').ej2_instances[0];
             var venue = document.getElementById('venueDD').ej2_instances[0];
             venue.enabled = true;
-            var tempQuery = new ej.data.Query().where('CityID', 'equal', cityObj.value);
+            var tempQuery = new ej.data.Query().where('CityID', 'equal', city.value);
             venue.query = tempQuery;
             venue.text = null;
             venue.dataBind();
         }
         function venueChange() {
-            var venueObj = document.getElementById('venueDD').ej2_instances[0];
+            var venue = document.getElementById('venueDD').ej2_instances[0];
             var auditorium = document.getElementById('audiDD').ej2_instances[0];
             auditorium.enabled = true;
-            var tempQuery = new ej.data.Query().where('VenueID', 'equal', cityObj.value);
+            var tempQuery = new ej.data.Query().where('VenueID', 'equal', venue.value);
             auditorium.query = tempQuery;
             auditorium.text = null;
             auditorium.dataBind();
