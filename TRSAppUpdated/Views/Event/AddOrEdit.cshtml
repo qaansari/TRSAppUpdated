@@ -28,7 +28,7 @@
                                 <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
                                     <div class="form-group">
                                         <label class="col-form-label">Country <span class="text-danger">*</span></label>
-                                        <ejs-dropdownlist cssClass="form-control form-control-sm" dataSource="@(ViewData["CountryList"])" placeholder="Select a country"
+                                        <ejs-dropdownlist id="countryDD" cssClass="form-control form-control-sm" dataSource="@(ViewData["CountryList"])" placeholder="Select a country"
                                                           allowFiltering="true" ejs-for="CountryID" popupHeight="220px" change="countryChange">
                                             <e-dropdownlist-fields value="ID" text="Title"></e-dropdownlist-fields>
                                         </ejs-dropdownlist>
@@ -38,7 +38,7 @@
                                 <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
                                     <div class="form-group">
                                         <label class="col-form-label">City <span class="text-danger">*</span></label>
-                                        <ejs-dropdownlist cssClass="form-control form-control-sm" dataSource="@(ViewData["CityList"])" placeholder="Select a city"
+                                        <ejs-dropdownlist id="cityDD" cssClass="form-control form-control-sm" dataSource="@(ViewData["CityList"])" placeholder="Select a city"
                                                           allowFiltering="true" ejs-for="CityID" popupHeight="220px" change="cityChange" enabled="false">
                                             <e-dropdownlist-fields value="ID" text="Title"></e-dropdownlist-fields>
                                         </ejs-dropdownlist>
@@ -48,7 +48,7 @@
                                 <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
                                     <div class="form-group">
                                         <label class="col-form-label">Venue <span class="text-danger">*</span></label>
-                                        <ejs-dropdownlist cssClass="form-control form-control-sm" dataSource="@(ViewData["VenueList"])" placeholder="Select a venue"
+                                        <ejs-dropdownlist id="venueDD" cssClass="form-control form-control-sm" dataSource="@(ViewData["VenueList"])" placeholder="Select a venue"
                                                           allowFiltering="true" ejs-for="VenueID" popupHeight="220px" change="venueChange" enabled="false">
                                             <e-dropdownlist-fields value="ID" text="Title"></e-dropdownlist-fields>
                                         </ejs-dropdownlist>
@@ -58,7 +58,7 @@
                                 <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
                                     <div class="form-group">
                                         <label class="col-form-label">Auditorium <span class="text-danger">*</span></label>
-                                        <ejs-dropdownlist cssClass="form-control form-control-sm" dataSource="@(ViewData["AuditoriumList"])" placeholder="Select an auditorium"
+                                        <ejs-dropdownlist id="audiDD" cssClass="form-control form-control-sm" dataSource="@(ViewData["AuditoriumList"])" placeholder="Select an auditorium"
                                                           allowFiltering="true" ejs-for="AuditoriumID" popupHeight="220px" enabled="false">
                                             <e-dropdownlist-fields value="ID" text="Title"></e-dropdownlist-fields>
                                         </ejs-dropdownlist>
@@ -154,8 +154,8 @@
     </div>
     <script>
         function countryChange() {
-            var countryObj = document.getElementById('CountryID').ej2_instances[0];
-            var city = document.getElementById('CityID').ej2_instances[0];
+            var countryObj = document.getElementById('countryDD').ej2_instances[0];
+            var city = document.getElementById('cityDD').ej2_instances[0];
             city.enabled = true;
             var tempQuery = new ej.data.Query().where('CountryID', 'equal', countryObj.value);
             city.query = tempQuery;
@@ -163,8 +163,8 @@
             city.dataBind();
         }
         function cityChange() {
-            var cityObj = document.getElementById('CityID').ej2_instances[0];
-            var venue = document.getElementById('VenueID').ej2_instances[0];
+            var cityObj = document.getElementById('cityDD').ej2_instances[0];
+            var venue = document.getElementById('venueDD').ej2_instances[0];
             venue.enabled = true;
             var tempQuery = new ej.data.Query().where('CityID', 'equal', cityObj.value);
             venue.query = tempQuery;
@@ -172,8 +172,8 @@
             venue.dataBind();
         }
         function venueChange() {
-            var venueObj = document.getElementById('VenueID').ej2_instances[0];
-            var auditorium = document.getElementById('AuditoriumID').ej2_instances[0];
+            var venueObj = document.getElementById('venueDD').ej2_instances[0];
+            var auditorium = document.getElementById('audiDD').ej2_instances[0];
             auditorium.enabled = true;
             var tempQuery = new ej.data.Query().where('VenueID', 'equal', cityObj.value);
             auditorium.query = tempQuery;
