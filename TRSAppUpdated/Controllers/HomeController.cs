@@ -110,12 +110,15 @@ namespace TRSAppUpdated.Controllers
                     var claimsPrincipal = new ClaimsPrincipal(claimsIndentity);
                     var authProperties = new AuthenticationProperties
                     {
-                        IsPersistent = Model.IsPersistent,
+                        // IMPORTANT: Remove AddHours(5) completely
                         ExpiresUtc = Model.IsPersistent
-                   ? DateTimeOffset.UtcNow.AddDays(1)  // 24 hours for persistent
-                   : DateTimeOffset.UtcNow.AddHours(1), // 1 hour for non-persistent
+         ? DateTimeOffset.UtcNow.AddDays(1)  // 24 hours
+         : DateTimeOffset.UtcNow.AddHours(1), // 1 hour
+                                              // Add these for server stability
                         AllowRefresh = true,
-                        // This ensures the cookie persists across browser sessions
+                        IssuedUtc = DateTimeOffset.UtcNow,
+                        // This helps with server time sync
+                        IsPersistent = Model.IsPersistent
                     };
                     await _httpContextAccessor.HttpContext.SignInAsync(
                         CookieAuthenticationDefaults.AuthenticationScheme,

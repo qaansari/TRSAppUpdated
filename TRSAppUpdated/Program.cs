@@ -43,27 +43,48 @@ namespace TRSAppUpdated
             builder.Services.AddScoped<IUserService, UserService>();
             //Authentication Configuration
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(options =>
-    {
-        options.Cookie.Name = "TRSAppUpdated.AuthCookie";
-        options.Cookie.HttpOnly = true;
-        options.Cookie.IsEssential = true;
-        options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest; // Adjust based on your SSL
-        options.Cookie.SameSite = SameSiteMode.Lax;
-        options.LoginPath = "/Home/Index";
-        options.LogoutPath = "/Home/Logout";
-        options.AccessDeniedPath = "/Home/Index";
-        // IMPORTANT: Set these values to match your login logic
-        options.ExpireTimeSpan = TimeSpan.FromHours(24);  // Default to 24 hours
-        options.SlidingExpiration = true; // This resets expiration on activity
-    });
+     .AddCookie(options =>
+     {
+         options.Cookie.Name = "AppAuth";
+         options.Cookie.HttpOnly = true;
+         options.Cookie.IsEssential = true;
+         options.Cookie.SecurePolicy = builder.Environment.IsDevelopment()
+             ? CookieSecurePolicy.SameAsRequest
+             : CookieSecurePolicy.Always; // Use Always in production
+
+         options.LoginPath = "/Home/Index";
+         options.LogoutPath = "/Home/Logout";
+         options.AccessDeniedPath = "/Home/Index";
+
+         // Use absolute times for server stability
+         options.ExpireTimeSpan = TimeSpan.FromDays(30); // Max you want
+         options.SlidingExpiration = true;
+
+         // IMPORTANT for HosterPK: Set explicit cookie expiration
+         options.Events = new CookieAuthenticationEvents
+         {
+             OnSigningIn = async context =>
+             {
+                 // Set cookie expiry to match your logic
+                 if (context.Properties.IsPersistent)
+                 {
+                     context.Properties.ExpiresUtc = DateTimeOffset.UtcNow.AddDays(1);
+                 }
+                 else
+                 {
+                     context.Properties.ExpiresUtc = DateTimeOffset.UtcNow.AddHours(1);
+                 }
+                 await Task.CompletedTask;
+             }
+         };
+     });
             //Session Configuration
             builder.Services.AddSession(options =>
             {
                 options.IdleTimeout = TimeSpan.FromHours(24);  // Match cookie timeout
                 options.Cookie.HttpOnly = true;
                 options.Cookie.IsEssential = true;
-                options.Cookie.Name = "TRSAppUpdated.Session";
+                options.Cookie.Name = "AppSession";
                 options.Cookie.SameSite = SameSiteMode.Lax;
                 // Session cookie should not expire when browser closes
                 options.Cookie.MaxAge = TimeSpan.FromHours(24);
