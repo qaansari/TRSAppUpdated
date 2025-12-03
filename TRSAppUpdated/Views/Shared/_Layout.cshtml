@@ -274,4 +274,41 @@
     <ejs-scripts></ejs-scripts>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
+
 </html>
+@section Scripts{
+    <script>
+        let timeoutWarning;
+        let timeoutLogout;
+        function resetTimers() {
+            clearTimeout(timeoutWarning);
+            clearTimeout(timeoutLogout);
+
+            // Show warning 5 minutes before timeout (adjust as needed)
+            timeoutWarning = setTimeout(function() {
+                Lobibox.confirm({
+                    msg: "Your session will expire in 5 minutes. Would you like to stay logged in?",
+                    callback: function(result) {
+                        if (result) {
+                            // Ping server to refresh session
+                            fetch('/Home/KeepAlive').then(() => {
+                                resetTimers();
+                            });
+                        }
+                    }
+                });
+            }, 55 * 60 * 1000); // 55 minutes
+            // Force logout after 60 minutes
+            timeoutLogout = setTimeout(function() {
+                window.location.href = '/Home/Logout?timeout=true';
+            }, 60 * 60 * 1000); // 60 minutes
+        }
+        // Reset timers on user activity
+        document.addEventListener('click', resetTimers);
+        document.addEventListener('keypress', resetTimers);
+        document.addEventListener('mousemove', resetTimers);
+        // Initialize timers
+        resetTimers();
+    </script>
+}
+

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
@@ -107,17 +108,23 @@ namespace TRSAppUpdated.Controllers
             };
                     var claimsIndentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                     var claimsPrincipal = new ClaimsPrincipal(claimsIndentity);
+                    var authProperties = new AuthenticationProperties
+                    {
+                        IsPersistent = Model.IsPersistent,
+                        ExpiresUtc = Model.IsPersistent
+                   ? DateTimeOffset.UtcNow.AddDays(1)  // 24 hours for persistent
+                   : DateTimeOffset.UtcNow.AddHours(1), // 1 hour for non-persistent
+                        AllowRefresh = true,
+                        // This ensures the cookie persists across browser sessions
+                    };
                     await _httpContextAccessor.HttpContext.SignInAsync(
-         CookieAuthenticationDefaults.AuthenticationScheme,
-         claimsPrincipal,
-         new AuthenticationProperties
-         {
-             IsPersistent = Model.IsPersistent,
-             ExpiresUtc = Model.IsPersistent
-    ? DateTime.UtcNow.AddHours(5).AddDays(1)
-    : DateTime.UtcNow.AddHours(5).AddHours(1)
-         });
+                        CookieAuthenticationDefaults.AuthenticationScheme,
+                        claimsPrincipal,
+                        authProperties);
+
                     TempData["Message"] = $"1,Welcome {user.FullName}";
+                    var cookie = _httpContextAccessor.HttpContext.Response.Headers["Set-Cookie"];
+                    _logger.LogInformation($"Auth Cookie Set: {cookie}");
                     return RedirectToAction("Index", "Dashboard");
                 }
             }
@@ -126,6 +133,12 @@ namespace TRSAppUpdated.Controllers
                 _logger.LogError($"Error occured at Index (POST) in {_Title} Controller due to {ex}");
             }
             return View(Model);
+        }
+        [Authorize]
+        public IActionResult KeepAlive()
+        {
+            // This will refresh the cookie due to sliding expiration
+            return Json(new { success = true });
         }
         //Sign up (GET)
         public IActionResult Signup()

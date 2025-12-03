@@ -41,24 +41,32 @@ namespace TRSAppUpdated
             builder.Services.AddScoped<IShowService, ShowService>();
             builder.Services.AddScoped<ITicketService, TicketService>();
             builder.Services.AddScoped<IUserService, UserService>();
+            //Authentication Configuration
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
+        options.Cookie.Name = "TRSAppUpdated.AuthCookie";
         options.Cookie.HttpOnly = true;
         options.Cookie.IsEssential = true;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest; // Adjust based on your SSL
+        options.Cookie.SameSite = SameSiteMode.Lax;
         options.LoginPath = "/Home/Index";
         options.LogoutPath = "/Home/Logout";
         options.AccessDeniedPath = "/Home/Index";
-        // 👇 Fixes Expiration Issue
-        options.ExpireTimeSpan = TimeSpan.FromHours(24);  // 24 hours cookie
-        // 👇 EXTREMELY IMPORTANT
-        options.SlidingExpiration = true;
+        // IMPORTANT: Set these values to match your login logic
+        options.ExpireTimeSpan = TimeSpan.FromHours(24);  // Default to 24 hours
+        options.SlidingExpiration = true; // This resets expiration on activity
     });
+            //Session Configuration
             builder.Services.AddSession(options =>
             {
-                options.IdleTimeout = TimeSpan.FromHours(24);  // session alive for 24 hours
+                options.IdleTimeout = TimeSpan.FromHours(24);  // Match cookie timeout
                 options.Cookie.HttpOnly = true;
                 options.Cookie.IsEssential = true;
+                options.Cookie.Name = "TRSAppUpdated.Session";
+                options.Cookie.SameSite = SameSiteMode.Lax;
+                // Session cookie should not expire when browser closes
+                options.Cookie.MaxAge = TimeSpan.FromHours(24);
             });
             builder.Services.AddAuthorization(options =>
             {
