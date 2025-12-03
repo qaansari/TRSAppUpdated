@@ -22,8 +22,9 @@
             </div>
             <div class="info w-100 my-2">
                 <h5 class="fw-bold text-uppercase text-right">No of Seats: @(_TSeats)</h5>
+                <h5 class="fw-bold text-uppercase text-right @(Model.ReservedSeats==0?"d-none":"")">Reserved: @(Model.ReservedSeats)</h5>
+                <h5 class="fw-bold text-uppercase text-right @(Model.ReservedSeats == 0 ? "d-none" : "")">Left: @(_TSeats - Model.ReservedSeats)</h5>
                 <h5 class="fw-bold text-uppercase text-right">Estd. Revenue: @(Model.EstimatedRevenue)</h5>
-                <h5 class="fw-bold text-uppercase text-right">After Discont: @(Model.AfterDiscountRevenue)</h5>
                 <h5 class="fw-bold text-uppercase text-right">Total Sale: @(Model.AmountReceived)</h5>
             </div>
             <div class="w-100">
