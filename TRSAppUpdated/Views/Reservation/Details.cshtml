@@ -7,6 +7,7 @@
     bool isAdmin = (await _authorizationService.AuthorizeAsync(User, "Admin")).Succeeded ? true : false;
     bool isModerator = (await _authorizationService.AuthorizeAsync(User, "Moderator")).Succeeded ? true : false;
     bool isUser = (await _authorizationService.AuthorizeAsync(User, "User")).Succeeded ? true : false;
+    bool isGeneralEvent = ViewBag.IsGeneralEvent != null ? ViewBag.IsGeneralEvent : false;
     if (isModerator || isUser)
     {
         Layout = "_EmptyLayout";
@@ -160,76 +161,82 @@
     </div>
 </div>
 <div class="row mb-2">
-        <div class="ticket-container">
-            <div class="ticket-header">
-                <h2>E-Ticket</h2>
-            </div>
-            <div class="ticket-body">
-                @if (Model.ID != 0)
-                {
-                    <div class="logo_img_section">
-                        <img src="~/assets/images/web-logo-light.png" class="logo_img" />
-                    </div>
-                    <div class="ticket_heading">
-                        <h2>E-Ticket</h2>
-                    </div>
-                    <div class="ticket-number">
-                        <h3>@Model.TicketNumber</h3>
-                    </div>
+    <div class="ticket-container">
+        <div class="ticket-header">
+            <h2>E-Ticket</h2>
+        </div>
+        <div class="ticket-body">
+            @if (Model.ID != 0)
+            {
+                <div class="logo_img_section">
+                    <img src="~/assets/images/web-logo-light.png" class="logo_img" />
+                </div>
+                <div class="ticket_heading">
+                    <h2>E-Ticket</h2>
+                </div>
+                <div class="ticket-number">
+                    <h3>@Model.TicketNumber</h3>
+                </div>
 
-                    <div class="ticket-content">
-                        <div class="ticket-info">
-                            <div class="info-row">
-                                <div class="info-label">Event Name:</div>
+                <div class="ticket-content">
+                    <div class="ticket-info">
+                        <div class="info-row">
+                            <div class="info-label">Event Name:</div>
                             <div class="info-value"><b>@Model.EventName.ToUpper()</b></div>
-                            </div>
-                            <div class="info-row">
-                                <div class="info-label">Show Date:</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Show Date:</div>
                             <div class="info-value"><b>@Model.ShowDateTime.ToUpper()</b></div>
-                            </div>
-                            <div class="info-row">
-                                <div class="info-label">Customer Name:</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Customer Name:</div>
                             <div class="info-value"><b>@Model.CustomerName.ToUpper()</b></div>
-                            </div>
-                            <div class="info-row">
-                                <div class="info-label">Phone Number:</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Phone Number:</div>
                             <div class="info-value"><b>@Model.CustomerPhone.ToUpper()</b></div>
+                        </div>
+                        <div class="info-row">
+                            @{
+                                int _count = Model.SeatLabels.Split(',').Count();
+                            }
+                            <div class="info-label">
+                                Reserved Seats:
+                                (@(_count))
                             </div>
-                            <div class="info-row">
-                                @{
-                                    int _count = Model.SeatLabels.Split(',').Count();
-                                }
-                                <div class="info-label">
-                                    Reserved Seats:
-                                    (@(_count))
-                                </div>
-                                <div class="info-value">
-
+                            <div class="info-value">
+                                @if (!isGeneralEvent)
+                                {
                                     @foreach (var seat in Model.SeatLabels.Split(','))
                                     {
                                         <span class="seats-badge">@seat.Trim()</span>
                                     }
-                                </div>
+                                }
+                                else
+                                {
+                                    <span class="seats-badge">First Come First Sit</span>
+                                }
                             </div>
                         </div>
-                        @if (!string.IsNullOrEmpty(Model.EventImagePath))
-                        {
-                            <div class="image-info">
-                                <img src="~/assets/images/events/@(Model.EventImagePath)" />
-                            </div>
-                        }
                     </div>
-                }
-                else
-                {
-                    <p>No reservation details found.</p>
-                }
+                    @if (!string.IsNullOrEmpty(Model.EventImagePath))
+                    {
+                        <div class="image-info">
+                            <img src="~/assets/images/events/@(Model.EventImagePath)" />
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <p>No reservation details found.</p>
+            }
 
-            </div>
-            <div class="footer">
-                Thank you for your reservation. Please present this ticket at the venue.
-            </div>
         </div>
+        <div class="footer">
+            Thank you for your reservation. Please present this ticket at the venue.
+        </div>
+    </div>
 </div>
 @if (isSuperAdmin || isAdmin)
 {

@@ -451,6 +451,11 @@ namespace TRSAppUpdated.Controllers
                 if (EventID != 0)
                 {
                     ViewBag.EventID = EventID;
+                    ViewBag.IsGeneralEvent = _context.Events
+                        .Where(x => !x.IsDeleted && x.ID == EventID)
+                        .AsNoTracking()
+                        .Select(x => x.IsGeneral)
+                        .FirstOrDefault();
                 }
                 if (ID != 0)
                 {
@@ -471,9 +476,20 @@ namespace TRSAppUpdated.Controllers
             {
                 if (EventID != 0)
                     ViewBag.EventID = EventID;
+                bool isGenEvent = _context.Events
+                       .Where(x => !x.IsDeleted && x.ID == EventID)
+                       .AsNoTracking()
+                       .Select(x => x.IsGeneral)
+                       .FirstOrDefault();
+                
 
                 if (ID != 0)
                     _item = _reservationService.GetDetailsByID(ID);
+                var seats = string.Join("", _item.SeatLabels.Split(',').Select(s => $"<span class='seats-badge'>{s.Trim()}</span>"));
+                if (isGenEvent)
+                {
+                    seats = $"<span class='seats-badge'>First Come First Sit</span>";
+                }
                 string _docWidth = "490mm";
                 string _docHeight = "218mm";
                 string logoImageSrc = GetImageSource("web-logo-light.png", "assets/images");
@@ -625,7 +641,7 @@ namespace TRSAppUpdated.Controllers
                     <div class='info-row'><div class='info-label'>Phone Number:</div><div class='info-value'><b>{_item.CustomerPhone.ToUpper()}</b></div></div>
                     <div class='info-row'>
                         <div class='info-label'>Reserved Seats: ({_item.SeatLabels.Split(',').Count()})</div>
-                        <div class='info-value'>{string.Join("", _item.SeatLabels.Split(',').Select(s => $"<span class='seats-badge'>{s.Trim()}</span>"))}</div>
+                        <div class='info-value'>{seats}</div>
                     </div>
                 </div>
                 <div class='image_info'>
