@@ -38,7 +38,7 @@
                 <div class="card-body">
                     @{
                         string _dateNarration = Model.StartDate.Value.ToString("dddd, dd MMMM yyyy");
-                        if (Model.EndDate.HasValue && Model.EndDate.Value!=Model.StartDate)
+                        if (Model.EndDate.HasValue && Model.EndDate.Value != Model.StartDate)
                         {
                             _dateNarration += $" till {Model.EndDate.Value.ToString("dddd, dd MMMM yyyy")}";
                         }
@@ -98,7 +98,7 @@
                                         <h4 class="card-title mb-2">
                                             Shows For @(Model.Title)
                                             @if (isSuperAdmin && !string.IsNullOrEmpty(Model.EventStatusTitle)
-                                           && Model.EventStatusTitle.Trim().ToLower() != "ended")
+                                                                                && Model.EventStatusTitle.Trim().ToLower() != "ended")
                                             {
                                                 <span class="float-right mb-2">
                                                     <a asp-action="AddOrEdit" asp-controller="Show" asp-route-ID="0" asp-route-EventID="@(Model.ID)" class="btn btn-primary sm-btn">Add Show</a>
@@ -158,7 +158,7 @@
                                         <h4 class="card-title mb-2">
                                             Reservations For @(Model.Title)
                                             @if ((isSuperAdmin || isAdmin) && !string.IsNullOrEmpty(Model.EventStatusTitle)
-                                           && Model.EventStatusTitle.Trim().ToLower() != "ended")
+                                                                                && Model.EventStatusTitle.Trim().ToLower() != "ended")
                                             {
                                                 <span class="float-right mb-2">
                                                     <a asp-action="AddOrEdit" asp-controller="Reservation" asp-route-ID="0" asp-route-EventID="@(Model.ID)" class="btn btn-primary sm-btn">Add Reservation</a>
@@ -171,7 +171,7 @@
                                                 <p class="text-muted">Total entries: @(Model.ReservationList.Count())</p>
                                                 <p class="text-muted">Closed entries: @(Model.ReservationList.Where(x => !string.IsNullOrEmpty(x.ReservationStatusTitle) && x.ReservationStatusTitle.ToLower() == "closed").Count())</p>
                                             </div>
-                                            
+
                                             <table id="reservationTable" class="table display table-striped table-bordered dt-responsive nowrap mt-2" style="width:100%">
                                                 <thead>
                                                     <tr>
@@ -183,6 +183,7 @@
                                                         <th class="d-none">Amount Paid</th>
                                                         @if (isAdmin || isSuperAdmin)
                                                         {
+                                                            <th>Amount Remaining</th>
                                                             <th>Arrival Status</th>
                                                             <th>Booking Status</th>
                                                         }
@@ -209,6 +210,7 @@
                                                                 <td class="d-none">@(item.AmountPaid)</td>
                                                                 @if (isAdmin || isSuperAdmin)
                                                                 {
+                                                                    <td>@(item.AmountRemaining)</td>
                                                                     <td>
                                                                         @{
                                                                             string _BadgeColor = "primary";
@@ -277,7 +279,7 @@
                                                                         }
                                                                     }
                                                                     @if (isSuperAdmin && !string.IsNullOrEmpty(Model.EventStatusTitle)
-                                                                   && Model.EventStatusTitle.Trim().ToLower() != "ended")
+                                                                                                                    && Model.EventStatusTitle.Trim().ToLower() != "ended")
                                                                     {
                                                                         <a asp-action="AddOrEdit" asp-controller="Reservation" asp-route-ID="@(item.ID)" asp-route-EventID="@(Model.ID)" class="btn btn-primary sm-btn">Edit</a>
                                                                     }
@@ -290,11 +292,11 @@
                                                         int _colspan = 2;
                                                         if (isAdmin)
                                                         {
-                                                            _colspan = 5;
+                                                            _colspan = 6;
                                                         }
                                                         else if (isSuperAdmin)
                                                         {
-                                                            _colspan = 7;
+                                                            _colspan = 8;
                                                         }
                                                         <tr>
                                                             <td colspan="@(_colspan)" class="text-center">
@@ -387,85 +389,85 @@
         </div>
     }
     @section Scripts {
-    <script src="~/assets/js/jquery.min.js"></script>
-    <script src="~/assets/js/datatables.min.js"></script>
-    <script src="~/assets/js/dataTables.responsive.min.js"></script>
-    <!--Buttons js-->
-    <script src="https://cdn.datatables.net/buttons/1.7.1/js/dataTables.buttons.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/1.7.1/js/buttons.html5.min.js"></script>
-    <script>
-         document.addEventListener("DOMContentLoaded", function () {
-                // Retrieve the last active tab from local storage
-                const lastActiveTab = localStorage.getItem("lastActiveTab");
-                if (lastActiveTab) {
-                    // Deactivate all tabs and tab contents
-                    document.querySelectorAll('.nav-tabs .nav-link').forEach(tab => tab.classList.remove('active'));
-                    document.querySelectorAll('.tab-pane').forEach(content => content.classList.remove('show', 'active'));
+        <script src="~/assets/js/jquery.min.js"></script>
+        <script src="~/assets/js/datatables.min.js"></script>
+        <script src="~/assets/js/dataTables.responsive.min.js"></script>
+        <!--Buttons js-->
+        <script src="https://cdn.datatables.net/buttons/1.7.1/js/dataTables.buttons.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+        <script src="https://cdn.datatables.net/buttons/1.7.1/js/buttons.html5.min.js"></script>
+        <script>
+             document.addEventListener("DOMContentLoaded", function () {
+                    // Retrieve the last active tab from local storage
+                    const lastActiveTab = localStorage.getItem("lastActiveTab");
+                    if (lastActiveTab) {
+                        // Deactivate all tabs and tab contents
+                        document.querySelectorAll('.nav-tabs .nav-link').forEach(tab => tab.classList.remove('active'));
+                        document.querySelectorAll('.tab-pane').forEach(content => content.classList.remove('show', 'active'));
 
-                    // Activate the last active tab and its corresponding content
-                    const activeTab = document.querySelector(`.nav-tabs .nav-link[href="${lastActiveTab}"]`);
-                    const activeContent = document.querySelector(lastActiveTab);
+                        // Activate the last active tab and its corresponding content
+                        const activeTab = document.querySelector(`.nav-tabs .nav-link[href="${lastActiveTab}"]`);
+                        const activeContent = document.querySelector(lastActiveTab);
 
-                    if (activeTab && activeContent) {
-                        activeTab.classList.add('active');
-                        activeContent.classList.add('show', 'active');
+                        if (activeTab && activeContent) {
+                            activeTab.classList.add('active');
+                            activeContent.classList.add('show', 'active');
+                        }
                     }
-                }
-                // Add click event listeners to save the active tab to local storage
-                document.querySelectorAll('.nav-tabs .nav-link').forEach(tab => {
-                    tab.addEventListener('click', function () {
-                        localStorage.setItem("lastActiveTab", this.getAttribute('href'));
+                    // Add click event listeners to save the active tab to local storage
+                    document.querySelectorAll('.nav-tabs .nav-link').forEach(tab => {
+                        tab.addEventListener('click', function () {
+                            localStorage.setItem("lastActiveTab", this.getAttribute('href'));
+                        });
                     });
                 });
+                       $(document).ready(function(){
+              $('#showTable').DataTable({responsive:true});
+              $('#reservationTable').DataTable({
+                              responsive:true,
+                dom: 'Bfrtip', // This defines the position of the buttons
+                buttons: [
+                    {
+                        extend: 'excelHtml5', // This creates an Excel export button
+                        className: 'btn btn-primary',
+                        text: 'Export to Excel', // Button text
+                        title: 'Reservations For @(Model.Title.ToUpper())' // Optional: Title for the Excel file
+                    }
+                ]
             });
-                   $(document).ready(function(){
-          $('#showTable').DataTable({responsive:true});
-          $('#reservationTable').DataTable({
-                          responsive:true,
-            dom: 'Bfrtip', // This defines the position of the buttons
-            buttons: [
-                {
-                    extend: 'excelHtml5', // This creates an Excel export button
-                    className: 'btn btn-primary',
-                    text: 'Export to Excel', // Button text
-                    title: 'Reservations For @(Model.Title.ToUpper())' // Optional: Title for the Excel file
-                }
-            ]
-        });
-          //Delete Show Functionality
-          $(document).on('click', '.deleteShowBtn', function(){
-            var selectedID = $(this).data("id");
-            $("#deleteShowModal .selectedIdElement").val(selectedID);
-            $("#deleteShowModal").modal("show");
-          });
-          $("#deleteShowModal .confirmDeleteBtn").click(function(){
-            $("#deleteShowModal .delete_form").submit();
-            $("#deleteShowModal").modal("hide");
-          });
-          $(document).on('click', '.closeRsvBtn', function(){
-            var selectedID = $(this).data("id");
-            $("#closeRsvModal .selectedIdElement").val(selectedID);
-            $("#closeRsvModal").modal("show");
-          });
-          $("#closeRsvModal .confirmBtn").click(function(){
-            $("#closeRsvModal .close_form").submit();
-            $("#closeRsvModal").modal("hide");
-          });
-          // End Show functionality
-             $(document).on('click', '.endShowBtn', function(){
+              //Delete Show Functionality
+              $(document).on('click', '.deleteShowBtn', function(){
                 var selectedID = $(this).data("id");
-                $("#endShowModal .selectedIdElement").val(selectedID);
-                $("#endShowModal").modal("show");
+                $("#deleteShowModal .selectedIdElement").val(selectedID);
+                $("#deleteShowModal").modal("show");
+              });
+              $("#deleteShowModal .confirmDeleteBtn").click(function(){
+                $("#deleteShowModal .delete_form").submit();
+                $("#deleteShowModal").modal("hide");
+              });
+              $(document).on('click', '.closeRsvBtn', function(){
+                var selectedID = $(this).data("id");
+                $("#closeRsvModal .selectedIdElement").val(selectedID);
+                $("#closeRsvModal").modal("show");
+              });
+              $("#closeRsvModal .confirmBtn").click(function(){
+                $("#closeRsvModal .close_form").submit();
+                $("#closeRsvModal").modal("hide");
+              });
+              // End Show functionality
+                 $(document).on('click', '.endShowBtn', function(){
+                    var selectedID = $(this).data("id");
+                    $("#endShowModal .selectedIdElement").val(selectedID);
+                    $("#endShowModal").modal("show");
+                });
+                $("#endShowModal .confirmBtn").click(function(){
+                    $("#endShowModal .end_form").submit();
+                    $("#endShowModal").modal("hide");
+                });
             });
-            $("#endShowModal .confirmBtn").click(function(){
-                $("#endShowModal .end_form").submit();
-                $("#endShowModal").modal("hide");
-            });
-        });
 
-    </script>
-    @if (_Message != null)
+        </script>
+        @if (_Message != null)
         {
             if (_Message.StartsWith("1"))
             {
