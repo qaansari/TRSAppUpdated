@@ -39,6 +39,7 @@ namespace TRSAppUpdated.Services
                         ReservationStatusTitle = x.ReservationStatus.Title,
                         EventImagePath = x.Show.Event.ImagePath,
                         IsFullyPaid = x.IsFullyPaid,
+                        TicketCategory=x.ReservationTickets.Select(x=>x.Ticket).FirstOrDefault().Category,
                         CostPrice = x.CostPrice,
                         Discount = x.Discount,
                         SalePrice = x.SalePrice,

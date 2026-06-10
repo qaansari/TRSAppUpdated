@@ -72,5 +72,6 @@ namespace TRSAppUpdated.ViewModels
         public string? ShowDateTime { get; set; }
         public string? ClosedByUserName { get; set; }
         public string? ClosedDateTime{ get; set; }
+        public string? TicketCategory { get; set; }
     }
 }

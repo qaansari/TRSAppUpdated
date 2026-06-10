@@ -205,12 +205,14 @@
                                 (@(_count))
                             </div>
                             <div class="info-value">
+                                <span class="fw-bold">@(Model.TicketCategory) - </span>
                                 @if (!isGeneralEvent)
                                 {
                                     @foreach (var seat in Model.SeatLabels.Split(','))
                                     {
                                         <span class="seats-badge">@seat.Trim()</span>
                                     }
+
                                 }
                                 else
                                 {
