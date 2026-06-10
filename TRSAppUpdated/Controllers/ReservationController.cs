@@ -616,6 +616,9 @@ namespace TRSAppUpdated.Controllers
         margin-right: 5px;
         margin-bottom: 5px;
     }}
+.fw-bold{{
+    font-weight: 600;
+}}
 </style>
 </head>
 <body>
@@ -641,7 +644,7 @@ namespace TRSAppUpdated.Controllers
                     <div class='info-row'><div class='info-label'>Phone Number:</div><div class='info-value'><b>{_item.CustomerPhone.ToUpper()}</b></div></div>
                     <div class='info-row'>
                         <div class='info-label'>Reserved Seats: ({_item.SeatLabels.Split(',').Count()})</div>
-                        <div class='info-value'>{seats}</div>
+                        <div class='info-value'><span class='fw-bold'>{_item.TicketCategory} - </span>{seats}</div>
                     </div>
                 </div>
                 <div class='image_info'>
