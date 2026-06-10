@@ -149,6 +149,11 @@
         margin-right: 5px;
         margin-bottom: 5px;
     }
+
+    .seat_category {
+        font-weight: 600;
+        text-transform: uppercase;
+    }
 </style>
 <div class="row mb-2">
     <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
@@ -205,7 +210,7 @@
                                 (@(_count))
                             </div>
                             <div class="info-value">
-                                <span class="fw-bold">@(Model.TicketCategory) - </span>
+                                <span class="seat_category">@(Model.TicketCategory) - </span>
                                 @if (!isGeneralEvent)
                                 {
                                     @foreach (var seat in Model.SeatLabels.Split(','))
