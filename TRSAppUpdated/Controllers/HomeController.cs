@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using System.Security.Claims;
@@ -21,9 +22,11 @@ namespace TRSAppUpdated.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly IUserService _userService;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IConfiguration _configuration;
         public HomeController(AppDbContext context, ICountryService countryService,
             ILogger<HomeController> logger, IUserService userService,
-            IHttpContextAccessor httpContextAccessor, IWebHostEnvironment webHostEnvironment)
+            IHttpContextAccessor httpContextAccessor, IWebHostEnvironment webHostEnvironment,
+            IConfiguration configuration)
         {
             _context = context;
             _countryService = countryService;
@@ -31,6 +34,7 @@ namespace TRSAppUpdated.Controllers
             _userService = userService;
             _httpContextAccessor = httpContextAccessor;
             _webHostEnvironment = webHostEnvironment;
+            _configuration = configuration;
         }
         //Index (Login) (GET)
         public IActionResult Index()
@@ -43,16 +47,18 @@ namespace TRSAppUpdated.Controllers
         }
         //Index (Login) (POST)
         [HttpPost]
+        [EnableRateLimiting("auth-limit")]
         public async Task<IActionResult> Index(LoginVM Model)
         {
             try
             {
                 if (ModelState.IsValid)
                 {
+                    var inputEmail = Model.Email?.Trim() ?? string.Empty;
                     var hashedPassword = Model.Password.HashWithSalt();
                     var user = _context.Users
                         .Where(x => !x.IsDeleted
-                        && x.Email == Model.Email
+                        && x.Email == inputEmail
                         && x.Password == hashedPassword)
                         .Select(x => new UserVM()
                         {
@@ -78,19 +84,22 @@ namespace TRSAppUpdated.Controllers
                     }
                     else if (!user.IsVerified)
                     {
-                        if (!string.IsNullOrEmpty(user.UserToken) && user.TokenExpiryTime.HasValue)
+                        var userEntity = await _context.Users.FirstOrDefaultAsync(x => !x.IsDeleted && x.ID == user.ID);
+                        if (userEntity != null)
                         {
-                            if (DateTime.UtcNow.AddHours(5) > user.TokenExpiryTime.Value)
+                            if (string.IsNullOrEmpty(userEntity.UserToken) || !userEntity.TokenExpiryTime.HasValue || DateTime.UtcNow.AddHours(5) > userEntity.TokenExpiryTime.Value)
                             {
-                                user.UserToken = Guid.NewGuid().ToString();
-                                user.TokenExpiryTime = DateTime.UtcNow.AddHours(5).AddMinutes(10);
-                                _context.Entry(user).State = EntityState.Modified;
+                                userEntity.UserToken = Guid.NewGuid().ToString();
+                                userEntity.TokenExpiryTime = DateTime.UtcNow.AddHours(5).AddMinutes(10);
+                                userEntity.UpdatedDateTime = DateTime.UtcNow.AddHours(5);
+                                _context.Entry(userEntity).State = EntityState.Modified;
                                 await _context.SaveChangesAsync();
+                                user.UserToken = userEntity.UserToken;
                             }
                         }
                         TempData["Message"] = "1,A verification email has been sent to your email";
                         string _verificationLink = AppHelper._appUrl + "User/VerifyEmail?token=" + user.UserToken;
-                        AppHelper.SendVerificationEmail(user.Email, "verify email", _verificationLink);
+                        await AppHelper.SendVerificationEmailAsync(user.Email, "verify email", _verificationLink, _configuration);
                         return View(Model);
                     }
                     else if (!user.IsActive)
@@ -134,6 +143,7 @@ namespace TRSAppUpdated.Controllers
             catch (Exception ex)
             {
                 _logger.LogError($"Error occured at Index (POST) in {_Title} Controller due to {ex}");
+                TempData["Message"] = $"0,Login error: {ex.Message}";
             }
             return View(Model);
         }
@@ -151,6 +161,7 @@ namespace TRSAppUpdated.Controllers
         }
         //Sign up (POST)
         [HttpPost]
+        [EnableRateLimiting("auth-limit")]
         public async Task<IActionResult> Signup(UserVM Model)
         {
             try
@@ -217,7 +228,7 @@ namespace TRSAppUpdated.Controllers
                     {
                         TempData["Message"] = "1,A verification email has been sent to your email";
                         string _verificationLink = AppHelper._appUrl + "Home/VerifyEmail?token=" + _item.UserToken;
-                        AppHelper.SendVerificationEmail(_item.Email, "verify email", _verificationLink);
+                        await AppHelper.SendVerificationEmailAsync(_item.Email, "verify email", _verificationLink, _configuration);
                     }
                 }
             }
@@ -278,6 +289,7 @@ namespace TRSAppUpdated.Controllers
         }
         //Forget Password (POST)
         [HttpPost]
+        [EnableRateLimiting("auth-limit")]
         public async Task<IActionResult> ForgetPassword(ForgetPasswordVM Model)
         {
             try
@@ -302,7 +314,7 @@ namespace TRSAppUpdated.Controllers
                     }
                     TempData["Message"] = "1,A reset password link has been sent to your email";
                     string _verificationLink = AppHelper._appUrl + "Home/ResetPassword?token=" + _user.UserToken;
-                    AppHelper.SendVerificationEmail(Model.Email, "reset password", _verificationLink);
+                    await AppHelper.SendVerificationEmailAsync(Model.Email, "reset password", _verificationLink, _configuration);
                 }
             }
             catch (Exception ex)

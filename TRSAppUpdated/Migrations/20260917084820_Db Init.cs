@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -13,149 +14,175 @@ namespace TRSAppUpdated.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.AlterDatabase()
+                .Annotation("MySql:CharSet", "utf8mb4");
+
             migrationBuilder.CreateTable(
                 name: "Roles",
                 columns: table => new
                 {
                     ID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Title = table.Column<string>(type: "varchar(20)", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Title = table.Column<string>(type: "varchar(20)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Roles", x => x.ID);
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "Auditoriums",
                 columns: table => new
                 {
                     ID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Title = table.Column<string>(type: "varchar(50)", nullable: false),
-                    ImagePath = table.Column<string>(type: "varchar(300)", nullable: true),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Title = table.Column<string>(type: "varchar(50)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ImagePath = table.Column<string>(type: "varchar(300)", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     NoOfRows = table.Column<int>(type: "int", nullable: false),
-                    StartingRow = table.Column<string>(type: "varchar(1)", nullable: false),
-                    Alignment = table.Column<string>(type: "varchar(5)", nullable: false),
+                    StartingRow = table.Column<string>(type: "varchar(1)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Alignment = table.Column<string>(type: "varchar(5)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     VenueID = table.Column<int>(type: "int", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     CreatedByUserID = table.Column<int>(type: "int", nullable: false),
                     UpdatedByUserID = table.Column<int>(type: "int", nullable: true),
                     DeletedByUserID = table.Column<int>(type: "int", nullable: true),
-                    CreatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    CreatedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    UpdatedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    DeletedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Auditoriums", x => x.ID);
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "Categories",
                 columns: table => new
                 {
                     ID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Title = table.Column<string>(type: "varchar(20)", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Title = table.Column<string>(type: "varchar(20)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     CreatedByUserID = table.Column<int>(type: "int", nullable: false),
                     UpdatedByUserID = table.Column<int>(type: "int", nullable: true),
                     DeletedByUserID = table.Column<int>(type: "int", nullable: true),
-                    CreatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    CreatedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    UpdatedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    DeletedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Categories", x => x.ID);
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "Cities",
                 columns: table => new
                 {
                     ID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Title = table.Column<string>(type: "varchar(40)", nullable: false),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Title = table.Column<string>(type: "varchar(40)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     CountryID = table.Column<int>(type: "int", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     CreatedByUserID = table.Column<int>(type: "int", nullable: false),
                     UpdatedByUserID = table.Column<int>(type: "int", nullable: true),
                     DeletedByUserID = table.Column<int>(type: "int", nullable: true),
-                    CreatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    CreatedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    UpdatedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    DeletedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Cities", x => x.ID);
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "Columns",
                 columns: table => new
                 {
                     ID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     ColumnNumber = table.Column<int>(type: "int", nullable: false),
                     RowID = table.Column<int>(type: "int", nullable: false),
                     CreatedByUserID = table.Column<int>(type: "int", nullable: false),
-                    CreatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    CreatedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Columns", x => x.ID);
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "Countries",
                 columns: table => new
                 {
                     ID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Title = table.Column<string>(type: "varchar(40)", nullable: false),
-                    DialingCode = table.Column<string>(type: "varchar(4)", nullable: false),
-                    Flag = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Title = table.Column<string>(type: "varchar(40)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    DialingCode = table.Column<string>(type: "varchar(4)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Flag = table.Column<string>(type: "varchar(50)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     CreatedByUserID = table.Column<int>(type: "int", nullable: false),
                     UpdatedByUserID = table.Column<int>(type: "int", nullable: true),
                     DeletedByUserID = table.Column<int>(type: "int", nullable: true),
-                    CreatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    CreatedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    UpdatedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    DeletedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Countries", x => x.ID);
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
                     ID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    FirstName = table.Column<string>(type: "varchar(20)", nullable: false),
-                    LastName = table.Column<string>(type: "varchar(20)", nullable: false),
-                    ContactNumber = table.Column<string>(type: "varchar(20)", nullable: false),
-                    Email = table.Column<string>(type: "varchar(320)", nullable: false),
-                    Password = table.Column<string>(type: "varchar(max)", nullable: false),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    FirstName = table.Column<string>(type: "varchar(20)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    LastName = table.Column<string>(type: "varchar(20)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ContactNumber = table.Column<string>(type: "varchar(20)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Email = table.Column<string>(type: "varchar(320)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Password = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     RoleID = table.Column<int>(type: "int", nullable: false),
                     CountryID = table.Column<int>(type: "int", nullable: true),
-                    ImagePath = table.Column<string>(type: "varchar(300)", nullable: true),
-                    UserToken = table.Column<string>(type: "varchar(68)", nullable: true),
-                    TokenExpiryTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    IsVerified = table.Column<bool>(type: "bit", nullable: false),
+                    ImagePath = table.Column<string>(type: "varchar(300)", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    UserToken = table.Column<string>(type: "varchar(68)", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    TokenExpiryTime = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    IsActive = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    IsVerified = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     CreatedByUserID = table.Column<int>(type: "int", nullable: true),
                     UpdatedByUserID = table.Column<int>(type: "int", nullable: true),
                     DeletedByUserID = table.Column<int>(type: "int", nullable: true),
-                    CreatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    UpdatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    CreatedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    UpdatedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    DeletedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -170,7 +197,7 @@ namespace TRSAppUpdated.Migrations
                         column: x => x.RoleID,
                         principalTable: "Roles",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Users_Users_CreatedByUserID",
                         column: x => x.CreatedByUserID,
@@ -186,22 +213,24 @@ namespace TRSAppUpdated.Migrations
                         column: x => x.UpdatedByUserID,
                         principalTable: "Users",
                         principalColumn: "ID");
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "EventStatuses",
                 columns: table => new
                 {
                     ID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Title = table.Column<string>(type: "varchar(40)", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Title = table.Column<string>(type: "varchar(40)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     CreatedByUserID = table.Column<int>(type: "int", nullable: false),
                     UpdatedByUserID = table.Column<int>(type: "int", nullable: true),
                     DeletedByUserID = table.Column<int>(type: "int", nullable: true),
-                    CreatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    CreatedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    UpdatedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    DeletedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -211,7 +240,7 @@ namespace TRSAppUpdated.Migrations
                         column: x => x.CreatedByUserID,
                         principalTable: "Users",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_EventStatuses_Users_DeletedByUserID",
                         column: x => x.DeletedByUserID,
@@ -222,22 +251,24 @@ namespace TRSAppUpdated.Migrations
                         column: x => x.UpdatedByUserID,
                         principalTable: "Users",
                         principalColumn: "ID");
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "Expenses",
                 columns: table => new
                 {
                     ID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Title = table.Column<string>(type: "varchar(20)", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Title = table.Column<string>(type: "varchar(20)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     CreatedByUserID = table.Column<int>(type: "int", nullable: false),
                     UpdatedByUserID = table.Column<int>(type: "int", nullable: true),
                     DeletedByUserID = table.Column<int>(type: "int", nullable: true),
-                    CreatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    CreatedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    UpdatedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    DeletedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -247,7 +278,7 @@ namespace TRSAppUpdated.Migrations
                         column: x => x.CreatedByUserID,
                         principalTable: "Users",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Expenses_Users_DeletedByUserID",
                         column: x => x.DeletedByUserID,
@@ -258,22 +289,24 @@ namespace TRSAppUpdated.Migrations
                         column: x => x.UpdatedByUserID,
                         principalTable: "Users",
                         principalColumn: "ID");
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "NoteTypes",
                 columns: table => new
                 {
                     ID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Title = table.Column<string>(type: "varchar(20)", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Title = table.Column<string>(type: "varchar(20)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     CreatedByUserID = table.Column<int>(type: "int", nullable: false),
                     UpdatedByUserID = table.Column<int>(type: "int", nullable: true),
                     DeletedByUserID = table.Column<int>(type: "int", nullable: true),
-                    CreatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    CreatedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    UpdatedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    DeletedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -283,7 +316,7 @@ namespace TRSAppUpdated.Migrations
                         column: x => x.CreatedByUserID,
                         principalTable: "Users",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_NoteTypes_Users_DeletedByUserID",
                         column: x => x.DeletedByUserID,
@@ -294,22 +327,24 @@ namespace TRSAppUpdated.Migrations
                         column: x => x.UpdatedByUserID,
                         principalTable: "Users",
                         principalColumn: "ID");
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "PaymentModes",
                 columns: table => new
                 {
                     ID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Title = table.Column<string>(type: "varchar(40)", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Title = table.Column<string>(type: "varchar(40)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     CreatedByUserID = table.Column<int>(type: "int", nullable: false),
                     UpdatedByUserID = table.Column<int>(type: "int", nullable: true),
                     DeletedByUserID = table.Column<int>(type: "int", nullable: true),
-                    CreatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    CreatedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    UpdatedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    DeletedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -319,7 +354,7 @@ namespace TRSAppUpdated.Migrations
                         column: x => x.CreatedByUserID,
                         principalTable: "Users",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_PaymentModes_Users_DeletedByUserID",
                         column: x => x.DeletedByUserID,
@@ -330,22 +365,24 @@ namespace TRSAppUpdated.Migrations
                         column: x => x.UpdatedByUserID,
                         principalTable: "Users",
                         principalColumn: "ID");
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "ReservationStatuses",
                 columns: table => new
                 {
                     ID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Title = table.Column<string>(type: "varchar(40)", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Title = table.Column<string>(type: "varchar(40)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     CreatedByUserID = table.Column<int>(type: "int", nullable: false),
                     UpdatedByUserID = table.Column<int>(type: "int", nullable: true),
                     DeletedByUserID = table.Column<int>(type: "int", nullable: true),
-                    CreatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    CreatedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    UpdatedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    DeletedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -355,7 +392,7 @@ namespace TRSAppUpdated.Migrations
                         column: x => x.CreatedByUserID,
                         principalTable: "Users",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_ReservationStatuses_Users_DeletedByUserID",
                         column: x => x.DeletedByUserID,
@@ -366,18 +403,20 @@ namespace TRSAppUpdated.Migrations
                         column: x => x.UpdatedByUserID,
                         principalTable: "Users",
                         principalColumn: "ID");
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "Rows",
                 columns: table => new
                 {
                     ID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    RowLabel = table.Column<string>(type: "varchar(1)", nullable: false),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    RowLabel = table.Column<string>(type: "varchar(1)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     AuditoriumID = table.Column<int>(type: "int", nullable: false),
                     CreatedByUserID = table.Column<int>(type: "int", nullable: false),
-                    CreatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    CreatedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -387,25 +426,26 @@ namespace TRSAppUpdated.Migrations
                         column: x => x.AuditoriumID,
                         principalTable: "Auditoriums",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Rows_Users_CreatedByUserID",
                         column: x => x.CreatedByUserID,
                         principalTable: "Users",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.NoAction);
-                });
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "Seats",
                 columns: table => new
                 {
                     ID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     SeatNumber = table.Column<int>(type: "int", nullable: false),
                     ColumnID = table.Column<int>(type: "int", nullable: false),
                     CreatedByUserID = table.Column<int>(type: "int", nullable: false),
-                    CreatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    CreatedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -415,32 +455,36 @@ namespace TRSAppUpdated.Migrations
                         column: x => x.ColumnID,
                         principalTable: "Columns",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Seats_Users_CreatedByUserID",
                         column: x => x.CreatedByUserID,
                         principalTable: "Users",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.NoAction);
-                });
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "Venues",
                 columns: table => new
                 {
                     ID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Title = table.Column<string>(type: "varchar(50)", nullable: false),
-                    Address = table.Column<string>(type: "varchar(300)", nullable: false),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Title = table.Column<string>(type: "varchar(50)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Address = table.Column<string>(type: "varchar(300)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     CityID = table.Column<int>(type: "int", nullable: false),
-                    ImagePath = table.Column<string>(type: "varchar(300)", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    ImagePath = table.Column<string>(type: "varchar(300)", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     CreatedByUserID = table.Column<int>(type: "int", nullable: false),
                     UpdatedByUserID = table.Column<int>(type: "int", nullable: true),
                     DeletedByUserID = table.Column<int>(type: "int", nullable: true),
-                    CreatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    CreatedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    UpdatedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    DeletedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -450,13 +494,13 @@ namespace TRSAppUpdated.Migrations
                         column: x => x.CityID,
                         principalTable: "Cities",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Venues_Users_CreatedByUserID",
                         column: x => x.CreatedByUserID,
                         principalTable: "Users",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Venues_Users_DeletedByUserID",
                         column: x => x.DeletedByUserID,
@@ -467,29 +511,33 @@ namespace TRSAppUpdated.Migrations
                         column: x => x.UpdatedByUserID,
                         principalTable: "Users",
                         principalColumn: "ID");
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "Events",
                 columns: table => new
                 {
                     ID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Title = table.Column<string>(type: "varchar(50)", nullable: false),
-                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IsGeneral = table.Column<bool>(type: "bit", nullable: false),
-                    ImagePath = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Title = table.Column<string>(type: "varchar(50)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    StartDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    EndDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    Description = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    IsGeneral = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    ImagePath = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     AuditoriumID = table.Column<int>(type: "int", nullable: false),
                     EventStatusID = table.Column<int>(type: "int", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     CreatedByUserID = table.Column<int>(type: "int", nullable: false),
                     UpdatedByUserID = table.Column<int>(type: "int", nullable: true),
                     DeletedByUserID = table.Column<int>(type: "int", nullable: true),
-                    CreatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    CreatedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    UpdatedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    DeletedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -499,19 +547,19 @@ namespace TRSAppUpdated.Migrations
                         column: x => x.AuditoriumID,
                         principalTable: "Auditoriums",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Events_EventStatuses_EventStatusID",
                         column: x => x.EventStatusID,
                         principalTable: "EventStatuses",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Events_Users_CreatedByUserID",
                         column: x => x.CreatedByUserID,
                         principalTable: "Users",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Events_Users_DeletedByUserID",
                         column: x => x.DeletedByUserID,
@@ -522,25 +570,28 @@ namespace TRSAppUpdated.Migrations
                         column: x => x.UpdatedByUserID,
                         principalTable: "Users",
                         principalColumn: "ID");
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "Notes",
                 columns: table => new
                 {
                     ID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     Seq = table.Column<int>(type: "int", nullable: false),
-                    EnTitle = table.Column<string>(type: "varchar(max)", nullable: false),
-                    UrduTitle = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    EnTitle = table.Column<string>(type: "text", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    UrduTitle = table.Column<string>(type: "text", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     NoteTypeID = table.Column<int>(type: "int", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     CreatedByUserID = table.Column<int>(type: "int", nullable: false),
                     UpdatedByUserID = table.Column<int>(type: "int", nullable: true),
                     DeletedByUserID = table.Column<int>(type: "int", nullable: true),
-                    CreatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    CreatedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    UpdatedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    DeletedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -550,13 +601,13 @@ namespace TRSAppUpdated.Migrations
                         column: x => x.NoteTypeID,
                         principalTable: "NoteTypes",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Notes_Users_CreatedByUserID",
                         column: x => x.CreatedByUserID,
                         principalTable: "Users",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Notes_Users_DeletedByUserID",
                         column: x => x.DeletedByUserID,
@@ -567,18 +618,19 @@ namespace TRSAppUpdated.Migrations
                         column: x => x.UpdatedByUserID,
                         principalTable: "Users",
                         principalColumn: "ID");
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "EventCategories",
                 columns: table => new
                 {
                     ID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     CategoryID = table.Column<int>(type: "int", nullable: false),
                     EventID = table.Column<int>(type: "int", nullable: false),
                     CreatedByUserID = table.Column<int>(type: "int", nullable: false),
-                    CreatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    CreatedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -588,38 +640,39 @@ namespace TRSAppUpdated.Migrations
                         column: x => x.CategoryID,
                         principalTable: "Categories",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_EventCategories_Events_EventID",
                         column: x => x.EventID,
                         principalTable: "Events",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_EventCategories_Users_CreatedByUserID",
                         column: x => x.CreatedByUserID,
                         principalTable: "Users",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.NoAction);
-                });
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "Shows",
                 columns: table => new
                 {
                     ID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     EventID = table.Column<int>(type: "int", nullable: false),
-                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Time = table.Column<TimeSpan>(type: "time", nullable: false),
-                    IsEnded = table.Column<bool>(type: "bit", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    Date = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    Time = table.Column<TimeSpan>(type: "time(6)", nullable: false),
+                    IsEnded = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     CreatedByUserID = table.Column<int>(type: "int", nullable: false),
                     UpdatedByUserID = table.Column<int>(type: "int", nullable: true),
                     DeletedByUserID = table.Column<int>(type: "int", nullable: true),
-                    CreatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    CreatedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    UpdatedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    DeletedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -629,13 +682,13 @@ namespace TRSAppUpdated.Migrations
                         column: x => x.EventID,
                         principalTable: "Events",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Shows_Users_CreatedByUserID",
                         column: x => x.CreatedByUserID,
                         principalTable: "Users",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Shows_Users_DeletedByUserID",
                         column: x => x.DeletedByUserID,
@@ -646,40 +699,45 @@ namespace TRSAppUpdated.Migrations
                         column: x => x.UpdatedByUserID,
                         principalTable: "Users",
                         principalColumn: "ID");
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "Reservations",
                 columns: table => new
                 {
                     ID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    TicketNumber = table.Column<string>(type: "varchar(20)", nullable: false),
-                    CustomerName = table.Column<string>(type: "varchar(41)", nullable: false),
-                    CustomerPhone = table.Column<string>(type: "varchar(20)", nullable: false),
-                    CostPrice = table.Column<double>(type: "float", nullable: false),
-                    Discount = table.Column<double>(type: "float", nullable: false),
-                    SalePrice = table.Column<double>(type: "float", nullable: false),
-                    AmountPaid = table.Column<double>(type: "float", nullable: false),
-                    AmountRemaining = table.Column<double>(type: "float", nullable: false),
-                    IsFullyPaid = table.Column<bool>(type: "bit", nullable: false),
-                    TransactionID = table.Column<string>(type: "varchar(50)", nullable: true),
-                    BookingDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    TicketNumber = table.Column<string>(type: "varchar(20)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    CustomerName = table.Column<string>(type: "varchar(41)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    CustomerPhone = table.Column<string>(type: "varchar(20)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    CostPrice = table.Column<double>(type: "double", nullable: false),
+                    Discount = table.Column<double>(type: "double", nullable: false),
+                    SalePrice = table.Column<double>(type: "double", nullable: false),
+                    AmountPaid = table.Column<double>(type: "double", nullable: false),
+                    AmountRemaining = table.Column<double>(type: "double", nullable: false),
+                    IsFullyPaid = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    TransactionID = table.Column<string>(type: "varchar(50)", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    BookingDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     ShowID = table.Column<int>(type: "int", nullable: false),
                     PaymentModeID = table.Column<int>(type: "int", nullable: false),
                     ReservationStatusID = table.Column<int>(type: "int", nullable: false),
                     ClosedByUserID = table.Column<int>(type: "int", nullable: true),
-                    ClosingDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsApproved = table.Column<bool>(type: "bit", nullable: true),
+                    ClosingDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    IsApproved = table.Column<bool>(type: "tinyint(1)", nullable: true),
                     ActionByUserID = table.Column<int>(type: "int", nullable: true),
-                    ActionDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    ActionDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     CreatedByUserID = table.Column<int>(type: "int", nullable: false),
                     UpdatedByUserID = table.Column<int>(type: "int", nullable: true),
                     DeletedByUserID = table.Column<int>(type: "int", nullable: true),
-                    CreatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    CreatedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    UpdatedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    DeletedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -689,19 +747,19 @@ namespace TRSAppUpdated.Migrations
                         column: x => x.PaymentModeID,
                         principalTable: "PaymentModes",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Reservations_ReservationStatuses_ReservationStatusID",
                         column: x => x.ReservationStatusID,
                         principalTable: "ReservationStatuses",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Reservations_Shows_ShowID",
                         column: x => x.ShowID,
                         principalTable: "Shows",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Reservations_Users_ActionByUserID",
                         column: x => x.ActionByUserID,
@@ -717,7 +775,7 @@ namespace TRSAppUpdated.Migrations
                         column: x => x.CreatedByUserID,
                         principalTable: "Users",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Reservations_Users_DeletedByUserID",
                         column: x => x.DeletedByUserID,
@@ -728,27 +786,29 @@ namespace TRSAppUpdated.Migrations
                         column: x => x.UpdatedByUserID,
                         principalTable: "Users",
                         principalColumn: "ID");
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "ShowExpenses",
                 columns: table => new
                 {
                     ID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     EventID = table.Column<int>(type: "int", nullable: false),
                     ShowID = table.Column<int>(type: "int", nullable: false),
                     ExpenseID = table.Column<int>(type: "int", nullable: false),
-                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Amount = table.Column<double>(type: "float", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    Date = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    Amount = table.Column<double>(type: "double", nullable: false),
+                    Description = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     CreatedByUserID = table.Column<int>(type: "int", nullable: false),
                     UpdatedByUserID = table.Column<int>(type: "int", nullable: true),
                     DeletedByUserID = table.Column<int>(type: "int", nullable: true),
-                    CreatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    CreatedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    UpdatedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    DeletedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -758,25 +818,25 @@ namespace TRSAppUpdated.Migrations
                         column: x => x.EventID,
                         principalTable: "Events",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_ShowExpenses_Expenses_ExpenseID",
                         column: x => x.ExpenseID,
                         principalTable: "Expenses",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_ShowExpenses_Shows_ShowID",
                         column: x => x.ShowID,
                         principalTable: "Shows",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_ShowExpenses_Users_CreatedByUserID",
                         column: x => x.CreatedByUserID,
                         principalTable: "Users",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_ShowExpenses_Users_DeletedByUserID",
                         column: x => x.DeletedByUserID,
@@ -787,33 +847,35 @@ namespace TRSAppUpdated.Migrations
                         column: x => x.UpdatedByUserID,
                         principalTable: "Users",
                         principalColumn: "ID");
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "Tickets",
                 columns: table => new
                 {
                     ID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     ShowID = table.Column<int>(type: "int", nullable: false),
                     SeatID = table.Column<int>(type: "int", nullable: false),
-                    CostPrice = table.Column<double>(type: "float", nullable: false),
-                    Discount = table.Column<double>(type: "float", nullable: false),
-                    SalePrice = table.Column<double>(type: "float", nullable: false),
-                    IsReserved = table.Column<bool>(type: "bit", nullable: false),
-                    IsRefunded = table.Column<bool>(type: "bit", nullable: false),
-                    IsCancelled = table.Column<bool>(type: "bit", nullable: false),
-                    Category = table.Column<string>(type: "varchar(50)", nullable: false),
-                    ReservationDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    RefundDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    CancellationDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CostPrice = table.Column<double>(type: "double", nullable: false),
+                    Discount = table.Column<double>(type: "double", nullable: false),
+                    SalePrice = table.Column<double>(type: "double", nullable: false),
+                    IsReserved = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    IsRefunded = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    IsCancelled = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    Category = table.Column<string>(type: "varchar(50)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ReservationDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    RefundDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    CancellationDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     CreatedByUserID = table.Column<int>(type: "int", nullable: false),
                     UpdatedByUserID = table.Column<int>(type: "int", nullable: true),
                     DeletedByUserID = table.Column<int>(type: "int", nullable: true),
-                    CreatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    CreatedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    UpdatedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    DeletedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -823,19 +885,19 @@ namespace TRSAppUpdated.Migrations
                         column: x => x.SeatID,
                         principalTable: "Seats",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Tickets_Shows_ShowID",
                         column: x => x.ShowID,
                         principalTable: "Shows",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Tickets_Users_CreatedByUserID",
                         column: x => x.CreatedByUserID,
                         principalTable: "Users",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Tickets_Users_DeletedByUserID",
                         column: x => x.DeletedByUserID,
@@ -846,18 +908,20 @@ namespace TRSAppUpdated.Migrations
                         column: x => x.UpdatedByUserID,
                         principalTable: "Users",
                         principalColumn: "ID");
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "ReservationImages",
                 columns: table => new
                 {
                     ID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     ReservationID = table.Column<int>(type: "int", nullable: false),
-                    ImagePath = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ImagePath = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     CreatedByUserID = table.Column<int>(type: "int", nullable: false),
-                    CreatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    CreatedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -867,25 +931,26 @@ namespace TRSAppUpdated.Migrations
                         column: x => x.ReservationID,
                         principalTable: "Reservations",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_ReservationImages_Users_CreatedByUserID",
                         column: x => x.CreatedByUserID,
                         principalTable: "Users",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.NoAction);
-                });
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "ReservationTickets",
                 columns: table => new
                 {
                     ID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     TicketID = table.Column<int>(type: "int", nullable: false),
                     ReservationID = table.Column<int>(type: "int", nullable: false),
                     CreatedByUserID = table.Column<int>(type: "int", nullable: false),
-                    CreatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    CreatedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -895,20 +960,21 @@ namespace TRSAppUpdated.Migrations
                         column: x => x.ReservationID,
                         principalTable: "Reservations",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_ReservationTickets_Tickets_TicketID",
                         column: x => x.TicketID,
                         principalTable: "Tickets",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_ReservationTickets_Users_CreatedByUserID",
                         column: x => x.CreatedByUserID,
                         principalTable: "Users",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.NoAction);
-                });
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.InsertData(
                 table: "Roles",
@@ -924,21 +990,21 @@ namespace TRSAppUpdated.Migrations
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "ID", "ContactNumber", "CountryID", "CreatedByUserID", "CreatedDateTime", "DeletedByUserID", "DeletedDateTime", "Email", "FirstName", "ImagePath", "IsActive", "IsDeleted", "IsVerified", "LastName", "Password", "RoleID", "TokenExpiryTime", "UpdatedByUserID", "UpdatedDateTime", "UserToken" },
-                values: new object[] { 1, "+923312541767", null, null, new DateTime(2025, 8, 16, 11, 48, 13, 96, DateTimeKind.Utc).AddTicks(5462), null, null, "sa@eventland.pk", "Super", null, true, false, true, "Admin", "6FkLTXY5CrK8ccZIBV6HAibnMhfq44wfgPMuzSxJjQ4=", 1, null, null, null, null });
+                values: new object[] { 1, "+923312541767", null, null, new DateTime(2026, 9, 17, 13, 48, 17, 493, DateTimeKind.Utc).AddTicks(4015), null, null, "sa@eventland.pk", "Super", null, true, false, true, "Admin", "6FkLTXY5CrK8ccZIBV6HAibnMhfq44wfgPMuzSxJjQ4=", 1, null, null, null, null });
 
             migrationBuilder.InsertData(
                 table: "Countries",
                 columns: new[] { "ID", "CreatedByUserID", "CreatedDateTime", "DeletedByUserID", "DeletedDateTime", "DialingCode", "Flag", "IsDeleted", "Title", "UpdatedByUserID", "UpdatedDateTime" },
-                values: new object[] { 1, 1, new DateTime(2025, 8, 16, 11, 48, 13, 96, DateTimeKind.Utc).AddTicks(5870), null, null, "+92", "🇵🇰", false, "Pakistan", null, null });
+                values: new object[] { 1, 1, new DateTime(2026, 9, 17, 13, 48, 17, 494, DateTimeKind.Utc).AddTicks(2461), null, null, "+92", "🇵🇰", false, "Pakistan", null, null });
 
             migrationBuilder.InsertData(
                 table: "EventStatuses",
                 columns: new[] { "ID", "CreatedByUserID", "CreatedDateTime", "DeletedByUserID", "DeletedDateTime", "IsDeleted", "Title", "UpdatedByUserID", "UpdatedDateTime" },
                 values: new object[,]
                 {
-                    { 1, 1, new DateTime(2025, 8, 16, 11, 48, 13, 96, DateTimeKind.Utc).AddTicks(5807), null, null, false, "Active", null, null },
-                    { 2, 1, new DateTime(2025, 8, 16, 11, 48, 13, 96, DateTimeKind.Utc).AddTicks(5809), null, null, false, "Ended", null, null },
-                    { 3, 1, new DateTime(2025, 8, 16, 11, 48, 13, 96, DateTimeKind.Utc).AddTicks(5811), null, null, false, "Postponed", null, null }
+                    { 1, 1, new DateTime(2026, 9, 17, 13, 48, 17, 493, DateTimeKind.Utc).AddTicks(8382), null, null, false, "Active", null, null },
+                    { 2, 1, new DateTime(2026, 9, 17, 13, 48, 17, 493, DateTimeKind.Utc).AddTicks(9395), null, null, false, "Ended", null, null },
+                    { 3, 1, new DateTime(2026, 9, 17, 13, 48, 17, 493, DateTimeKind.Utc).AddTicks(9400), null, null, false, "Postponed", null, null }
                 });
 
             migrationBuilder.InsertData(
@@ -946,9 +1012,9 @@ namespace TRSAppUpdated.Migrations
                 columns: new[] { "ID", "CreatedByUserID", "CreatedDateTime", "DeletedByUserID", "DeletedDateTime", "IsDeleted", "Title", "UpdatedByUserID", "UpdatedDateTime" },
                 values: new object[,]
                 {
-                    { 1, 1, new DateTime(2025, 8, 16, 11, 48, 13, 96, DateTimeKind.Utc).AddTicks(5957), null, null, false, "Cash", null, null },
-                    { 2, 1, new DateTime(2025, 8, 16, 11, 48, 13, 96, DateTimeKind.Utc).AddTicks(5959), null, null, false, "Easypaisa/Jazzcash", null, null },
-                    { 3, 1, new DateTime(2025, 8, 16, 11, 48, 13, 96, DateTimeKind.Utc).AddTicks(5960), null, null, false, "Bank Transfer", null, null }
+                    { 1, 1, new DateTime(2026, 9, 17, 13, 48, 17, 494, DateTimeKind.Utc).AddTicks(6512), null, null, false, "Cash", null, null },
+                    { 2, 1, new DateTime(2026, 9, 17, 13, 48, 17, 494, DateTimeKind.Utc).AddTicks(6518), null, null, false, "Easypaisa/Jazzcash", null, null },
+                    { 3, 1, new DateTime(2026, 9, 17, 13, 48, 17, 494, DateTimeKind.Utc).AddTicks(6519), null, null, false, "Bank Transfer", null, null }
                 });
 
             migrationBuilder.InsertData(
@@ -956,11 +1022,11 @@ namespace TRSAppUpdated.Migrations
                 columns: new[] { "ID", "CreatedByUserID", "CreatedDateTime", "DeletedByUserID", "DeletedDateTime", "IsDeleted", "Title", "UpdatedByUserID", "UpdatedDateTime" },
                 values: new object[,]
                 {
-                    { 1, 1, new DateTime(2025, 8, 16, 11, 48, 13, 96, DateTimeKind.Utc).AddTicks(6001), null, null, false, "Arrival Pending", null, null },
-                    { 2, 1, new DateTime(2025, 8, 16, 11, 48, 13, 96, DateTimeKind.Utc).AddTicks(6003), null, null, false, "Cancelled", null, null },
-                    { 3, 1, new DateTime(2025, 8, 16, 11, 48, 13, 96, DateTimeKind.Utc).AddTicks(6004), null, null, false, "Closed", null, null },
-                    { 4, 1, new DateTime(2025, 8, 16, 11, 48, 13, 96, DateTimeKind.Utc).AddTicks(6005), null, null, false, "Refunded", null, null },
-                    { 5, 1, new DateTime(2025, 8, 16, 11, 48, 13, 96, DateTimeKind.Utc).AddTicks(6007), null, null, false, "Not Attended", null, null }
+                    { 1, 1, new DateTime(2026, 9, 17, 13, 48, 17, 494, DateTimeKind.Utc).AddTicks(8485), null, null, false, "Arrival Pending", null, null },
+                    { 2, 1, new DateTime(2026, 9, 17, 13, 48, 17, 494, DateTimeKind.Utc).AddTicks(8491), null, null, false, "Cancelled", null, null },
+                    { 3, 1, new DateTime(2026, 9, 17, 13, 48, 17, 494, DateTimeKind.Utc).AddTicks(8492), null, null, false, "Closed", null, null },
+                    { 4, 1, new DateTime(2026, 9, 17, 13, 48, 17, 494, DateTimeKind.Utc).AddTicks(8494), null, null, false, "Refunded", null, null },
+                    { 5, 1, new DateTime(2026, 9, 17, 13, 48, 17, 494, DateTimeKind.Utc).AddTicks(8496), null, null, false, "Not Attended", null, null }
                 });
 
             migrationBuilder.InsertData(
@@ -968,9 +1034,9 @@ namespace TRSAppUpdated.Migrations
                 columns: new[] { "ID", "CountryID", "CreatedByUserID", "CreatedDateTime", "DeletedByUserID", "DeletedDateTime", "IsDeleted", "Title", "UpdatedByUserID", "UpdatedDateTime" },
                 values: new object[,]
                 {
-                    { 1, 1, 1, new DateTime(2025, 8, 16, 11, 48, 13, 96, DateTimeKind.Utc).AddTicks(5910), null, null, false, "Karachi", null, null },
-                    { 2, 1, 1, new DateTime(2025, 8, 16, 11, 48, 13, 96, DateTimeKind.Utc).AddTicks(5912), null, null, false, "Lahore", null, null },
-                    { 3, 1, 1, new DateTime(2025, 8, 16, 11, 48, 13, 96, DateTimeKind.Utc).AddTicks(5913), null, null, false, "Islamabad", null, null }
+                    { 1, 1, 1, new DateTime(2026, 9, 17, 13, 48, 17, 494, DateTimeKind.Utc).AddTicks(4728), null, null, false, "Karachi", null, null },
+                    { 2, 1, 1, new DateTime(2026, 9, 17, 13, 48, 17, 494, DateTimeKind.Utc).AddTicks(4734), null, null, false, "Lahore", null, null },
+                    { 3, 1, 1, new DateTime(2026, 9, 17, 13, 48, 17, 494, DateTimeKind.Utc).AddTicks(4736), null, null, false, "Islamabad", null, null }
                 });
 
             migrationBuilder.CreateIndex(
@@ -1214,9 +1280,14 @@ namespace TRSAppUpdated.Migrations
                 column: "ReservationStatusID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Reservations_ShowID",
+                name: "IX_Reservations_ShowID_IsDeleted_IsApproved",
                 table: "Reservations",
-                column: "ShowID");
+                columns: new[] { "ShowID", "IsDeleted", "IsApproved" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Reservations_TicketNumber",
+                table: "Reservations",
+                column: "TicketNumber");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Reservations_UpdatedByUserID",
@@ -1244,9 +1315,9 @@ namespace TRSAppUpdated.Migrations
                 column: "CreatedByUserID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ReservationTickets_ReservationID",
+                name: "IX_ReservationTickets_ReservationID_TicketID",
                 table: "ReservationTickets",
-                column: "ReservationID");
+                columns: new[] { "ReservationID", "TicketID" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_ReservationTickets_TicketID",
@@ -1314,9 +1385,9 @@ namespace TRSAppUpdated.Migrations
                 column: "DeletedByUserID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Shows_EventID",
+                name: "IX_Shows_EventID_Date_IsDeleted_IsEnded",
                 table: "Shows",
-                column: "EventID");
+                columns: new[] { "EventID", "Date", "IsDeleted", "IsEnded" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Shows_UpdatedByUserID",
@@ -1339,9 +1410,9 @@ namespace TRSAppUpdated.Migrations
                 column: "SeatID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Tickets_ShowID",
+                name: "IX_Tickets_ShowID_IsReserved_IsDeleted",
                 table: "Tickets",
-                column: "ShowID");
+                columns: new[] { "ShowID", "IsReserved", "IsDeleted" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Tickets_UpdatedByUserID",
@@ -1364,6 +1435,11 @@ namespace TRSAppUpdated.Migrations
                 column: "DeletedByUserID");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Users_Email",
+                table: "Users",
+                column: "Email");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Users_RoleID",
                 table: "Users",
                 column: "RoleID");
@@ -1372,6 +1448,11 @@ namespace TRSAppUpdated.Migrations
                 name: "IX_Users_UpdatedByUserID",
                 table: "Users",
                 column: "UpdatedByUserID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_UserToken",
+                table: "Users",
+                column: "UserToken");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Venues_CityID",
@@ -1399,7 +1480,7 @@ namespace TRSAppUpdated.Migrations
                 column: "CreatedByUserID",
                 principalTable: "Users",
                 principalColumn: "ID",
-                onDelete: ReferentialAction.NoAction);
+                onDelete: ReferentialAction.Cascade);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Auditoriums_Users_DeletedByUserID",
@@ -1421,7 +1502,7 @@ namespace TRSAppUpdated.Migrations
                 column: "VenueID",
                 principalTable: "Venues",
                 principalColumn: "ID",
-                onDelete: ReferentialAction.NoAction);
+                onDelete: ReferentialAction.Cascade);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Categories_Users_CreatedByUserID",
@@ -1429,7 +1510,7 @@ namespace TRSAppUpdated.Migrations
                 column: "CreatedByUserID",
                 principalTable: "Users",
                 principalColumn: "ID",
-                onDelete: ReferentialAction.NoAction);
+                onDelete: ReferentialAction.Cascade);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Categories_Users_DeletedByUserID",
@@ -1451,7 +1532,7 @@ namespace TRSAppUpdated.Migrations
                 column: "CountryID",
                 principalTable: "Countries",
                 principalColumn: "ID",
-                onDelete: ReferentialAction.NoAction);
+                onDelete: ReferentialAction.Cascade);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Cities_Users_CreatedByUserID",
@@ -1459,7 +1540,7 @@ namespace TRSAppUpdated.Migrations
                 column: "CreatedByUserID",
                 principalTable: "Users",
                 principalColumn: "ID",
-                onDelete: ReferentialAction.NoAction);
+                onDelete: ReferentialAction.Cascade);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Cities_Users_DeletedByUserID",
@@ -1481,7 +1562,7 @@ namespace TRSAppUpdated.Migrations
                 column: "RowID",
                 principalTable: "Rows",
                 principalColumn: "ID",
-                onDelete: ReferentialAction.NoAction);
+                onDelete: ReferentialAction.Cascade);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Columns_Users_CreatedByUserID",
@@ -1489,7 +1570,7 @@ namespace TRSAppUpdated.Migrations
                 column: "CreatedByUserID",
                 principalTable: "Users",
                 principalColumn: "ID",
-                onDelete: ReferentialAction.NoAction);
+                onDelete: ReferentialAction.Cascade);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Countries_Users_CreatedByUserID",
@@ -1497,7 +1578,7 @@ namespace TRSAppUpdated.Migrations
                 column: "CreatedByUserID",
                 principalTable: "Users",
                 principalColumn: "ID",
-                onDelete: ReferentialAction.NoAction);
+                onDelete: ReferentialAction.Cascade);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Countries_Users_DeletedByUserID",

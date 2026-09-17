@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
@@ -225,10 +225,9 @@ namespace TRSAppUpdated.Controllers
                         || x.UrduTitle.Trim().ToLower().Contains(_searchedTerm.Trim().ToLower())
                         || x.Seq.ToString().Trim().ToLower().Contains(_searchedTerm.Trim().ToLower()));
                 }
-                int _skip = (_pageNo - 1) * _pageSize;
                 totalRecords = await _query.CountAsync();
-                _query = _query.Skip(_skip).Take(_pageSize);
-                _result = await _query.OrderBy(x => x.Seq).ToListAsync();
+                int _skip = (_pageNo - 1) * _pageSize;
+                _result = await _query.OrderBy(x => x.Seq).Skip(_skip).Take(_pageSize).ToListAsync();
             }
             catch (Exception ex)
             {

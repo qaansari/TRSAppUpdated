@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TRSAppUpdated.Models
@@ -11,7 +11,7 @@ namespace TRSAppUpdated.Models
         public string FirstName { get; set; }
         [Column(TypeName = "varchar(20)")]
         public string LastName { get; set; }
-        [Column(TypeName = "varchar(41)")]
+        [NotMapped]
         public string FullName
         {
             get
@@ -24,7 +24,7 @@ namespace TRSAppUpdated.Models
         [Column(TypeName = "varchar(320)")]
         [DataType(DataType.EmailAddress)]
         public string Email { get; set; }
-        [Column(TypeName = "varchar(max)")]
+        [Column(TypeName = "varchar(255)")]
         public string Password { get; set; }
         [ForeignKey("Role")]
         public int RoleID { get; set; }

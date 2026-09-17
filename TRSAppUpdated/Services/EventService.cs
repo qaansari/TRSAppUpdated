@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Syncfusion.EJ2.Linq;
+using Microsoft.EntityFrameworkCore;
+using TRSAppUpdated.Helpers;
 using TRSAppUpdated.Interfaces;
 using TRSAppUpdated.Models;
 using TRSAppUpdated.ViewModels;
@@ -10,142 +10,181 @@ namespace TRSAppUpdated.Services
     {
         private readonly AppDbContext _context;
         private readonly ILogger<EventService> _logger;
+        private readonly ICacheService _cacheService;
         private readonly string _Title = "Event";
-        public EventService(AppDbContext context, ILogger<EventService> logger)
+
+        public EventService(AppDbContext context, ILogger<EventService> logger, ICacheService cacheService)
         {
             _context = context;
             _logger = logger;
+            _cacheService = cacheService;
         }
-        //Get All
+
+        //Get All with In-Memory Caching
         public List<EventVM> GetAll()
         {
-            try
+            return _cacheService.GetOrCreate(CacheKeys.EventsList, () =>
             {
-                var _result = _context.Events.Where(x => !x.IsDeleted)
-                             .Select(x => new EventVM()
-                             {
-                                 ID = x.ID,
-                                 Title = x.Title,
-                             })
-                             .AsNoTracking()
-                             .OrderBy(x => x.Title)
-                             .ToList();
-                return _result ?? new List<EventVM>();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error occured at GetAll in {_Title} Service due to {ex}");
-            }
-            return new List<EventVM>();
+                try
+                {
+                    var result = _context.Events.Where(x => !x.IsDeleted)
+                                 .Select(x => new EventVM()
+                                 {
+                                     ID = x.ID,
+                                     Title = x.Title,
+                                 })
+                                 .AsNoTracking()
+                                 .OrderBy(x => x.Title)
+                                 .ToList();
+                    return result ?? new List<EventVM>();
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError($"Error occured at GetAll in {_Title} Service due to {ex}");
+                }
+                return new List<EventVM>();
+            }, TimeSpan.FromHours(1));
         }
-        //Get All Paginated
+
+        //Get All Paginated - Fixed OrderBy before Skip/Take
         public async Task<(List<EventVM> _result, int totalRecords)> GetAllPaginated(int _pageNo = 1, int _pageSize = 10, string _searchedTerm = "", int _CountryID = 0)
         {
-            var _result = new List<EventVM>();
+            var result = new List<EventVM>();
             int totalRecords = 0;
             try
             {
-                // For AJAX calls
-                var _query = _context.Events
+                var query = _context.Events
                     .Where(x => !x.IsDeleted)
-                           .Select(x => new EventVM()
-                           {
-                               ID = x.ID,
-                               Title = x.Title,
-                               CountryID = x.Auditorium.Venue.City.CountryID,
-                               CountryTitle = x.Auditorium.Venue.City.Country.Title,
-                               CityTitle = x.Auditorium.Venue.City.Title,
-                               VenueTitle = x.Auditorium.Venue.Title,
-                               AuditoriumTitle = x.Auditorium.Title,
-                               EventStatusTitle = x.EventStatus.Title,
-                               ImagePath = x.ImagePath
-                           })
-                           .AsNoTracking()
-                           .AsQueryable();
+                    .Select(x => new EventVM()
+                    {
+                        ID = x.ID,
+                        Title = x.Title,
+                        CountryID = x.Auditorium.Venue.City.CountryID,
+                        CountryTitle = x.Auditorium.Venue.City.Country.Title,
+                        CityTitle = x.Auditorium.Venue.City.Title,
+                        VenueTitle = x.Auditorium.Venue.Title,
+                        AuditoriumTitle = x.Auditorium.Title,
+                        EventStatusTitle = x.EventStatus.Title,
+                        ImagePath = x.ImagePath
+                    })
+                    .AsNoTracking()
+                    .AsQueryable();
+
                 if (_CountryID != 0)
                 {
-                    _query = _query.Where(x => x.CountryID == _CountryID);
+                    query = query.Where(x => x.CountryID == _CountryID);
                 }
+
                 if (!string.IsNullOrEmpty(_searchedTerm))
                 {
-                    _query = _query
-                        .Where(x => x.Title.Trim().ToLower().Contains(_searchedTerm.Trim().ToLower())
-                        || x.CityTitle.Trim().ToLower().Contains(_searchedTerm.Trim().ToLower())
-                        || x.VenueTitle.Trim().ToLower().Contains(_searchedTerm.Trim().ToLower())
-                        || x.AuditoriumTitle.Trim().ToLower().Contains(_searchedTerm.Trim().ToLower())
-                        || x.EventStatusTitle.Trim().ToLower().Contains(_searchedTerm.Trim().ToLower()));
+                    string term = _searchedTerm.Trim().ToLower();
+                    query = query.Where(x => x.Title.ToLower().Contains(term)
+                        || x.CityTitle.ToLower().Contains(term)
+                        || x.VenueTitle.ToLower().Contains(term)
+                        || x.AuditoriumTitle.ToLower().Contains(term)
+                        || x.EventStatusTitle.ToLower().Contains(term));
                 }
-                int _skip = (_pageNo - 1) * _pageSize;
-                totalRecords = await _query.CountAsync();
-                _query = _query.Skip(_skip).Take(_pageSize);
-                _result = await _query.OrderByDescending(x => x.ID).ToListAsync();
+
+                totalRecords = await query.CountAsync();
+                int skip = (_pageNo - 1) * _pageSize;
+
+                // Crucial fix: OrderBy MUST precede Skip and Take
+                result = await query.OrderByDescending(x => x.ID)
+                                    .Skip(skip)
+                                    .Take(_pageSize)
+                                    .ToListAsync();
             }
             catch (Exception ex)
             {
                 _logger.LogError($"Error occured at GetAllPaginated in {_Title} Service due to {ex}");
             }
-            return (_result, totalRecords);
+            return (result, totalRecords);
         }
-        //Get Details By ID
+
+        //Get Details By ID - Fixed in-memory date formatting
         public async Task<EventVM> GetDetailsByID(int ID)
         {
-            // For AJAX calls
             try
             {
-                var _object = await _context.Events
-     .Where(x => !x.IsDeleted && x.ID == ID)
-     .Select(x => new EventVM()
-     {
-         ID = x.ID,
-         Title = x.Title,
-         StartDate = x.StartDate,
-         EndDate = x.EndDate,
-         Description = x.Description,
-         CountryID = x.Auditorium.Venue.City.CountryID,
-         CountryTitle = x.Auditorium.Venue.City.Country.Title,
-         CityTitle = x.Auditorium.Venue.City.Title,
-         VenueTitle = x.Auditorium.Venue.Title,
-         AuditoriumTitle = x.Auditorium.Title,
-         EventStatusTitle = x.EventStatus.Title,
-         ShowsList = x.Shows
-             .Where(s => !s.IsDeleted)
-             .OrderBy(x => x.Date)
-             .Select(s => new ShowVM()
-             {
-                 ID = s.ID,
-                 Date = s.Date,
-                 Time = s.Time,
-                 IsEnded = s.IsEnded,
-             })
-             .ToList(),
-         EventCategoriesList = x.EventCategories
-              .Select(ec => ec.Category.Title)
-             .ToList(),
-         ReservationList = x.Shows
-             .SelectMany(s => s.Reservations)
-             .Select(r => new ReservationVM()
-             {
-                 ID = r.ID,
-                 TicketNumber = r.TicketNumber,
-                 ShowDateTime = r.Show.Date.ToString("dddd, dd MMMM yyyy") + " "
-                 + DateTime.Today.Add(r.Show.Time).ToString("hh:mm tt"),
-                 CustomerName = r.CustomerName,
-                 CustomerPhone = r.CustomerPhone,
-                 AmountRemaining=r.AmountRemaining,
-                 SalePrice = r.SalePrice,
-                 CreatedByUserID = r.CreatedByUserID,
-                 AmountPaid = r.AmountPaid,
-                 IsApproved = r.IsApproved,
-                 ReservationStatusTitle = r.ReservationStatus.Title,
-                 ApprovedByUserName = r.ActionByUser.FullName,
-                 CreatedByUserName = r.CreatedByUser.FullName,
-             })
-             .ToList(),
-         ImagePath = x.ImagePath
-     })
-            .AsNoTracking()
-            .FirstOrDefaultAsync();
-                return _object ?? new EventVM();
+                var ev = await _context.Events
+                    .Where(x => !x.IsDeleted && x.ID == ID)
+                    .Include(x => x.Auditorium).ThenInclude(a => a.Venue).ThenInclude(v => v.City).ThenInclude(c => c.Country)
+                    .Include(x => x.EventStatus)
+                    .Include(x => x.EventCategories).ThenInclude(ec => ec.Category)
+                    .Include(x => x.Shows.Where(s => !s.IsDeleted))
+                        .ThenInclude(s => s.Reservations.Where(r => !r.IsDeleted))
+                            .ThenInclude(r => r.ReservationStatus)
+                    .Include(x => x.Shows.Where(s => !s.IsDeleted))
+                        .ThenInclude(s => s.Reservations.Where(r => !r.IsDeleted))
+                            .ThenInclude(r => r.ActionByUser)
+                    .Include(x => x.Shows.Where(s => !s.IsDeleted))
+                        .ThenInclude(s => s.Reservations.Where(r => !r.IsDeleted))
+                            .ThenInclude(r => r.CreatedByUser)
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync();
+
+                if (ev == null)
+                {
+                    return new EventVM();
+                }
+
+                var vm = new EventVM
+                {
+                    ID = ev.ID,
+                    Title = ev.Title,
+                    StartDate = ev.StartDate,
+                    EndDate = ev.EndDate,
+                    Description = ev.Description,
+                    CountryID = ev.Auditorium?.Venue?.City?.CountryID ?? 0,
+                    CountryTitle = ev.Auditorium?.Venue?.City?.Country?.Title ?? string.Empty,
+                    CityTitle = ev.Auditorium?.Venue?.City?.Title ?? string.Empty,
+                    VenueTitle = ev.Auditorium?.Venue?.Title ?? string.Empty,
+                    AuditoriumTitle = ev.Auditorium?.Title ?? string.Empty,
+                    EventStatusTitle = ev.EventStatus?.Title ?? string.Empty,
+                    ImagePath = ev.ImagePath,
+                    ShowsList = ev.Shows
+                        .Where(s => !s.IsDeleted)
+                        .OrderBy(s => s.Date)
+                        .Select(s => new ShowVM
+                        {
+                            ID = s.ID,
+                            Date = s.Date,
+                            Time = s.Time,
+                            IsEnded = s.IsEnded
+                        }).ToList(),
+                    EventCategoriesList = ev.EventCategories
+                        .Select(ec => ec.Category?.Title ?? string.Empty)
+                        .ToList()
+                };
+
+                var reservations = new List<ReservationVM>();
+                foreach (var show in ev.Shows.Where(s => !s.IsDeleted))
+                {
+                    string showDateStr = show.Date.ToString("dddd, dd MMMM yyyy") + " "
+                        + DateTime.Today.Add(show.Time).ToString("hh:mm tt");
+
+                    foreach (var r in show.Reservations.Where(r => !r.IsDeleted))
+                    {
+                        reservations.Add(new ReservationVM
+                        {
+                            ID = r.ID,
+                            TicketNumber = r.TicketNumber,
+                            ShowDateTime = showDateStr,
+                            CustomerName = r.CustomerName,
+                            CustomerPhone = r.CustomerPhone,
+                            AmountRemaining = r.AmountRemaining,
+                            SalePrice = r.SalePrice,
+                            CreatedByUserID = r.CreatedByUserID,
+                            AmountPaid = r.AmountPaid,
+                            IsApproved = r.IsApproved,
+                            ReservationStatusTitle = r.ReservationStatus?.Title ?? string.Empty,
+                            ApprovedByUserName = r.ActionByUser?.FullName ?? string.Empty,
+                            CreatedByUserName = r.CreatedByUser?.FullName ?? string.Empty,
+                        });
+                    }
+                }
+                vm.ReservationList = reservations;
+                return vm;
             }
             catch (Exception ex)
             {

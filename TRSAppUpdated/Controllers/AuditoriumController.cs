@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
@@ -19,12 +19,13 @@ namespace TRSAppUpdated.Controllers
         private readonly IVenueService _venueService;
         private readonly ICountryService _countryService;
         private readonly ICityService _cityService;
+        private readonly ICacheService _cacheService;
         private readonly string _Title = "Auditorium";
         private readonly int _UserID;
         public AuditoriumController(AppDbContext context, IHttpContextAccessor httpContextAccessor,
             IWebHostEnvironment webHostEnvironment, ILogger<AuditoriumController> logger,
             IVenueService venueService, ICountryService countryService,
-            ICityService cityService)
+            ICityService cityService, ICacheService cacheService)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;
@@ -33,6 +34,7 @@ namespace TRSAppUpdated.Controllers
             _venueService = venueService;
             _countryService = countryService;
             _cityService = cityService;
+            _cacheService = cacheService;
             _UserID = Convert.ToInt32(_httpContextAccessor.HttpContext.User.FindFirstValue("UserID"));
         }
         //Index (Get All)
@@ -139,6 +141,8 @@ namespace TRSAppUpdated.Controllers
                             if (_item.NoOfRows != Model.NoOfRows || _item.StartingRow.Trim() != Model.StartingRow.Trim())
                             {
                                 var _rows = _context.Rows
+                                    .Include(r => r.Columns)
+                                    .ThenInclude(c => c.Seats)
                                     .Where(x => x.AuditoriumID == _item.ID).ToList();
                                 if (_rows.Count > 0)
                                 {
@@ -181,6 +185,7 @@ namespace TRSAppUpdated.Controllers
                             _item.UpdatedDateTime = DateTime.UtcNow.AddHours(5);
                             _context.Entry(_item).State = EntityState.Modified;
                             await _context.SaveChangesAsync();
+                            _cacheService.Remove(CacheKeys.Auditoriums);
                             TempData["Message"] = $"1,{_Title} Successfully Updated";
                         }
                     }
@@ -221,6 +226,7 @@ namespace TRSAppUpdated.Controllers
                         _context.Rows.AddRange(_rowsToAdd);
                         //Rows Insertion End
                         await _context.SaveChangesAsync();
+                        _cacheService.Remove(CacheKeys.Auditoriums);
                         TempData["Message"] = $"1,{_Title} Successfully Added";
                     }
                     if (_item != null && Model.ImageFile != null)
@@ -267,6 +273,7 @@ namespace TRSAppUpdated.Controllers
                     _context.ChangeTracker.Clear();
                     _context.Entry(_item).State = EntityState.Modified;
                     await _context.SaveChangesAsync();
+                    _cacheService.Remove(CacheKeys.Auditoriums);
                     TempData["Message"] = $"1,{_Title} Successfully Deleted";
                 }
                 else
@@ -310,10 +317,9 @@ namespace TRSAppUpdated.Controllers
                         .Where(x => x.Title.Trim().ToLower().Contains(_searchedTerm.Trim().ToLower())
                     || (!string.IsNullOrEmpty(x.VenueTitle) && x.VenueTitle.Trim().ToLower().Contains(_searchedTerm.Trim().ToLower())));
                 }
-                int _skip = (_pageNo - 1) * _pageSize;
                 totalRecords = await _query.CountAsync();
-                _query = _query.Skip(_skip).Take(_pageSize);
-                _result = await _query.OrderByDescending(x => x.ID).ToListAsync();
+                int _skip = (_pageNo - 1) * _pageSize;
+                _result = await _query.OrderByDescending(x => x.ID).Skip(_skip).Take(_pageSize).ToListAsync();
             }
             catch (Exception ex)
             {
@@ -404,14 +410,14 @@ namespace TRSAppUpdated.Controllers
                         AuditoriumName = x.Title.Trim(),
                         VenueName = x.Venue.Title.Trim(),
                         AuditoriumAlignment = x.Alignment,
-                        Rows = x.Rows.Select(y => new RowVM()
+                        Rows = x.Rows.OrderBy(y => y.ID).Select(y => new RowVM()
                         {
                             RowLabel = y.RowLabel,
-                            Columns = y.Columns.Select(c => new ColumnVM()
+                            Columns = y.Columns.OrderBy(c => c.ColumnNumber).Select(c => new ColumnVM()
                             {
                                 ID = c.ID,
                                 ColumnNumber = c.ColumnNumber,
-                                Seats = c.Seats.Select(s => s.SeatNumber).ToList()
+                                Seats = c.Seats.OrderBy(s => s.SeatNumber).Select(s => s.SeatNumber).ToList()
                             }).ToList()
                         }).ToList()
                     }).FirstOrDefault();

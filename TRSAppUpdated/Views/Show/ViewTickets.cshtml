@@ -1,4 +1,4 @@
-﻿@model SeatVM
+@model SeatVM
 @{
     bool isSuperAdmin = (await _authorizationService.AuthorizeAsync(User, "SuperAdmin")).Succeeded ? true : false;
     bool isAdmin = (await _authorizationService.AuthorizeAsync(User, "Admin")).Succeeded ? true : false;
@@ -7,7 +7,8 @@
     ViewData["Title"] = $"Ticket Details";
     var _Message = TempData["Message"] as string;
     int _EventID = ViewBag.EventID != null ? ViewBag.EventID : 0;
-    int _TSeats = Model.Rows.SelectMany(x => x.Columns).SelectMany(x => x.SeatTickets).Count();
+    int _TSeats = Model.Rows?.SelectMany(x => x.Columns).SelectMany(x => x.SeatTickets).Count() ?? 0;
+    bool isRightAligned = string.Equals(Model.AuditoriumAlignment, "right", StringComparison.OrdinalIgnoreCase);
 }
 @if (isSuperAdmin || isAdmin || isModerator || isUser)
 {
@@ -17,7 +18,7 @@
                 <div class="form-group mb-0 float-right my-2 mr-5px">
                     <a class="btn btn-danger btn-sm" href="@Url.Action("Details", "Event", new { ID = _EventID })">Back</a>
                 </div>
-                <h1 class="fw-bold text-uppercase text-center">@(Model.EventName) dated @(Model.ShowDate.Value.ToString("dddd, dd MMMM yyyy"))</h1>
+                <h1 class="fw-bold text-uppercase text-center">@(Model.EventName) dated @(Model.ShowDate.HasValue ? Model.ShowDate.Value.ToString("dddd, dd MMMM yyyy") : "")</h1>
                 <h1 class="fw-bold text-uppercase text-center">@(Model.AuditoriumName)</h1>
             </div>
             <div class="info w-100 my-2">
@@ -28,32 +29,40 @@
                 <h5 class="fw-bold text-uppercase text-right">Total Sale: @(Model.AmountReceived)</h5>
             </div>
             <div class="w-100">
-                @foreach (var row in Model.Rows)
+                @if (Model.Rows != null)
                 {
-                    @if (Model.AuditoriumAlignment.ToLower() == "right")
+                    var rows = Model.Rows.OrderBy(r => r.ID).ToList();
+                    @foreach (var row in rows)
                     {
-                        row.Columns = row.Columns.ToList().AsEnumerable().Reverse().ToList();
-                    }
-                    <div class="seat-row mt-2">
-                        <span class="row_label mr-5px fw-bold">@row.RowLabel (@(row.Category) - @(row.CostPrice))</span>
-                        @foreach (var column in row.Columns)
+                        var columns = row.Columns != null ? row.Columns.OrderBy(c => c.ColumnNumber).ToList() : new List<ColumnVM>();
+                        if (isRightAligned)
                         {
-                            @if (Model.AuditoriumAlignment.ToLower() == "right")
-                            {
-                                column.SeatTickets = column.SeatTickets.ToList().AsEnumerable().Reverse().ToList();
-                            }
-                            foreach (var seat in column.SeatTickets)
-                            {
-                                <div class="@(_TSeats <= 450 ? "seat_bigger" : "seat") @(seat.IsReserved ? "reserved" : "")" title="Price: @seat.CostPrice">
-                                    @seat.SeatNumber
-                                </div>
-                            }
-                            <div class="column-gap"></div>
+                            columns.Reverse();
                         }
-                        <span class="row_label fw-bold">@row.RowLabel (@(row.Category) - @(row.CostPrice))</span>
-                    </div>
+                        <div class="seat-row mt-2">
+                            <span class="row_label mr-5px fw-bold">@row.RowLabel (@(row.Category) - @(row.CostPrice))</span>
+                            @foreach (var column in columns)
+                            {
+                                if (column.SeatTickets != null && column.SeatTickets.Count > 0)
+                                {
+                                    var seats = column.SeatTickets.OrderBy(s => s.SeatNumber).ToList();
+                                    if (isRightAligned)
+                                    {
+                                        seats.Reverse();
+                                    }
+                                    @foreach (var seat in seats)
+                                    {
+                                        <div class="@(_TSeats <= 450 ? "seat_bigger" : "seat") @(seat.IsReserved ? "reserved" : "")" title="Price: @seat.CostPrice">
+                                            @seat.SeatNumber
+                                        </div>
+                                    }
+                                    <div class="column-gap"></div>
+                                }
+                            }
+                            <span class="row_label fw-bold">@row.RowLabel (@(row.Category) - @(row.CostPrice))</span>
+                        </div>
+                    }
                 }
-
             </div>
         </div>
     </div>

@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using TRSAppUpdated.Helpers;
+using TRSAppUpdated.Interfaces;
 using TRSAppUpdated.Models;
 using TRSAppUpdated.ViewModels;
 
@@ -13,16 +15,20 @@ namespace TRSAppUpdated.Controllers
         private readonly AppDbContext _context;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ILogger<CountryController> _logger;
+        private readonly ICacheService _cacheService;
         private readonly string _Title = "Country";
         private readonly int _UserID;
+
         public CountryController(AppDbContext context, IHttpContextAccessor httpContextAccessor,
-            ILogger<CountryController> logger)
+            ILogger<CountryController> logger, ICacheService cacheService)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;
             _logger = logger;
+            _cacheService = cacheService;
             _UserID = Convert.ToInt32(_httpContextAccessor.HttpContext.User.FindFirstValue("UserID"));
         }
+
         //Index (Get All)
         public async Task<IActionResult> Index(int _pageNo = 1, int _pageSize = 10, string _searchedTerm = "")
         {
@@ -41,6 +47,7 @@ namespace TRSAppUpdated.Controllers
             }
             return View(new List<CountryVM>());
         }
+
         // GetPartial
         [HttpGet]
         public async Task<IActionResult> GetPartial(int _pageNo = 1, int _pageSize = 10, string _searchedTerm = "")
@@ -61,6 +68,7 @@ namespace TRSAppUpdated.Controllers
             }
             return PartialView($"_{_partialViewName}TablePartial", new List<CountryVM>());
         }
+
         //AddOrEdit (GET)
         public IActionResult AddOrEdit(int ID = 0)
         {
@@ -88,6 +96,7 @@ namespace TRSAppUpdated.Controllers
             }
             return View(_item);
         }
+
         //AddOrEdit (POST)
         [HttpPost]
         public async Task<IActionResult> AddOrEdit(CountryVM Model)
@@ -120,6 +129,7 @@ namespace TRSAppUpdated.Controllers
                             _context.ChangeTracker.Clear();
                             _context.Entry(_item).State = EntityState.Modified;
                             await _context.SaveChangesAsync();
+                            _cacheService.Remove(CacheKeys.Countries);
                             TempData["Message"] = $"1,{_Title} Successfully Updated";
                         }
                     }
@@ -140,18 +150,19 @@ namespace TRSAppUpdated.Controllers
                         _item.CreatedDateTime = DateTime.UtcNow.AddHours(5);
                         _context.Countries.Add(_item);
                         await _context.SaveChangesAsync();
+                        _cacheService.Remove(CacheKeys.Countries);
                         TempData["Message"] = $"1,{_Title} Successfully Added";
                     }
                     return RedirectToAction("Index");
                 }
             }
-
             catch (Exception ex)
             {
                 _logger.LogError($"Error occured at AddOrEdit (POST) in {_Title} Controller due to {ex}");
             }
             return View(Model);
         }
+
         [HttpPost]
         public async Task<IActionResult> Delete(int ID)
         {
@@ -167,6 +178,7 @@ namespace TRSAppUpdated.Controllers
                     _context.ChangeTracker.Clear();
                     _context.Entry(_item).State = EntityState.Modified;
                     await _context.SaveChangesAsync();
+                    _cacheService.Remove(CacheKeys.Countries);
                     TempData["Message"] = $"1,{_Title} Successfully Deleted";
                 }
                 else
@@ -180,16 +192,15 @@ namespace TRSAppUpdated.Controllers
             }
             return RedirectToAction("Index");
         }
+
         //Get List
         [NonAction]
         public async Task<(List<CountryVM> _result, int totalRecords)> GetList(int _pageNo, int _pageSize, string _searchedTerm)
         {
-
             var _result = new List<CountryVM>();
             int totalRecords = 0;
             try
             {
-                // For AJAX calls
                 var _query = _context.Countries.Where(x => !x.IsDeleted)
                            .Select(x => new CountryVM()
                            {
@@ -205,10 +216,11 @@ namespace TRSAppUpdated.Controllers
                     _query = _query
                         .Where(x => x.Title.Trim().ToLower().Contains(_searchedTerm.Trim().ToLower()));
                 }
-                int _skip = (_pageNo - 1) * _pageSize;
                 totalRecords = await _query.CountAsync();
-                _query = _query.Skip(_skip).Take(_pageSize);
-                _result = await _query.OrderByDescending(x => x.ID).ToListAsync();
+                int _skip = (_pageNo - 1) * _pageSize;
+
+                // Fixed: OrderBy before Skip/Take
+                _result = await _query.OrderByDescending(x => x.ID).Skip(_skip).Take(_pageSize).ToListAsync();
             }
             catch (Exception ex)
             {

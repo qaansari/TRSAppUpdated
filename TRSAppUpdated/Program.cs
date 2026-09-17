@@ -1,8 +1,11 @@
-﻿using DinkToPdf;
+using DinkToPdf;
 using DinkToPdf.Contracts;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using System.Threading.RateLimiting;
 using TRSAppUpdated.Helpers;
 using TRSAppUpdated.Interfaces;
 using TRSAppUpdated.Models;
@@ -15,13 +18,43 @@ namespace TRSAppUpdated
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            // Configure AppHelper static settings from configuration
+            AppHelper.ConfigureSettings(builder.Configuration);
+
             // Add services to the container.
+            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
             builder.Services.AddDbContext<AppDbContext>(options =>
             {
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+                options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), mySqlOptions =>
+                {
+                    mySqlOptions.EnableRetryOnFailure(
+                        maxRetryCount: 5,
+                        maxRetryDelay: TimeSpan.FromSeconds(10),
+                        errorNumbersToAdd: null);
+                });
                 options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
             });
-            builder.Services.AddControllersWithViews();
+
+            builder.Services.AddMemoryCache();
+            builder.Services.AddSingleton<ICacheService, CacheService>();
+            builder.Services.AddControllersWithViews(options =>
+            {
+                options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
+            });
+
+            builder.Services.AddRateLimiter(options =>
+            {
+                options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+                options.AddFixedWindowLimiter("auth-limit", opt =>
+                {
+                    opt.PermitLimit = 20;
+                    opt.Window = TimeSpan.FromMinutes(1);
+                    opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+                    opt.QueueLimit = 0;
+                });
+            });
+
             builder.Services.AddDistributedMemoryCache();
             builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             builder.Services.AddScoped<IExpenseService, ExpenseService>();
@@ -105,8 +138,12 @@ namespace TRSAppUpdated
             //Syncfusion
             Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1JEaF5cXmRCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdmWXhedHZWQmlZWE1yXkpWYEk=");
             // Register DinkToPdf
-            var context = new CustomAssemblyLoadContext();
-            context.LoadUnmanagedLibrary(Path.Combine(builder.Environment.WebRootPath,"assets","native", "libwkhtmltox.dll"));
+            var nativeLibPath = Path.Combine(builder.Environment.WebRootPath, "assets", "native", "libwkhtmltox.dll");
+            if (File.Exists(nativeLibPath))
+            {
+                var context = new CustomAssemblyLoadContext();
+                context.LoadUnmanagedLibrary(nativeLibPath);
+            }
             builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
             var app = builder.Build();
             // Configure the HTTP request pipeline.
@@ -118,10 +155,24 @@ namespace TRSAppUpdated
             }
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            app.UseAuthentication();
+
+            // Security Headers Middleware
+            app.Use(async (context, next) =>
+            {
+                context.Response.Headers.Append("X-Content-Type-Options", "nosniff");
+                context.Response.Headers.Append("X-Frame-Options", "SAMEORIGIN");
+                context.Response.Headers.Append("Referrer-Policy", "strict-origin-when-cross-origin");
+                context.Response.Headers.Append("X-XSS-Protection", "1; mode=block");
+                await next();
+            });
+
             app.UseRouting();
-            app.UseAuthorization();
+
+            app.UseRateLimiter();
             app.UseSession();
+            app.UseAuthentication();
+            app.UseAuthorization();
+
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");

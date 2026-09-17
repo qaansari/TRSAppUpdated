@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using TRSAppUpdated.Helpers;
 using TRSAppUpdated.Interfaces;
 using TRSAppUpdated.Models;
 using TRSAppUpdated.ViewModels;
@@ -9,33 +10,40 @@ namespace TRSAppUpdated.Services
     {
         private readonly AppDbContext _context;
         private readonly ILogger<EventStatusService> _logger;
+        private readonly ICacheService _cacheService;
         private readonly string _Title = "Event Status";
-        public EventStatusService(AppDbContext context, ILogger<EventStatusService> logger)
+
+        public EventStatusService(AppDbContext context, ILogger<EventStatusService> logger, ICacheService cacheService)
         {
             _context = context;
             _logger = logger;
+            _cacheService = cacheService;
         }
-        //Get All
+
+        //Get All with In-Memory Caching
         public List<EventStatusVM> GetAll()
         {
-            try
+            return _cacheService.GetOrCreate(CacheKeys.EventStatuses, () =>
             {
-                var _result = _context.EventStatuses.Where(x => !x.IsDeleted)
-                             .Select(x => new EventStatusVM()
-                             {
-                                 ID = x.ID,
-                                 Title = x.Title,
-                             })
-                             .AsNoTracking()
-                             .OrderBy(x => x.Title)
-                             .ToList();
-                return _result ?? new List<EventStatusVM>();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error occured at GetAll in {_Title} Service due to {ex}");
-            }
-            return new List<EventStatusVM>();
+                try
+                {
+                    var result = _context.EventStatuses.Where(x => !x.IsDeleted)
+                                 .Select(x => new EventStatusVM()
+                                 {
+                                     ID = x.ID,
+                                     Title = x.Title,
+                                 })
+                                 .AsNoTracking()
+                                 .OrderBy(x => x.Title)
+                                 .ToList();
+                    return result ?? new List<EventStatusVM>();
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError($"Error occured at GetAll in {_Title} Service due to {ex}");
+                }
+                return new List<EventStatusVM>();
+            }, TimeSpan.FromHours(4));
         }
     }
 }

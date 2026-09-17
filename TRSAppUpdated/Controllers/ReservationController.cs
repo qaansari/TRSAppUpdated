@@ -1,6 +1,5 @@
-﻿using DinkToPdf;
+using DinkToPdf;
 using DinkToPdf.Contracts;
-using EFCore.BulkExtensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -28,13 +27,15 @@ namespace TRSAppUpdated.Controllers
         private readonly IPaymentModeService _paymentModeService;
         private readonly IReservationStatusService _reservationStatusService;
         private readonly IUserService _userService;
+        private readonly ICacheService _cacheService;
         private readonly string _Title = "Reservation";
         private readonly int _UserID;
         public ReservationController(AppDbContext context, IHttpContextAccessor httpContextAccessor, IConverter converter,
             IWebHostEnvironment webHostEnvironment, ILogger<ReservationController> logger,
             IReservationService reservationService, IShowService showService,
             ITicketService ticketService, IPaymentModeService paymentModeService,
-            IReservationStatusService reservationStatusService, IUserService userService)
+            IReservationStatusService reservationStatusService, IUserService userService,
+            ICacheService cacheService)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;
@@ -48,6 +49,7 @@ namespace TRSAppUpdated.Controllers
             _reservationStatusService = reservationStatusService;
             _UserID = Convert.ToInt32(_httpContextAccessor.HttpContext.User.FindFirstValue("UserID"));
             _userService = userService;
+            _cacheService = cacheService;
         }
         [Authorize(Roles = "Super Admin,Admin")]
         public IActionResult AddOrEdit(int ID = 0, int EventID = 0)
@@ -126,26 +128,101 @@ namespace TRSAppUpdated.Controllers
                 ViewData["UserList"] = _userService.GetAll();
                 if (ModelState.IsValid)
                 {
-                    var _item = new Reservation();
-                    if (Model.AmountRemaining == 0)
+                    await using var transaction = await _context.Database.BeginTransactionAsync();
+                    try
                     {
-                        Model.IsFullyPaid = true;
-                    }
-                    var _reservationStatusTitle = _context.ReservationStatuses.Where(x => !x.IsDeleted
-                     && x.ID == Model.ReservationStatusID).Select(x => x.Title).FirstOrDefault();
-                    if (Model.ID != 0)
-                    {
-                        var isExists = _context.ReservationTickets.Where(x => x.ReservationID != Model.ID && Model.TicketIDs.Contains(x.TicketID))
-                         .Any();
-                        if (isExists)
+                        var now = DateTime.UtcNow.AddHours(5);
+                        var _item = new Reservation();
+                        if (Model.AmountRemaining == 0)
                         {
-                            TempData["Message"] = $"0,Invalid Tickets Selected";
-                            return RedirectToAction("AddOrEdit", _Title, new { ID = Model.ID, EventID = Model.EventID });
+                            Model.IsFullyPaid = true;
                         }
-                        _item = _context.Reservations.Where(x => !x.IsDeleted && x.ID == Model.ID)
-                            .AsNoTracking().FirstOrDefault();
-                        if (_item != null)
+                        var _reservationStatusTitle = await _context.ReservationStatuses
+                            .Where(x => !x.IsDeleted && x.ID == Model.ReservationStatusID)
+                            .Select(x => x.Title)
+                            .FirstOrDefaultAsync();
+
+                        if (Model.ID != 0)
                         {
+                            var isExists = await _context.ReservationTickets
+                                .Where(x => x.ReservationID != Model.ID && Model.TicketIDs.Contains(x.TicketID))
+                                .AnyAsync();
+                            if (isExists)
+                            {
+                                TempData["Message"] = $"0,Invalid Tickets Selected";
+                                return RedirectToAction("AddOrEdit", _Title, new { ID = Model.ID, EventID = Model.EventID });
+                            }
+                            _item = await _context.Reservations
+                                .Where(x => !x.IsDeleted && x.ID == Model.ID)
+                                .AsNoTracking()
+                                .FirstOrDefaultAsync();
+
+                            if (_item != null)
+                            {
+                                _item.CustomerName = Model.CustomerName.Trim();
+                                _item.CustomerPhone = Model.CustomerPhone.Trim();
+                                _item.CostPrice = Model.CostPrice;
+                                _item.Discount = Model.Discount;
+                                _item.SalePrice = Model.SalePrice;
+                                _item.AmountPaid = Model.AmountPaid;
+                                _item.AmountRemaining = Model.AmountRemaining;
+                                _item.IsFullyPaid = Model.IsFullyPaid;
+                                _item.TransactionID = Model.TransactionID;
+                                _item.BookingDateTime = Model.BookingDateTime;
+                                _item.IsApproved = Model.IsApproved;
+                                if (_item.IsApproved.HasValue)
+                                {
+                                    _item.ActionByUserID = Model.ActionByUserID.HasValue ? Model.ActionByUserID : _UserID;
+                                    _item.ActionDateTime = now;
+                                }
+                                if (!string.IsNullOrEmpty(_reservationStatusTitle) && _reservationStatusTitle.Equals("closed", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    _item.ClosedByUserID = _UserID;
+                                    _item.ClosingDateTime = now;
+                                }
+                                _item.ShowID = Model.ShowID;
+                                _item.PaymentModeID = Model.PaymentModeID;
+                                _item.ReservationStatusID = Model.ReservationStatusID;
+                                _item.UpdatedByUserID = _UserID;
+                                _item.UpdatedDateTime = now;
+                                _context.Entry(_item).State = EntityState.Modified;
+                                await _context.SaveChangesAsync();
+
+                                var _existingRsvs = await _context.ReservationTickets
+                                    .Where(x => x.ReservationID == Model.ID).ToListAsync();
+                                if (_existingRsvs != null && _existingRsvs.Count > 0)
+                                {
+                                    List<int> _existingTicketIDs = _existingRsvs.Select(x => x.TicketID).ToList();
+                                    bool _isSameList = Model.TicketIDs.SequenceEqual(_existingTicketIDs);
+                                    if (!_isSameList)
+                                    {
+                                        await _context.Tickets
+                                            .Where(x => !x.IsDeleted && _existingTicketIDs.Contains(x.ID))
+                                            .ExecuteUpdateAsync(s => s
+                                                .SetProperty(t => t.IsReserved, false)
+                                                .SetProperty(t => t.ReservationDateTime, (DateTime?)null)
+                                                .SetProperty(t => t.SalePrice, 0)
+                                                .SetProperty(t => t.Discount, 0)
+                                                .SetProperty(t => t.UpdatedByUserID, _UserID)
+                                                .SetProperty(t => t.UpdatedDateTime, now));
+
+                                        _context.ReservationTickets.RemoveRange(_existingRsvs);
+                                    }
+                                }
+                                TempData["Message"] = $"1,{_Title} Successfully Updated";
+                            }
+                        }
+                        else
+                        {
+                            var isExists = await _context.ReservationTickets
+                                .Where(x => Model.TicketIDs.Contains(x.TicketID))
+                                .AnyAsync();
+                            if (isExists)
+                            {
+                                TempData["Message"] = $"0,Invalid Tickets Selected";
+                                return RedirectToAction("AddOrEdit", _Title, new { ID = Model.ID, EventID = Model.EventID });
+                            }
+                            _item.TicketNumber = Model.TicketNumber.Trim();
                             _item.CustomerName = Model.CustomerName.Trim();
                             _item.CustomerPhone = Model.CustomerPhone.Trim();
                             _item.CostPrice = Model.CostPrice;
@@ -155,247 +232,97 @@ namespace TRSAppUpdated.Controllers
                             _item.AmountRemaining = Model.AmountRemaining;
                             _item.IsFullyPaid = Model.IsFullyPaid;
                             _item.TransactionID = Model.TransactionID;
-                            _item.BookingDateTime = Model.BookingDateTime;
+                            if (!Model.BookingDateTime.HasValue)
+                            {
+                                Model.BookingDateTime = now;
+                            }
                             _item.IsApproved = Model.IsApproved;
                             if (_item.IsApproved.HasValue)
                             {
                                 _item.ActionByUserID = Model.ActionByUserID.HasValue ? Model.ActionByUserID : _UserID;
-                                _item.ActionDateTime = DateTime.UtcNow.AddHours(5);
+                                _item.ActionDateTime = now;
                             }
-                            if (!string.IsNullOrEmpty(_reservationStatusTitle) && _reservationStatusTitle.ToLower() == "closed")
+                            if (!string.IsNullOrEmpty(_reservationStatusTitle) && _reservationStatusTitle.Equals("closed", StringComparison.OrdinalIgnoreCase))
                             {
                                 _item.ClosedByUserID = _UserID;
-                                _item.ClosingDateTime = DateTime.UtcNow.AddHours(5);
+                                _item.ClosingDateTime = now;
                             }
+                            _item.BookingDateTime = Model.BookingDateTime;
                             _item.ShowID = Model.ShowID;
                             _item.PaymentModeID = Model.PaymentModeID;
                             _item.ReservationStatusID = Model.ReservationStatusID;
-                            _item.UpdatedByUserID = _UserID;
-                            _item.UpdatedDateTime = DateTime.UtcNow.AddHours(5);
-                            _context.Entry(_item).State = EntityState.Modified;
+                            _item.CreatedByUserID = _UserID;
+                            _item.CreatedDateTime = now;
+                            _context.Reservations.Add(_item);
                             await _context.SaveChangesAsync();
-                            var _existingRsvs = _context.ReservationTickets
-                                .Where(x => x.ReservationID == Model.ID).ToList();
-                            if (_existingRsvs != null && _existingRsvs.Count > 0)
-                            {
-                                List<int> _existingTicketIDs = _existingRsvs.Select(x => x.TicketID).ToList();
-                                bool _isSameList = Model.TicketIDs.SequenceEqual(_existingTicketIDs);
-                                if (!_isSameList)
-                                {
-                                    await _context.Tickets
-                                    .Where(x => !x.IsDeleted && _existingTicketIDs.Contains(x.ID))
-                                    .BatchUpdateAsync(x => new Ticket
-                                    {
-                                        CostPrice = x.CostPrice,
-                                        IsReserved = false,
-                                        ReservationDateTime = null,
-                                        IsRefunded = x.IsRefunded,
-                                        RefundDateTime = x.RefundDateTime,
-                                        IsCancelled = x.IsCancelled,
-                                        CancellationDateTime = x.CancellationDateTime,
-                                        SalePrice = 0,
-                                        Discount = 0,
-                                        UpdatedByUserID = _UserID,
-                                        UpdatedDateTime = DateTime.UtcNow.AddHours(5),
-                                    });
-                                    _context.ReservationTickets.RemoveRange(_existingRsvs);
-                                }
-                            }
-                            TempData["Message"] = $"1,{_Title} Successfully Updated";
+                            TempData["Message"] = $"1,{_Title} Successfully Added";
                         }
-                    }
-                    else
-                    {
-                        var isExists = _context.ReservationTickets.Where(x => Model.TicketIDs.Contains(x.TicketID))
-                        .Any();
-                        if (isExists)
-                        {
-                            TempData["Message"] = $"0,Invalid Tickets Selected";
-                            return RedirectToAction("AddOrEdit", _Title, new { ID = Model.ID, EventID = Model.EventID });
-                        }
-                        _item.TicketNumber = Model.TicketNumber.Trim();
-                        _item.CustomerName = Model.CustomerName.Trim();
-                        _item.CustomerPhone = Model.CustomerPhone.Trim();
-                        _item.CostPrice = Model.CostPrice;
-                        _item.Discount = Model.Discount;
-                        _item.SalePrice = Model.SalePrice;
-                        _item.AmountPaid = Model.AmountPaid;
-                        _item.AmountRemaining = Model.AmountRemaining;
-                        _item.IsFullyPaid = Model.IsFullyPaid;
-                        _item.TransactionID = Model.TransactionID;
-                        if (!Model.BookingDateTime.HasValue)
-                        {
-                            Model.BookingDateTime = DateTime.UtcNow.AddHours(5);
-                        }
-                        _item.IsApproved = Model.IsApproved;
-                        if (_item.IsApproved.HasValue)
-                        {
-                            _item.ActionByUserID = Model.ActionByUserID.HasValue ? Model.ActionByUserID : _UserID;
-                            _item.ActionDateTime = DateTime.UtcNow.AddHours(5);
-                        }
-                        if (!string.IsNullOrEmpty(_reservationStatusTitle) && _reservationStatusTitle.ToLower() == "closed")
-                        {
-                            _item.ClosedByUserID = _UserID;
-                            _item.ClosingDateTime = DateTime.UtcNow.AddHours(5);
-                        }
-                        _item.BookingDateTime = Model.BookingDateTime;
-                        _item.ShowID = Model.ShowID;
-                        _item.PaymentModeID = Model.PaymentModeID;
-                        _item.ReservationStatusID = Model.ReservationStatusID;
-                        _item.CreatedByUserID = _UserID;
-                        _item.CreatedDateTime = DateTime.UtcNow.AddHours(5);
-                        _context.Reservations.Add(_item);
-                        await _context.SaveChangesAsync();
-                        TempData["Message"] = $"1,{_Title} Successfully Added";
-                    }
 
-                    if (_item != null && Model.ImageFile != null)
-                    {
-                        var _eventName = _context.Events.Where(x => !x.IsDeleted && x.ID == Model.EventID).AsNoTracking().Select(x => x.Title).FirstOrDefault();
-                        if (!string.IsNullOrEmpty(_eventName))
+                        if (_item != null && Model.ImageFile != null)
                         {
-                            if (_eventName.Contains(" "))
+                            var _eventName = await _context.Events
+                                .Where(x => !x.IsDeleted && x.ID == Model.EventID)
+                                .AsNoTracking()
+                                .Select(x => x.Title)
+                                .FirstOrDefaultAsync();
+
+                            if (!string.IsNullOrEmpty(_eventName))
                             {
                                 _eventName = _eventName.Replace(" ", "");
                             }
-                        }
-                        var folderPath = Path.Combine(_webHostEnvironment.WebRootPath, "assets", "images", "reservations", _eventName);
-                        if (!Directory.Exists(folderPath))
-                        {
-                            Directory.CreateDirectory(folderPath);
+                            var folderPath = Path.Combine(_webHostEnvironment.WebRootPath, "assets", "images", "reservations", _eventName ?? "default");
+                            if (!Directory.Exists(folderPath))
+                            {
+                                Directory.CreateDirectory(folderPath);
+                            }
+
+                            var baseFileName = $"payment_slip_{_item.TicketNumber}";
+                            if (!string.IsNullOrEmpty(_reservationStatusTitle))
+                            {
+                                baseFileName = $"payment_slip_{_item.TicketNumber}_{_reservationStatusTitle.Replace(" ", "")}";
+                            }
+                            var extension = Path.GetExtension(Model.ImageFile.FileName);
+                            var _fileName = baseFileName + extension;
+                            var _filePath = Path.Combine(folderPath, _fileName);
+                            int counter = 1;
+                            while (System.IO.File.Exists(_filePath))
+                            {
+                                _fileName = $"{baseFileName}_{counter}{extension}";
+                                _filePath = Path.Combine(folderPath, _fileName);
+                                counter++;
+                            }
+                            var compressedBytes = await AppHelper.CompressImageAsync(Model.ImageFile);
+                            await System.IO.File.WriteAllBytesAsync(_filePath, compressedBytes);
+                            _context.ReservationImages.Add(new ReservationImage()
+                            {
+                                ReservationID = _item.ID,
+                                ImagePath = _fileName,
+                                CreatedByUserID = _UserID,
+                                CreatedDateTime = now,
+                            });
+                            await _context.SaveChangesAsync();
                         }
 
-                        // Build initial filename
-                        var baseFileName = $"payment_slip_{_item.TicketNumber}";
+                        if (_item != null && Model.TicketIDs != null && Model.TicketIDs.Count > 0)
+                        {
+                            if (!string.IsNullOrEmpty(_reservationStatusTitle))
+                            {
+                                var _existingTicketsPerReservation = await _context.ReservationTickets
+                                    .Where(x => x.ReservationID == _item.ID).ToListAsync();
+                                var statusLower = _reservationStatusTitle.ToLower();
 
-                        if (!string.IsNullOrEmpty(_reservationStatusTitle))
-                        {
-                            if (_reservationStatusTitle.Contains(" "))
-                            {
-                                _reservationStatusTitle = _reservationStatusTitle.Replace(" ", "");
-                            }
-                            baseFileName = $"payment_slip_{_item.TicketNumber}_{_reservationStatusTitle}";
-                        }
-                        var extension = Path.GetExtension(Model.ImageFile.FileName);
-                        var _fileName = baseFileName + extension;
-                        var _filePath = Path.Combine(folderPath, _fileName);
-                        // Ensure unique filename if file exists
-                        int counter = 1;
-                        while (System.IO.File.Exists(_filePath))
-                        {
-                            _fileName = $"{baseFileName}_{counter}{extension}";
-                            _filePath = Path.Combine(folderPath, _fileName);
-                            counter++;
-                        }
-                        // Save file
-                        var compressedBytes = await AppHelper.CompressImageAsync(Model.ImageFile);
-                        await System.IO.File.WriteAllBytesAsync(_filePath, compressedBytes);
-                        _context.ReservationImages.Add(new ReservationImage()
-                        {
-                            ReservationID = _item.ID,
-                            ImagePath = _fileName,
-                            CreatedByUserID = _UserID,
-                            CreatedDateTime = DateTime.UtcNow.AddHours(5),
-                        });
-                        await _context.SaveChangesAsync();
-                    }
-                    if (_item != null && Model.TicketIDs != null && Model.TicketIDs.Count > 0)
-                    {
-                        if (!string.IsNullOrEmpty(_reservationStatusTitle))
-                        {
-                            var _existingTicketsPerReservation = _context.ReservationTickets.Where(x => x.ReservationID == _item.ID).ToList();
-                            if (_reservationStatusTitle.ToLower() == "arrivalpending" || _reservationStatusTitle.ToLower() == "arrival pending")
-                            {
-                                if (_existingTicketsPerReservation.Count > 0)
-                                {
-                                    _context.ReservationTickets.RemoveRange(_existingTicketsPerReservation);
-                                    await _context.SaveChangesAsync();
-                                }
-                                foreach (var _ticketID in Model.TicketIDs)
-                                {
-                                    var _isExists = _context.ReservationTickets.Where(x => x.TicketID == _ticketID
-                                    && x.ReservationID == _item.ID).Any();
-                                    if (!_isExists)
-                                    {
-                                        _context.ReservationTickets.Add(new ReservationTicket()
-                                        {
-                                            ReservationID = _item.ID,
-                                            TicketID = _ticketID,
-                                            CreatedByUserID = _UserID,
-                                            CreatedDateTime = DateTime.UtcNow.AddHours(5)
-                                        });
-                                    }
-                                    else
-                                    {
-                                        continue;
-                                    }
-                                }
-                                await _context.SaveChangesAsync();
-                            }
-                            if (_item.IsApproved.HasValue && _item.IsApproved.Value)
-                            {
-                                if (_reservationStatusTitle.ToLower() == "arrivalpending" || _reservationStatusTitle.ToLower() == "arrival pending")
-                                {
-                                    await _context.Tickets
-                               .Where(x => !x.IsDeleted && Model.TicketIDs.Contains(x.ID))
-                               .BatchUpdateAsync(x => new Ticket
-                               {
-                                   CostPrice = _item.CostPrice / Model.TicketIDs.Count,
-                                   IsReserved = true,
-                                   IsRefunded = x.IsRefunded,
-                                   RefundDateTime = x.RefundDateTime,
-                                   IsCancelled = x.IsCancelled,
-                                   CancellationDateTime = x.CancellationDateTime,
-                                   ReservationDateTime = DateTime.UtcNow.AddHours(5),
-                                   SalePrice = _item.SalePrice / Model.TicketIDs.Count,
-                                   Discount = _item.Discount / Model.TicketIDs.Count,
-                                   UpdatedByUserID = _UserID,
-                                   UpdatedDateTime = DateTime.UtcNow.AddHours(5),
-                               });
-                                }
-                                else if (_reservationStatusTitle.ToLower() == "refunded")
-                                {
-                                    await _context.Tickets
-                                .Where(x => !x.IsDeleted && Model.TicketIDs.Contains(x.ID))
-                                .BatchUpdateAsync(x => new Ticket
-                                {
-                                    CostPrice = _item.CostPrice / Model.TicketIDs.Count,
-                                    IsReserved = x.IsReserved,
-                                    IsRefunded = true,
-                                    RefundDateTime = DateTime.UtcNow.AddHours(5),
-                                    IsCancelled = x.IsCancelled,
-                                    CancellationDateTime = x.CancellationDateTime,
-                                    ReservationDateTime = x.ReservationDateTime,
-                                    SalePrice = _item.SalePrice / Model.TicketIDs.Count,
-                                    Discount = _item.Discount / Model.TicketIDs.Count,
-                                    UpdatedByUserID = _UserID,
-                                    UpdatedDateTime = DateTime.UtcNow.AddHours(5),
-                                });
-                                }
-                                else if (_reservationStatusTitle.ToLower() == "cancelled")
+                                if (statusLower == "arrivalpending" || statusLower == "arrival pending")
                                 {
                                     if (_existingTicketsPerReservation.Count > 0)
                                     {
-                                        await _context.Tickets
-                                .Where(x => !x.IsDeleted && _existingTicketsPerReservation.Select(x => x.TicketID).Contains(x.ID))
-                                .BatchUpdateAsync(x => new Ticket
-                                {
-                                    CostPrice = x.CostPrice,
-                                    IsReserved = false,
-                                    IsRefunded = x.IsRefunded,
-                                    RefundDateTime = x.RefundDateTime,
-                                    ReservationDateTime = null,
-                                    SalePrice = x.SalePrice,
-                                    Discount = x.Discount,
-                                    UpdatedByUserID = _UserID,
-                                    UpdatedDateTime = DateTime.UtcNow.AddHours(5),
-                                });
                                         _context.ReservationTickets.RemoveRange(_existingTicketsPerReservation);
+                                        await _context.SaveChangesAsync();
                                     }
                                     foreach (var _ticketID in Model.TicketIDs)
                                     {
-                                        var _isExists = _context.ReservationTickets.Where(x => x.TicketID == _ticketID
-                                        && x.ReservationID == _item.ID).Any();
+                                        var _isExists = await _context.ReservationTickets
+                                            .Where(x => x.TicketID == _ticketID && x.ReservationID == _item.ID)
+                                            .AnyAsync();
                                         if (!_isExists)
                                         {
                                             _context.ReservationTickets.Add(new ReservationTicket()
@@ -403,33 +330,97 @@ namespace TRSAppUpdated.Controllers
                                                 ReservationID = _item.ID,
                                                 TicketID = _ticketID,
                                                 CreatedByUserID = _UserID,
-                                                CreatedDateTime = DateTime.UtcNow.AddHours(5)
+                                                CreatedDateTime = now
                                             });
                                         }
-                                        else
-                                        {
-                                            continue;
-                                        }
                                     }
-                                    await _context.Tickets
-                                .Where(x => !x.IsDeleted && Model.TicketIDs.Contains(x.ID))
-                                .BatchUpdateAsync(x => new Ticket
-                                {
-                                    CostPrice = x.CostPrice,
-                                    IsReserved = false,
-                                    IsRefunded = x.IsRefunded,
-                                    RefundDateTime = x.RefundDateTime,
-                                    ReservationDateTime = null,
-                                    SalePrice = x.SalePrice,
-                                    Discount = x.Discount,
-                                    UpdatedByUserID = _UserID,
-                                    UpdatedDateTime = DateTime.UtcNow.AddHours(5),
-                                });
+                                    await _context.SaveChangesAsync();
                                 }
-                            }
 
-                            await _context.SaveChangesAsync();
+                                if (_item.IsApproved.HasValue && _item.IsApproved.Value)
+                                {
+                                    double costPerTicket = Model.TicketIDs.Count > 0 ? (double)_item.CostPrice / Model.TicketIDs.Count : 0.0;
+                                    double salePricePerTicket = Model.TicketIDs.Count > 0 ? (double)_item.SalePrice / Model.TicketIDs.Count : 0.0;
+                                    double discountPerTicket = Model.TicketIDs.Count > 0 ? (double)_item.Discount / Model.TicketIDs.Count : 0.0;
+
+                                    if (statusLower == "arrivalpending" || statusLower == "arrival pending")
+                                    {
+                                        await _context.Tickets
+                                            .Where(x => !x.IsDeleted && Model.TicketIDs.Contains(x.ID))
+                                            .ExecuteUpdateAsync(s => s
+                                                .SetProperty(t => t.CostPrice, costPerTicket)
+                                                .SetProperty(t => t.IsReserved, true)
+                                                .SetProperty(t => t.ReservationDateTime, now)
+                                                .SetProperty(t => t.SalePrice, salePricePerTicket)
+                                                .SetProperty(t => t.Discount, discountPerTicket)
+                                                .SetProperty(t => t.UpdatedByUserID, _UserID)
+                                                .SetProperty(t => t.UpdatedDateTime, now));
+                                    }
+                                    else if (statusLower == "refunded")
+                                    {
+                                        await _context.Tickets
+                                            .Where(x => !x.IsDeleted && Model.TicketIDs.Contains(x.ID))
+                                            .ExecuteUpdateAsync(s => s
+                                                .SetProperty(t => t.CostPrice, costPerTicket)
+                                                .SetProperty(t => t.IsRefunded, true)
+                                                .SetProperty(t => t.RefundDateTime, now)
+                                                .SetProperty(t => t.SalePrice, salePricePerTicket)
+                                                .SetProperty(t => t.Discount, discountPerTicket)
+                                                .SetProperty(t => t.UpdatedByUserID, _UserID)
+                                                .SetProperty(t => t.UpdatedDateTime, now));
+                                    }
+                                    else if (statusLower == "cancelled")
+                                    {
+                                        if (_existingTicketsPerReservation.Count > 0)
+                                        {
+                                            var existingTicketIds = _existingTicketsPerReservation.Select(x => x.TicketID).ToList();
+                                            await _context.Tickets
+                                                .Where(x => !x.IsDeleted && existingTicketIds.Contains(x.ID))
+                                                .ExecuteUpdateAsync(s => s
+                                                    .SetProperty(t => t.IsReserved, false)
+                                                    .SetProperty(t => t.ReservationDateTime, (DateTime?)null)
+                                                    .SetProperty(t => t.UpdatedByUserID, _UserID)
+                                                    .SetProperty(t => t.UpdatedDateTime, now));
+
+                                            _context.ReservationTickets.RemoveRange(_existingTicketsPerReservation);
+                                        }
+                                        foreach (var _ticketID in Model.TicketIDs)
+                                        {
+                                            var _isExists = await _context.ReservationTickets
+                                                .Where(x => x.TicketID == _ticketID && x.ReservationID == _item.ID)
+                                                .AnyAsync();
+                                            if (!_isExists)
+                                            {
+                                                _context.ReservationTickets.Add(new ReservationTicket()
+                                                {
+                                                    ReservationID = _item.ID,
+                                                    TicketID = _ticketID,
+                                                    CreatedByUserID = _UserID,
+                                                    CreatedDateTime = now
+                                                });
+                                            }
+                                        }
+                                        await _context.Tickets
+                                            .Where(x => !x.IsDeleted && Model.TicketIDs.Contains(x.ID))
+                                            .ExecuteUpdateAsync(s => s
+                                                .SetProperty(t => t.IsReserved, false)
+                                                .SetProperty(t => t.ReservationDateTime, (DateTime?)null)
+                                                .SetProperty(t => t.UpdatedByUserID, _UserID)
+                                                .SetProperty(t => t.UpdatedDateTime, now));
+                                    }
+                                }
+
+                                await _context.SaveChangesAsync();
+                            }
                         }
+
+                        await transaction.CommitAsync();
+                        _cacheService.Remove(CacheKeys.DashboardMetrics);
+                    }
+                    catch
+                    {
+                        await transaction.RollbackAsync();
+                        throw;
                     }
                 }
                 return RedirectToAction("Details", "Event", new { ID = Model.EventID });
@@ -485,7 +476,13 @@ namespace TRSAppUpdated.Controllers
 
                 if (ID != 0)
                     _item = _reservationService.GetDetailsByID(ID);
-                var seats = string.Join("", _item.SeatLabels.Split(',').Select(s => $"<span class='seats-badge'>{s.Trim()}</span>"));
+
+                var seatLabelsList = !string.IsNullOrEmpty(_item.SeatLabels)
+                    ? _item.SeatLabels.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToList()
+                    : new List<string>();
+                var seats = seatLabelsList.Count > 0
+                    ? string.Join("", seatLabelsList.Select(s => $"<span class='seats-badge'>{s}</span>"))
+                    : "<span class='seats-badge'>None</span>";
                 if (isGenEvent)
                 {
                     seats = $"<span class='seats-badge'>First Come First Sit</span>";
@@ -644,7 +641,7 @@ namespace TRSAppUpdated.Controllers
                     <div class='info-row'><div class='info-label'>Customer Name:</div><div class='info-value'><b>{_item.CustomerName.ToUpper()}</b></div></div>
                     <div class='info-row'><div class='info-label'>Phone Number:</div><div class='info-value'><b>{_item.CustomerPhone.ToUpper()}</b></div></div>
                     <div class='info-row'>
-                        <div class='info-label'>Reserved Seats: ({_item.SeatLabels.Split(',').Count()})</div>
+                        <div class='info-label'>Reserved Seats: ({(isGenEvent ? "General" : seatLabelsList.Count.ToString())})</div>
                         <div class='info-value'><span class='seat_category'>{_item.TicketCategory} - </span>{seats}</div>
                     </div>
                 </div>
@@ -730,6 +727,7 @@ namespace TRSAppUpdated.Controllers
                     _context.ChangeTracker.Clear();
                     _context.Entry(_item).State = EntityState.Modified;
                     await _context.SaveChangesAsync();
+                    _cacheService.Remove(CacheKeys.DashboardMetrics);
                     TempData["Message"] = $"1,{_Title} Successfully Closed";
                 }
                 else

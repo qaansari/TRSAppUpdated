@@ -1,8 +1,9 @@
-﻿@model SeatVM
+@model SeatVM
 @{
     ViewData["Title"] = "Seats";
     Layout = "_EmptyLayout";
-    int _TSeats=Model.Rows.SelectMany(x => x.Columns).SelectMany(x => x.Seats).Count();
+    int _TSeats = Model.Rows?.SelectMany(x => x.Columns).SelectMany(x => x.Seats).Count() ?? 0;
+    bool isRightAligned = string.Equals(Model.AuditoriumAlignment, "right", StringComparison.OrdinalIgnoreCase);
 }
 <style>
     .loader{
@@ -20,33 +21,39 @@
             <h3 class="fw-medium text-uppercase text-center">@(_TSeats) SEATS</h3>
         </div>
         <div class="w-100">
-            @foreach (var row in Model.Rows)
+            @if (Model.Rows != null)
             {
-                <div class="seat-row mt-2">
-                    <span class="row_label  mr-5px">@(row.RowLabel)</span>
-                    @if (Model.AuditoriumAlignment.ToLower() == "right")
+                var rows = Model.Rows.OrderBy(r => r.ID).ToList();
+                @foreach (var row in rows)
+                {
+                    var columns = row.Columns != null ? row.Columns.OrderBy(c => c.ColumnNumber).ToList() : new List<ColumnVM>();
+                    if (isRightAligned)
                     {
-                        row.Columns = row.Columns.ToList().AsEnumerable().Reverse().ToList();
+                        columns.Reverse();
                     }
-                    @foreach (var column in row.Columns)
-                    {
-                        if (column.Seats.Count > 0)
+                    <div class="seat-row mt-2">
+                        <span class="row_label mr-5px">@(row.RowLabel)</span>
+                        @foreach (var column in columns)
                         {
-                            @if (Model.AuditoriumAlignment.ToLower() == "right")
+                            if (column.Seats != null && column.Seats.Count > 0)
                             {
-                                column.Seats= column.Seats.ToList().AsEnumerable().Reverse().ToList();
+                                var seats = column.Seats.OrderBy(s => s).ToList();
+                                if (isRightAligned)
+                                {
+                                    seats.Reverse();
+                                }
+                                @foreach (var seat in seats)
+                                {
+                                    <div class="@(_TSeats <= 450 ? "seat_bigger" : "seat")">
+                                        @seat
+                                    </div>
+                                }
+                                <div class="column-gap"></div>
                             }
-                            @foreach (var seat in column.Seats)
-                            {
-                                <div class="@(_TSeats <= 450 ? "seat_bigger" : "seat")">
-                                    @seat
-                                </div>
-                            }
-                            <div class="column-gap"></div>
                         }
-                    }
-                    <span class="row_label">@(row.RowLabel)</span>
-                </div>
+                        <span class="row_label">@(row.RowLabel)</span>
+                    </div>
+                }
             }
         </div>
     </div>

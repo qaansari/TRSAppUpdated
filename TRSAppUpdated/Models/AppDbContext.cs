@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using TRSAppUpdated.Helpers;
 
 namespace TRSAppUpdated.Models
@@ -205,6 +205,35 @@ namespace TRSAppUpdated.Models
                     CreatedDateTime = DateTime.UtcNow.AddHours(5),
                     IsDeleted = false,
                 });
+
+            // Performance & Scalability Indexes
+            modelBuilder.Entity<Ticket>(entity =>
+            {
+                entity.HasIndex(t => new { t.ShowID, t.IsReserved, t.IsDeleted });
+                entity.HasIndex(t => t.SeatID);
+            });
+
+            modelBuilder.Entity<Show>(entity =>
+            {
+                entity.HasIndex(s => new { s.EventID, s.Date, s.IsDeleted, s.IsEnded });
+            });
+
+            modelBuilder.Entity<Reservation>(entity =>
+            {
+                entity.HasIndex(r => new { r.ShowID, r.IsDeleted, r.IsApproved });
+                entity.HasIndex(r => r.TicketNumber);
+            });
+
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.HasIndex(u => u.Email);
+                entity.HasIndex(u => u.UserToken);
+            });
+
+            modelBuilder.Entity<ReservationTicket>(entity =>
+            {
+                entity.HasIndex(rt => new { rt.ReservationID, rt.TicketID });
+            });
         }
 
     }

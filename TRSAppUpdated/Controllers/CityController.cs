@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using TRSAppUpdated.Helpers;
 using TRSAppUpdated.Interfaces;
 using TRSAppUpdated.Models;
 using TRSAppUpdated.ViewModels;
@@ -15,17 +16,21 @@ namespace TRSAppUpdated.Controllers
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ILogger<CityController> _logger;
         private readonly ICountryService _countryService;
+        private readonly ICacheService _cacheService;
         private readonly string _Title = "City";
         private readonly int _UserID;
+
         public CityController(AppDbContext context, IHttpContextAccessor httpContextAccessor,
-           ILogger<CityController> logger, ICountryService countryService)
+           ILogger<CityController> logger, ICountryService countryService, ICacheService cacheService)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;
             _logger = logger;
             _countryService = countryService;
+            _cacheService = cacheService;
             _UserID = Convert.ToInt32(_httpContextAccessor.HttpContext.User.FindFirstValue("UserID"));
         }
+
         //Index (Get All)
         public async Task<IActionResult> Index(int _pageNo = 1, int _pageSize = 10, string _searchedTerm = "")
         {
@@ -44,6 +49,7 @@ namespace TRSAppUpdated.Controllers
             }
             return View(new List<CityVM>());
         }
+
         // GetPartial
         [HttpGet]
         public async Task<IActionResult> GetPartial(int _pageNo = 1, int _pageSize = 10, string _searchedTerm = "")
@@ -64,6 +70,7 @@ namespace TRSAppUpdated.Controllers
             }
             return PartialView($"_{_partialViewName}TablePartial", new List<CityVM>());
         }
+
         //AddOrEdit (GET)
         public IActionResult AddOrEdit(int ID = 0)
         {
@@ -91,6 +98,7 @@ namespace TRSAppUpdated.Controllers
             }
             return View(_item);
         }
+
         //AddOrEdit (POST)
         [HttpPost]
         public async Task<IActionResult> AddOrEdit(CityVM Model)
@@ -124,6 +132,7 @@ namespace TRSAppUpdated.Controllers
                             _context.ChangeTracker.Clear();
                             _context.Entry(_item).State = EntityState.Modified;
                             await _context.SaveChangesAsync();
+                            _cacheService.Remove(CacheKeys.Cities);
                             TempData["Message"] = $"1,{_Title} Successfully Updated";
                         }
                     }
@@ -144,18 +153,19 @@ namespace TRSAppUpdated.Controllers
                         _item.CreatedDateTime = DateTime.UtcNow.AddHours(5);
                         _context.Cities.Add(_item);
                         await _context.SaveChangesAsync();
+                        _cacheService.Remove(CacheKeys.Cities);
                         TempData["Message"] = $"1,{_Title} Successfully Added";
                     }
                     return RedirectToAction("Index");
                 }
             }
-
             catch (Exception ex)
             {
                 _logger.LogError($"Error occured at AddOrEdit (POST) in {_Title} Controller due to {ex}");
             }
             return View(Model);
         }
+
         [HttpPost]
         public async Task<IActionResult> Delete(int ID)
         {
@@ -171,6 +181,7 @@ namespace TRSAppUpdated.Controllers
                     _context.ChangeTracker.Clear();
                     _context.Entry(_item).State = EntityState.Modified;
                     await _context.SaveChangesAsync();
+                    _cacheService.Remove(CacheKeys.Cities);
                     TempData["Message"] = $"1,{_Title} Successfully Deleted";
                 }
                 else
@@ -184,16 +195,15 @@ namespace TRSAppUpdated.Controllers
             }
             return RedirectToAction("Index");
         }
+
         //Get List
         [NonAction]
         public async Task<(List<CityVM> _result, int totalRecords)> GetList(int _pageNo, int _pageSize, string _searchedTerm)
         {
-
             var _result = new List<CityVM>();
             int totalRecords = 0;
             try
             {
-                // For AJAX calls
                 var _query = _context.Cities.Where(x => !x.IsDeleted)
                            .Select(x => new CityVM()
                            {
@@ -209,10 +219,11 @@ namespace TRSAppUpdated.Controllers
                         .Where(x => x.Title.Trim().ToLower().Contains(_searchedTerm.Trim().ToLower())
                         || x.CountryTitle.Trim().ToLower().Contains(_searchedTerm.Trim().ToLower()));
                 }
-                int _skip = (_pageNo - 1) * _pageSize;
                 totalRecords = await _query.CountAsync();
-                _query = _query.Skip(_skip).Take(_pageSize);
-                _result = await _query.OrderByDescending(x => x.ID).ToListAsync();
+                int _skip = (_pageNo - 1) * _pageSize;
+
+                // Fixed: OrderBy before Skip/Take
+                _result = await _query.OrderByDescending(x => x.ID).Skip(_skip).Take(_pageSize).ToListAsync();
             }
             catch (Exception ex)
             {

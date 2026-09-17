@@ -12,7 +12,7 @@ using TRSAppUpdated.Models;
 namespace TRSAppUpdated.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250816064813_Db Init")]
+    [Migration("20260917084820_Db Init")]
     partial class DbInit
     {
         /// <inheritdoc />
@@ -20,10 +20,10 @@ namespace TRSAppUpdated.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.11")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+                .HasAnnotation("ProductVersion", "9.0.2")
+                .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+            MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
             modelBuilder.Entity("TRSAppUpdated.Models.Auditorium", b =>
                 {
@@ -31,7 +31,7 @@ namespace TRSAppUpdated.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("ID"));
 
                     b.Property<string>("Alignment")
                         .IsRequired()
@@ -41,19 +41,19 @@ namespace TRSAppUpdated.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int?>("DeletedByUserID")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("DeletedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("ImagePath")
                         .HasColumnType("varchar(300)");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<int>("NoOfRows")
                         .HasColumnType("int");
@@ -70,7 +70,7 @@ namespace TRSAppUpdated.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int>("VenueID")
                         .HasColumnType("int");
@@ -94,22 +94,22 @@ namespace TRSAppUpdated.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("ID"));
 
                     b.Property<int>("CreatedByUserID")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int?>("DeletedByUserID")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("DeletedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -119,7 +119,7 @@ namespace TRSAppUpdated.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.HasKey("ID");
 
@@ -138,7 +138,7 @@ namespace TRSAppUpdated.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("ID"));
 
                     b.Property<int>("CountryID")
                         .HasColumnType("int");
@@ -147,16 +147,16 @@ namespace TRSAppUpdated.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int?>("DeletedByUserID")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("DeletedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -166,7 +166,7 @@ namespace TRSAppUpdated.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.HasKey("ID");
 
@@ -186,7 +186,7 @@ namespace TRSAppUpdated.Migrations
                             ID = 1,
                             CountryID = 1,
                             CreatedByUserID = 1,
-                            CreatedDateTime = new DateTime(2025, 8, 16, 11, 48, 13, 96, DateTimeKind.Utc).AddTicks(5910),
+                            CreatedDateTime = new DateTime(2026, 9, 17, 13, 48, 17, 494, DateTimeKind.Utc).AddTicks(4728),
                             IsDeleted = false,
                             Title = "Karachi"
                         },
@@ -195,7 +195,7 @@ namespace TRSAppUpdated.Migrations
                             ID = 2,
                             CountryID = 1,
                             CreatedByUserID = 1,
-                            CreatedDateTime = new DateTime(2025, 8, 16, 11, 48, 13, 96, DateTimeKind.Utc).AddTicks(5912),
+                            CreatedDateTime = new DateTime(2026, 9, 17, 13, 48, 17, 494, DateTimeKind.Utc).AddTicks(4734),
                             IsDeleted = false,
                             Title = "Lahore"
                         },
@@ -204,7 +204,7 @@ namespace TRSAppUpdated.Migrations
                             ID = 3,
                             CountryID = 1,
                             CreatedByUserID = 1,
-                            CreatedDateTime = new DateTime(2025, 8, 16, 11, 48, 13, 96, DateTimeKind.Utc).AddTicks(5913),
+                            CreatedDateTime = new DateTime(2026, 9, 17, 13, 48, 17, 494, DateTimeKind.Utc).AddTicks(4736),
                             IsDeleted = false,
                             Title = "Islamabad"
                         });
@@ -216,7 +216,7 @@ namespace TRSAppUpdated.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("ID"));
 
                     b.Property<int>("ColumnNumber")
                         .HasColumnType("int");
@@ -225,7 +225,7 @@ namespace TRSAppUpdated.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int>("RowID")
                         .HasColumnType("int");
@@ -245,19 +245,19 @@ namespace TRSAppUpdated.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("ID"));
 
                     b.Property<int>("CreatedByUserID")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int?>("DeletedByUserID")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("DeletedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("DialingCode")
                         .IsRequired()
@@ -265,10 +265,10 @@ namespace TRSAppUpdated.Migrations
 
                     b.Property<string>("Flag")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varchar(50)");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -278,7 +278,7 @@ namespace TRSAppUpdated.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.HasKey("ID");
 
@@ -295,7 +295,7 @@ namespace TRSAppUpdated.Migrations
                         {
                             ID = 1,
                             CreatedByUserID = 1,
-                            CreatedDateTime = new DateTime(2025, 8, 16, 11, 48, 13, 96, DateTimeKind.Utc).AddTicks(5870),
+                            CreatedDateTime = new DateTime(2026, 9, 17, 13, 48, 17, 494, DateTimeKind.Utc).AddTicks(2461),
                             DialingCode = "+92",
                             Flag = "🇵🇰",
                             IsDeleted = false,
@@ -309,7 +309,7 @@ namespace TRSAppUpdated.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("ID"));
 
                     b.Property<int>("AuditoriumID")
                         .HasColumnType("int");
@@ -318,34 +318,34 @@ namespace TRSAppUpdated.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int?>("DeletedByUserID")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("DeletedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<DateTime?>("EndDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int>("EventStatusID")
                         .HasColumnType("int");
 
                     b.Property<string>("ImagePath")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("IsGeneral")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -355,7 +355,7 @@ namespace TRSAppUpdated.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.HasKey("ID");
 
@@ -378,7 +378,7 @@ namespace TRSAppUpdated.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("ID"));
 
                     b.Property<int>("CategoryID")
                         .HasColumnType("int");
@@ -387,7 +387,7 @@ namespace TRSAppUpdated.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int>("EventID")
                         .HasColumnType("int");
@@ -409,22 +409,22 @@ namespace TRSAppUpdated.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("ID"));
 
                     b.Property<int>("CreatedByUserID")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int?>("DeletedByUserID")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("DeletedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -434,7 +434,7 @@ namespace TRSAppUpdated.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.HasKey("ID");
 
@@ -451,7 +451,7 @@ namespace TRSAppUpdated.Migrations
                         {
                             ID = 1,
                             CreatedByUserID = 1,
-                            CreatedDateTime = new DateTime(2025, 8, 16, 11, 48, 13, 96, DateTimeKind.Utc).AddTicks(5807),
+                            CreatedDateTime = new DateTime(2026, 9, 17, 13, 48, 17, 493, DateTimeKind.Utc).AddTicks(8382),
                             IsDeleted = false,
                             Title = "Active"
                         },
@@ -459,7 +459,7 @@ namespace TRSAppUpdated.Migrations
                         {
                             ID = 2,
                             CreatedByUserID = 1,
-                            CreatedDateTime = new DateTime(2025, 8, 16, 11, 48, 13, 96, DateTimeKind.Utc).AddTicks(5809),
+                            CreatedDateTime = new DateTime(2026, 9, 17, 13, 48, 17, 493, DateTimeKind.Utc).AddTicks(9395),
                             IsDeleted = false,
                             Title = "Ended"
                         },
@@ -467,7 +467,7 @@ namespace TRSAppUpdated.Migrations
                         {
                             ID = 3,
                             CreatedByUserID = 1,
-                            CreatedDateTime = new DateTime(2025, 8, 16, 11, 48, 13, 96, DateTimeKind.Utc).AddTicks(5811),
+                            CreatedDateTime = new DateTime(2026, 9, 17, 13, 48, 17, 493, DateTimeKind.Utc).AddTicks(9400),
                             IsDeleted = false,
                             Title = "Postponed"
                         });
@@ -479,22 +479,22 @@ namespace TRSAppUpdated.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("ID"));
 
                     b.Property<int>("CreatedByUserID")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int?>("DeletedByUserID")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("DeletedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -504,7 +504,7 @@ namespace TRSAppUpdated.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.HasKey("ID");
 
@@ -523,26 +523,26 @@ namespace TRSAppUpdated.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("ID"));
 
                     b.Property<int>("CreatedByUserID")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int?>("DeletedByUserID")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("DeletedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("EnTitle")
                         .IsRequired()
-                        .HasColumnType("varchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<int>("NoteTypeID")
                         .HasColumnType("int");
@@ -554,11 +554,11 @@ namespace TRSAppUpdated.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("UrduTitle")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.HasKey("ID");
 
@@ -579,22 +579,22 @@ namespace TRSAppUpdated.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("ID"));
 
                     b.Property<int>("CreatedByUserID")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int?>("DeletedByUserID")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("DeletedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -604,7 +604,7 @@ namespace TRSAppUpdated.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.HasKey("ID");
 
@@ -623,22 +623,22 @@ namespace TRSAppUpdated.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("ID"));
 
                     b.Property<int>("CreatedByUserID")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int?>("DeletedByUserID")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("DeletedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -648,7 +648,7 @@ namespace TRSAppUpdated.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.HasKey("ID");
 
@@ -665,7 +665,7 @@ namespace TRSAppUpdated.Migrations
                         {
                             ID = 1,
                             CreatedByUserID = 1,
-                            CreatedDateTime = new DateTime(2025, 8, 16, 11, 48, 13, 96, DateTimeKind.Utc).AddTicks(5957),
+                            CreatedDateTime = new DateTime(2026, 9, 17, 13, 48, 17, 494, DateTimeKind.Utc).AddTicks(6512),
                             IsDeleted = false,
                             Title = "Cash"
                         },
@@ -673,7 +673,7 @@ namespace TRSAppUpdated.Migrations
                         {
                             ID = 2,
                             CreatedByUserID = 1,
-                            CreatedDateTime = new DateTime(2025, 8, 16, 11, 48, 13, 96, DateTimeKind.Utc).AddTicks(5959),
+                            CreatedDateTime = new DateTime(2026, 9, 17, 13, 48, 17, 494, DateTimeKind.Utc).AddTicks(6518),
                             IsDeleted = false,
                             Title = "Easypaisa/Jazzcash"
                         },
@@ -681,7 +681,7 @@ namespace TRSAppUpdated.Migrations
                         {
                             ID = 3,
                             CreatedByUserID = 1,
-                            CreatedDateTime = new DateTime(2025, 8, 16, 11, 48, 13, 96, DateTimeKind.Utc).AddTicks(5960),
+                            CreatedDateTime = new DateTime(2026, 9, 17, 13, 48, 17, 494, DateTimeKind.Utc).AddTicks(6519),
                             IsDeleted = false,
                             Title = "Bank Transfer"
                         });
@@ -693,37 +693,37 @@ namespace TRSAppUpdated.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("ID"));
 
                     b.Property<int?>("ActionByUserID")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("ActionDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<double>("AmountPaid")
-                        .HasColumnType("float");
+                        .HasColumnType("double");
 
                     b.Property<double>("AmountRemaining")
-                        .HasColumnType("float");
+                        .HasColumnType("double");
 
                     b.Property<DateTime?>("BookingDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int?>("ClosedByUserID")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("ClosingDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<double>("CostPrice")
-                        .HasColumnType("float");
+                        .HasColumnType("double");
 
                     b.Property<int>("CreatedByUserID")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CustomerName")
                         .IsRequired()
@@ -737,19 +737,19 @@ namespace TRSAppUpdated.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("DeletedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<double>("Discount")
-                        .HasColumnType("float");
+                        .HasColumnType("double");
 
                     b.Property<bool?>("IsApproved")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("IsFullyPaid")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<int>("PaymentModeID")
                         .HasColumnType("int");
@@ -758,7 +758,7 @@ namespace TRSAppUpdated.Migrations
                         .HasColumnType("int");
 
                     b.Property<double>("SalePrice")
-                        .HasColumnType("float");
+                        .HasColumnType("double");
 
                     b.Property<int>("ShowID")
                         .HasColumnType("int");
@@ -774,7 +774,7 @@ namespace TRSAppUpdated.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.HasKey("ID");
 
@@ -790,9 +790,11 @@ namespace TRSAppUpdated.Migrations
 
                     b.HasIndex("ReservationStatusID");
 
-                    b.HasIndex("ShowID");
+                    b.HasIndex("TicketNumber");
 
                     b.HasIndex("UpdatedByUserID");
+
+                    b.HasIndex("ShowID", "IsDeleted", "IsApproved");
 
                     b.ToTable("Reservations");
                 });
@@ -803,17 +805,17 @@ namespace TRSAppUpdated.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("ID"));
 
                     b.Property<int>("CreatedByUserID")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("ImagePath")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<int>("ReservationID")
                         .HasColumnType("int");
@@ -833,22 +835,22 @@ namespace TRSAppUpdated.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("ID"));
 
                     b.Property<int>("CreatedByUserID")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int?>("DeletedByUserID")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("DeletedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -858,7 +860,7 @@ namespace TRSAppUpdated.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.HasKey("ID");
 
@@ -875,7 +877,7 @@ namespace TRSAppUpdated.Migrations
                         {
                             ID = 1,
                             CreatedByUserID = 1,
-                            CreatedDateTime = new DateTime(2025, 8, 16, 11, 48, 13, 96, DateTimeKind.Utc).AddTicks(6001),
+                            CreatedDateTime = new DateTime(2026, 9, 17, 13, 48, 17, 494, DateTimeKind.Utc).AddTicks(8485),
                             IsDeleted = false,
                             Title = "Arrival Pending"
                         },
@@ -883,7 +885,7 @@ namespace TRSAppUpdated.Migrations
                         {
                             ID = 2,
                             CreatedByUserID = 1,
-                            CreatedDateTime = new DateTime(2025, 8, 16, 11, 48, 13, 96, DateTimeKind.Utc).AddTicks(6003),
+                            CreatedDateTime = new DateTime(2026, 9, 17, 13, 48, 17, 494, DateTimeKind.Utc).AddTicks(8491),
                             IsDeleted = false,
                             Title = "Cancelled"
                         },
@@ -891,7 +893,7 @@ namespace TRSAppUpdated.Migrations
                         {
                             ID = 3,
                             CreatedByUserID = 1,
-                            CreatedDateTime = new DateTime(2025, 8, 16, 11, 48, 13, 96, DateTimeKind.Utc).AddTicks(6004),
+                            CreatedDateTime = new DateTime(2026, 9, 17, 13, 48, 17, 494, DateTimeKind.Utc).AddTicks(8492),
                             IsDeleted = false,
                             Title = "Closed"
                         },
@@ -899,7 +901,7 @@ namespace TRSAppUpdated.Migrations
                         {
                             ID = 4,
                             CreatedByUserID = 1,
-                            CreatedDateTime = new DateTime(2025, 8, 16, 11, 48, 13, 96, DateTimeKind.Utc).AddTicks(6005),
+                            CreatedDateTime = new DateTime(2026, 9, 17, 13, 48, 17, 494, DateTimeKind.Utc).AddTicks(8494),
                             IsDeleted = false,
                             Title = "Refunded"
                         },
@@ -907,7 +909,7 @@ namespace TRSAppUpdated.Migrations
                         {
                             ID = 5,
                             CreatedByUserID = 1,
-                            CreatedDateTime = new DateTime(2025, 8, 16, 11, 48, 13, 96, DateTimeKind.Utc).AddTicks(6007),
+                            CreatedDateTime = new DateTime(2026, 9, 17, 13, 48, 17, 494, DateTimeKind.Utc).AddTicks(8496),
                             IsDeleted = false,
                             Title = "Not Attended"
                         });
@@ -919,13 +921,13 @@ namespace TRSAppUpdated.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("ID"));
 
                     b.Property<int>("CreatedByUserID")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int>("ReservationID")
                         .HasColumnType("int");
@@ -937,9 +939,9 @@ namespace TRSAppUpdated.Migrations
 
                     b.HasIndex("CreatedByUserID");
 
-                    b.HasIndex("ReservationID");
-
                     b.HasIndex("TicketID");
+
+                    b.HasIndex("ReservationID", "TicketID");
 
                     b.ToTable("ReservationTickets");
                 });
@@ -950,10 +952,10 @@ namespace TRSAppUpdated.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("ID"));
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -996,7 +998,7 @@ namespace TRSAppUpdated.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("ID"));
 
                     b.Property<int>("AuditoriumID")
                         .HasColumnType("int");
@@ -1005,7 +1007,7 @@ namespace TRSAppUpdated.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("RowLabel")
                         .IsRequired()
@@ -1026,7 +1028,7 @@ namespace TRSAppUpdated.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("ID"));
 
                     b.Property<int>("ColumnID")
                         .HasColumnType("int");
@@ -1035,7 +1037,7 @@ namespace TRSAppUpdated.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int>("SeatNumber")
                         .HasColumnType("int");
@@ -1055,40 +1057,40 @@ namespace TRSAppUpdated.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("ID"));
 
                     b.Property<int>("CreatedByUserID")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int?>("DeletedByUserID")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("DeletedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int>("EventID")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("IsEnded")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<TimeSpan>("Time")
-                        .HasColumnType("time");
+                        .HasColumnType("time(6)");
 
                     b.Property<int?>("UpdatedByUserID")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.HasKey("ID");
 
@@ -1096,9 +1098,9 @@ namespace TRSAppUpdated.Migrations
 
                     b.HasIndex("DeletedByUserID");
 
-                    b.HasIndex("EventID");
-
                     b.HasIndex("UpdatedByUserID");
+
+                    b.HasIndex("EventID", "Date", "IsDeleted", "IsEnded");
 
                     b.ToTable("Shows");
                 });
@@ -1109,29 +1111,29 @@ namespace TRSAppUpdated.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("ID"));
 
                     b.Property<double>("Amount")
-                        .HasColumnType("float");
+                        .HasColumnType("double");
 
                     b.Property<int>("CreatedByUserID")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int?>("DeletedByUserID")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("DeletedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<int>("EventID")
                         .HasColumnType("int");
@@ -1140,7 +1142,7 @@ namespace TRSAppUpdated.Migrations
                         .HasColumnType("int");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<int>("ShowID")
                         .HasColumnType("int");
@@ -1149,7 +1151,7 @@ namespace TRSAppUpdated.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.HasKey("ID");
 
@@ -1174,53 +1176,53 @@ namespace TRSAppUpdated.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("ID"));
 
                     b.Property<DateTime?>("CancellationDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("Category")
                         .IsRequired()
                         .HasColumnType("varchar(50)");
 
                     b.Property<double>("CostPrice")
-                        .HasColumnType("float");
+                        .HasColumnType("double");
 
                     b.Property<int>("CreatedByUserID")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int?>("DeletedByUserID")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("DeletedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<double>("Discount")
-                        .HasColumnType("float");
+                        .HasColumnType("double");
 
                     b.Property<bool>("IsCancelled")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("IsRefunded")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("IsReserved")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<DateTime?>("RefundDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<DateTime?>("ReservationDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<double>("SalePrice")
-                        .HasColumnType("float");
+                        .HasColumnType("double");
 
                     b.Property<int>("SeatID")
                         .HasColumnType("int");
@@ -1232,7 +1234,7 @@ namespace TRSAppUpdated.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.HasKey("ID");
 
@@ -1242,9 +1244,9 @@ namespace TRSAppUpdated.Migrations
 
                     b.HasIndex("SeatID");
 
-                    b.HasIndex("ShowID");
-
                     b.HasIndex("UpdatedByUserID");
+
+                    b.HasIndex("ShowID", "IsReserved", "IsDeleted");
 
                     b.ToTable("Tickets");
                 });
@@ -1255,7 +1257,7 @@ namespace TRSAppUpdated.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("ID"));
 
                     b.Property<string>("ContactNumber")
                         .IsRequired()
@@ -1268,13 +1270,13 @@ namespace TRSAppUpdated.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("CreatedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int?>("DeletedByUserID")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("DeletedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -1288,13 +1290,13 @@ namespace TRSAppUpdated.Migrations
                         .HasColumnType("varchar(300)");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("IsVerified")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("LastName")
                         .IsRequired()
@@ -1302,19 +1304,19 @@ namespace TRSAppUpdated.Migrations
 
                     b.Property<string>("Password")
                         .IsRequired()
-                        .HasColumnType("varchar(max)");
+                        .HasColumnType("varchar(255)");
 
                     b.Property<int>("RoleID")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("TokenExpiryTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int?>("UpdatedByUserID")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("UserToken")
                         .HasColumnType("varchar(68)");
@@ -1327,9 +1329,13 @@ namespace TRSAppUpdated.Migrations
 
                     b.HasIndex("DeletedByUserID");
 
+                    b.HasIndex("Email");
+
                     b.HasIndex("RoleID");
 
                     b.HasIndex("UpdatedByUserID");
+
+                    b.HasIndex("UserToken");
 
                     b.ToTable("Users");
 
@@ -1338,7 +1344,7 @@ namespace TRSAppUpdated.Migrations
                         {
                             ID = 1,
                             ContactNumber = "+923312541767",
-                            CreatedDateTime = new DateTime(2025, 8, 16, 11, 48, 13, 96, DateTimeKind.Utc).AddTicks(5462),
+                            CreatedDateTime = new DateTime(2026, 9, 17, 13, 48, 17, 493, DateTimeKind.Utc).AddTicks(4015),
                             Email = "sa@eventland.pk",
                             FirstName = "Super",
                             IsActive = true,
@@ -1356,7 +1362,7 @@ namespace TRSAppUpdated.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("ID"));
 
                     b.Property<string>("Address")
                         .IsRequired()
@@ -1369,19 +1375,19 @@ namespace TRSAppUpdated.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int?>("DeletedByUserID")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("DeletedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("ImagePath")
                         .HasColumnType("varchar(300)");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -1391,7 +1397,7 @@ namespace TRSAppUpdated.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.HasKey("ID");
 

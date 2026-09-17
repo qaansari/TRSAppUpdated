@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using TRSAppUpdated.Helpers;
+using TRSAppUpdated.Interfaces;
 using TRSAppUpdated.Models;
 using TRSAppUpdated.ViewModels;
 
@@ -12,14 +14,16 @@ namespace TRSAppUpdated.Controllers
         private readonly AppDbContext _context;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ILogger<ShowController> _logger;
+        private readonly ICacheService _cacheService;
         private readonly string _Title = "Show";
         private readonly int _UserID;
         public ShowController(AppDbContext context, IHttpContextAccessor httpContextAccessor,
-            ILogger<ShowController> logger)
+            ILogger<ShowController> logger, ICacheService cacheService)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;
             _logger = logger;
+            _cacheService = cacheService;
             _UserID = Convert.ToInt32(_httpContextAccessor.HttpContext.User.FindFirstValue("UserID"));
         }
         [Authorize(Roles = "Super Admin")]
@@ -151,6 +155,7 @@ namespace TRSAppUpdated.Controllers
                                 await _context.Tickets.AddRangeAsync(_tickets);
                                 await _context.SaveChangesAsync();
                             }
+                            _cacheService.Remove(CacheKeys.ShowsList);
                         }
                     }
                     return RedirectToAction("Details", "Event", new { ID = Model.EventID });
@@ -184,6 +189,7 @@ namespace TRSAppUpdated.Controllers
                         _context.Tickets.RemoveRange(_tickets);
                     }
                     await _context.SaveChangesAsync();
+                    _cacheService.Remove(CacheKeys.ShowsList);
                     TempData["Message"] = $"1,{_Title} Successfully Deleted";
                 }
                 else
@@ -214,6 +220,7 @@ namespace TRSAppUpdated.Controllers
                     _context.ChangeTracker.Clear();
                     _context.Entry(_item).State = EntityState.Modified;
                     await _context.SaveChangesAsync();
+                    _cacheService.Remove(CacheKeys.ShowsList);
                     TempData["Message"] = $"1,{_Title} Successfully Ended";
                 }
                 else
@@ -239,19 +246,20 @@ namespace TRSAppUpdated.Controllers
                     _item.ShowID = ID;
                     _item.EventID = EventID;
                 }
-                var _tickets = await _context.Tickets
-                    .Include(x => x.Seat)
-                    .ThenInclude(x => x.Column)
-                .Where(x => !x.IsDeleted && x.ShowID == ID)
-                .Select(x => new
-                {
-                    x.ID,
-                    x.CostPrice,
-                    RowLabel = x.Seat.Column.Row.RowLabel,
-                    x.Category,
-                    x.IsReserved,
-                })
+                var rawTickets = await _context.Tickets
+                    .Where(x => !x.IsDeleted && x.ShowID == ID)
+                    .Select(x => new
+                    {
+                        x.ID,
+                        x.CostPrice,
+                        RowLabel = x.Seat.Column.Row.RowLabel,
+                        x.Category,
+                        x.IsReserved,
+                    })
                     .AsNoTracking()
+                    .ToListAsync();
+
+                var _tickets = rawTickets
                     .GroupBy(x => x.RowLabel)
                     .Select(g => new TicketRowVM
                     {
@@ -260,8 +268,10 @@ namespace TRSAppUpdated.Controllers
                         Price = g.First().CostPrice,
                         Category = g.First().Category,
                         IsReserved = g.First().IsReserved
-                    }).OrderBy(x => x.RowLabel)
-                    .ToListAsync();
+                    })
+                    .OrderBy(x => x.RowLabel)
+                    .ToList();
+
                 _item.TicketRowList = _tickets;
             }
             catch (Exception ex)
@@ -341,22 +351,22 @@ namespace TRSAppUpdated.Controllers
                     .ToList();
 
                 var firstTicket = eventTickets.FirstOrDefault();
+                var ticketBySeatId = eventTickets.Where(t => t.Seat != null).ToDictionary(t => t.Seat.ID, t => t);
 
                 var seatVM = new SeatVM()
                 {
                     AuditoriumName = firstTicket?.Show?.Event?.Auditorium?.Title?.Trim(),
-                    EventName= firstTicket?.Show?.Event?.Title.Trim(),
+                    EventName = firstTicket?.Show?.Event?.Title?.Trim(),
                     VenueName = firstTicket?.Show?.Event?.Auditorium?.Venue?.Title?.Trim(),
                     ShowDate = firstTicket?.Show?.Date,
-                    ReservedSeats=eventTickets.Count(x=>x.IsReserved),
-                    EstimatedRevenue =eventTickets.Sum(x=>x.CostPrice),
-                    AmountReceived=eventTickets.Where(x=>x.IsReserved).Sum(x=>x.SalePrice),
+                    ReservedSeats = eventTickets.Count(x => x.IsReserved),
+                    EstimatedRevenue = eventTickets.Sum(x => x.CostPrice),
+                    AmountReceived = eventTickets.Where(x => x.IsReserved).Sum(x => x.SalePrice),
                     AuditoriumAlignment = firstTicket?.Show?.Event?.Auditorium?.Alignment?.Trim(),
-                    Rows = firstTicket?.Show?.Event?.Auditorium?.Rows.Select(row =>
+                    Rows = firstTicket?.Show?.Event?.Auditorium?.Rows.OrderBy(row => row.ID).Select(row =>
                     {
-                        // Try to find a ticket for any seat in this row to get the price
-                        var firstSeatIdInRow = row.Columns.SelectMany(c => c.Seats).FirstOrDefault()?.ID;
-                        var rowTicket = eventTickets.FirstOrDefault(t => t.Seat.ID == firstSeatIdInRow);
+                        var firstSeatInRow = row.Columns.SelectMany(c => c.Seats).FirstOrDefault();
+                        ticketBySeatId.TryGetValue(firstSeatInRow?.ID ?? 0, out var rowTicket);
                         var rowPrice = rowTicket?.CostPrice ?? 0;
 
                         return new RowVM()
@@ -364,13 +374,13 @@ namespace TRSAppUpdated.Controllers
                             RowLabel = row.RowLabel,
                             CostPrice = rowPrice.ToString(),
                             Category = rowTicket?.Category,
-                            Columns = row.Columns.Select(col => new ColumnVM()
+                            Columns = row.Columns.OrderBy(col => col.ColumnNumber).Select(col => new ColumnVM()
                             {
                                 ID = col.ID,
                                 ColumnNumber = col.ColumnNumber,
-                                SeatTickets = col.Seats.Select(seat =>
+                                SeatTickets = col.Seats.OrderBy(seat => seat.SeatNumber).Select(seat =>
                                 {
-                                    var ticket = eventTickets.FirstOrDefault(t => t.Seat.ID == seat.ID);
+                                    ticketBySeatId.TryGetValue(seat.ID, out var ticket);
                                     return new TicketVM()
                                     {
                                         SeatNumber = seat.SeatNumber,

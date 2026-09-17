@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using TRSAppUpdated.Helpers;
 using TRSAppUpdated.Interfaces;
 using TRSAppUpdated.Models;
 using TRSAppUpdated.ViewModels;
@@ -15,17 +16,21 @@ namespace TRSAppUpdated.Controllers
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ILogger<NoteTypeController> _logger;
         private readonly INoteService _noteService;
+        private readonly ICacheService _cacheService;
         private readonly string _Title = "Note Type";
         private readonly int _UserID;
+
         public NoteTypeController(AppDbContext context, IHttpContextAccessor httpContextAccessor,
-            ILogger<NoteTypeController> logger, INoteService noteService)
+            ILogger<NoteTypeController> logger, INoteService noteService, ICacheService cacheService)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;
             _logger = logger;
             _noteService = noteService;
+            _cacheService = cacheService;
             _UserID = Convert.ToInt32(_httpContextAccessor.HttpContext.User.FindFirstValue("UserID"));
         }
+
         //Index (Get All)
         public async Task<IActionResult> Index(int _pageNo = 1, int _pageSize = 10, string _searchedTerm = "")
         {
@@ -44,6 +49,7 @@ namespace TRSAppUpdated.Controllers
             }
             return View(new List<NoteTypeVM>());
         }
+
         // GetPartial
         [HttpGet]
         public async Task<IActionResult> GetPartial(int _pageNo = 1, int _pageSize = 10, string _searchedTerm = "")
@@ -64,6 +70,7 @@ namespace TRSAppUpdated.Controllers
             }
             return PartialView($"_{_partialViewName}TablePartial", new List<NoteTypeVM>());
         }
+
         //AddOrEdit (GET)
         public IActionResult AddOrEdit(int ID = 0)
         {
@@ -89,6 +96,7 @@ namespace TRSAppUpdated.Controllers
             }
             return View(_item);
         }
+
         //AddOrEdit (POST)
         [HttpPost]
         public async Task<IActionResult> AddOrEdit(NoteTypeVM Model)
@@ -119,6 +127,7 @@ namespace TRSAppUpdated.Controllers
                             _context.ChangeTracker.Clear();
                             _context.Entry(_item).State = EntityState.Modified;
                             await _context.SaveChangesAsync();
+                            _cacheService.Remove(CacheKeys.NoteTypes);
                             TempData["Message"] = $"1,{_Title} Successfully Updated";
                         }
                     }
@@ -137,18 +146,19 @@ namespace TRSAppUpdated.Controllers
                         _item.CreatedDateTime = DateTime.UtcNow.AddHours(5);
                         _context.NoteTypes.Add(_item);
                         await _context.SaveChangesAsync();
+                        _cacheService.Remove(CacheKeys.NoteTypes);
                         TempData["Message"] = $"1,{_Title} Successfully Added";
                     }
                     return RedirectToAction("Index");
                 }
             }
-
             catch (Exception ex)
             {
                 _logger.LogError($"Error occured at AddOrEdit (POST) in {_Title} Controller due to {ex}");
             }
             return View(Model);
         }
+
         [HttpPost]
         public async Task<IActionResult> Delete(int ID)
         {
@@ -164,6 +174,7 @@ namespace TRSAppUpdated.Controllers
                     _context.ChangeTracker.Clear();
                     _context.Entry(_item).State = EntityState.Modified;
                     await _context.SaveChangesAsync();
+                    _cacheService.Remove(CacheKeys.NoteTypes);
                     TempData["Message"] = $"1,{_Title} Successfully Deleted";
                 }
                 else
@@ -177,16 +188,15 @@ namespace TRSAppUpdated.Controllers
             }
             return RedirectToAction("Index");
         }
+
         //Get List
         [NonAction]
         public async Task<(List<NoteTypeVM> _result, int totalRecords)> GetList(int _pageNo, int _pageSize, string _searchedTerm)
         {
-
             var _result = new List<NoteTypeVM>();
             int totalRecords = 0;
             try
             {
-                // For AJAX calls
                 var _query = _context.NoteTypes.Where(x => !x.IsDeleted)
                            .Select(x => new NoteTypeVM()
                            {
@@ -200,10 +210,11 @@ namespace TRSAppUpdated.Controllers
                     _query = _query
                         .Where(x => x.Title.Trim().ToLower().Contains(_searchedTerm.Trim().ToLower()));
                 }
-                int _skip = (_pageNo - 1) * _pageSize;
                 totalRecords = await _query.CountAsync();
-                _query = _query.Skip(_skip).Take(_pageSize);
-                _result = await _query.OrderByDescending(x => x.ID).ToListAsync();
+                int _skip = (_pageNo - 1) * _pageSize;
+
+                // Fixed: OrderBy before Skip/Take
+                _result = await _query.OrderByDescending(x => x.ID).Skip(_skip).Take(_pageSize).ToListAsync();
             }
             catch (Exception ex)
             {
@@ -211,6 +222,7 @@ namespace TRSAppUpdated.Controllers
             }
             return (_result, totalRecords);
         }
+
         //Update Notes (GET)
         public IActionResult UpdateNotes(int noteTypeID)
         {
@@ -225,6 +237,7 @@ namespace TRSAppUpdated.Controllers
             }
             return View(new List<NoteVM>());
         }
+
         [HttpPost]
         public async Task<IActionResult> UpdateNotes(List<Note> notes)
         {

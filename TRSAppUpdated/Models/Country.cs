@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -12,7 +12,7 @@ namespace TRSAppUpdated.Models
         public string Title { get; set; }
         [Column(TypeName = "varchar(4)")]
         public string DialingCode { get; set; }
-        [Column(TypeName = "nvarchar(max)")]
+        [Column(TypeName = "varchar(50)")]
         public string Flag { get; set; }
         public ICollection<User>? Users { get; set; }
         public ICollection<City> Cities { get; set; }

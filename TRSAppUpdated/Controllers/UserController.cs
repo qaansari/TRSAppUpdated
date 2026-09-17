@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
@@ -231,12 +231,10 @@ namespace TRSAppUpdated.Controllers
         [Authorize(Roles = "Super Admin")]
         public async Task<(List<UserVM> _result, int totalRecords)> GetList(int _pageNo, int _pageSize, string _searchedTerm)
         {
-
             var _result = new List<UserVM>();
             int totalRecords = 0;
             try
             {
-                // For AJAX calls
                 var _query = _context.Users.Where(x => !x.IsDeleted)
                            .Select(x => new UserVM()
                            {
@@ -249,19 +247,20 @@ namespace TRSAppUpdated.Controllers
                                RoleTitle = x.Role.Title,
                            })
                            .AsNoTracking()
-                            .AsEnumerable();
+                           .AsQueryable();
                 if (!string.IsNullOrEmpty(_searchedTerm))
                 {
+                    string term = _searchedTerm.Trim().ToLower();
                     _query = _query
-                        .Where(x => x.FullName.Trim().ToLower().Contains(_searchedTerm.Trim().ToLower())
-                        || x.ContactNumber.Trim().ToLower().Contains(_searchedTerm.Trim().ToLower())
-                        || x.Email.Trim().ToLower().Contains(_searchedTerm.Trim().ToLower())
-                        || x.RoleTitle.Trim().ToLower().Contains(_searchedTerm.Trim().ToLower()));
+                        .Where(x => x.FirstName.ToLower().Contains(term)
+                        || x.LastName.ToLower().Contains(term)
+                        || x.ContactNumber.ToLower().Contains(term)
+                        || x.Email.ToLower().Contains(term)
+                        || x.RoleTitle.ToLower().Contains(term));
                 }
+                totalRecords = await _query.CountAsync();
                 int _skip = (_pageNo - 1) * _pageSize;
-                totalRecords = _query.Count();
-                _query = _query.Skip(_skip).Take(_pageSize);
-                _result = _query.OrderByDescending(x => x.ID).ToList();
+                _result = await _query.OrderByDescending(x => x.ID).Skip(_skip).Take(_pageSize).ToListAsync();
             }
             catch (Exception ex)
             {

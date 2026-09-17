@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Tesseract;
 
 namespace TRSAppUpdated.Controllers
@@ -12,17 +12,19 @@ namespace TRSAppUpdated.Controllers
             _webHostEnvironment = webHostEnvironment;
         }
         [HttpPost]
+        [IgnoreAntiforgeryToken]
         public async Task<IActionResult> ExtractTextFromImage(IFormFile file)
         {
             if (file == null || file.Length == 0)
             {
                 return BadRequest("No file uploaded.");
             }
+            string filePath = null;
             try
             {
                 string extractedText;
                 // Save the file temporarily
-                var filePath = Path.GetTempFileName();
+                filePath = Path.GetTempFileName();
                 using (var stream = new FileStream(filePath, FileMode.Create))
                 {
                     await file.CopyToAsync(stream);
@@ -43,13 +45,25 @@ namespace TRSAppUpdated.Controllers
                         }
                     }
                 }
-                // Delete the temporary file
-                System.IO.File.Delete(filePath);
                 return Ok(new { text = extractedText });
             }
             catch (Exception ex)
             {
                 return StatusCode(500, $"Error: {ex.Message}");
+            }
+            finally
+            {
+                if (!string.IsNullOrEmpty(filePath) && System.IO.File.Exists(filePath))
+                {
+                    try
+                    {
+                        System.IO.File.Delete(filePath);
+                    }
+                    catch
+                    {
+                        // Ignore cleanup error
+                    }
+                }
             }
         }
     }

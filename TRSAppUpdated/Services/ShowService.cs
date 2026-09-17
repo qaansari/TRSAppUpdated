@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using TRSAppUpdated.Helpers;
 using TRSAppUpdated.Interfaces;
 using TRSAppUpdated.Models;
 using TRSAppUpdated.ViewModels;
@@ -9,41 +10,49 @@ namespace TRSAppUpdated.Services
     {
         private readonly AppDbContext _context;
         private readonly ILogger<ShowService> _logger;
+        private readonly ICacheService _cacheService;
         private readonly string _Title = "Show";
-        public ShowService(AppDbContext context, ILogger<ShowService> logger)
+
+        public ShowService(AppDbContext context, ILogger<ShowService> logger, ICacheService cacheService)
         {
             _context = context;
             _logger = logger;
+            _cacheService = cacheService;
         }
+
         public List<ShowVM> GetAll()
         {
-            try
+            return _cacheService.GetOrCreate(CacheKeys.ShowsList, () =>
             {
-                var _result = _context.Shows.Where(x => !x.IsDeleted)
-                             .Select(x => new ShowVM()
-                             {
-                                 ID = x.ID,
-                                 Date = x.Date,
-                                 Time = x.Time,
-                                 EventID = x.EventID,
-                             })
-                             .AsNoTracking()
-                             .OrderBy(x => x.EventID)
-                             .ToList();
-                return _result ?? new List<ShowVM>();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error occured at GetAll in {_Title} Service due to {ex}");
-            }
-            return new List<ShowVM>();
+                try
+                {
+                    var result = _context.Shows.Where(x => !x.IsDeleted)
+                                 .Select(x => new ShowVM()
+                                 {
+                                     ID = x.ID,
+                                     Date = x.Date,
+                                     Time = x.Time,
+                                     EventID = x.EventID,
+                                 })
+                                 .AsNoTracking()
+                                 .OrderBy(x => x.EventID)
+                                 .ToList();
+                    return result ?? new List<ShowVM>();
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError($"Error occured at GetAll in {_Title} Service due to {ex}");
+                }
+                return new List<ShowVM>();
+            }, TimeSpan.FromHours(1));
         }
+
         //Get Active Shows By EventID
         public List<ShowVM> GetActiveShowsByEventID(int EventID)
         {
             try
             {
-                var _list = _context.Shows
+                var list = _context.Shows
                         .Where(x => !x.IsDeleted && !x.IsEnded && x.EventID == EventID)
                         .Select(x => new ShowVM()
                         {
@@ -52,20 +61,21 @@ namespace TRSAppUpdated.Services
                             Time = x.Time
                         })
                         .AsNoTracking().ToList();
-                return _list ?? new List<ShowVM>();
+                return list ?? new List<ShowVM>();
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error occured at GetShowsByEventID in {_Title} Service due to {ex}");
+                _logger.LogError($"Error occured at GetActiveShowsByEventID in {_Title} Service due to {ex}");
             }
             return new List<ShowVM>();
         }
-        //Get Active Shows By EventID
+
+        //Get All Shows By EventID
         public List<ShowVM> GetAllShowsByEventID(int EventID)
         {
             try
             {
-                var _list = _context.Shows
+                var list = _context.Shows
                         .Where(x => !x.IsDeleted && x.EventID == EventID)
                         .Select(x => new ShowVM()
                         {
@@ -74,11 +84,11 @@ namespace TRSAppUpdated.Services
                             Time = x.Time
                         })
                         .AsNoTracking().ToList();
-                return _list ?? new List<ShowVM>();
+                return list ?? new List<ShowVM>();
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error occured at GetShowsByEventID in {_Title} Service due to {ex}");
+                _logger.LogError($"Error occured at GetAllShowsByEventID in {_Title} Service due to {ex}");
             }
             return new List<ShowVM>();
         }

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
@@ -207,34 +207,36 @@ namespace TRSAppUpdated.Controllers
         [NonAction]
         public async Task<(List<ShowExpenseVM> _result, int totalRecords)> GetList(int EventID, int _pageNo, int _pageSize, string _searchedTerm)
         {
-
             var _result = new List<ShowExpenseVM>();
             int totalRecords = 0;
             try
             {
-                // For AJAX calls
                 var _query = _context.ShowExpenses.Where(x => !x.IsDeleted && x.EventID == EventID)
-                           .Select(x => new ShowExpenseVM()
-                           {
-                               ID = x.ID,
-                               Date = x.Date,
-                               Amount = x.Amount,
-                               Description = x.Description,
-                               ShowDateTime = x.Show.Date.ToString("dddd, dd MMMM yyyy") + " " + DateTime.Today.Add(x.Show.Time).ToString("hh:mm tt"),
-                               ExpenseTitle = x.Expense.Title
-                           })
+                           .Include(x => x.Show)
+                           .Include(x => x.Expense)
                            .AsNoTracking()
                            .AsQueryable();
                 if (!string.IsNullOrEmpty(_searchedTerm))
                 {
-                    _query = _query
-                        .Where(x => (!string.IsNullOrEmpty(x.ShowDateTime) && x.ShowDateTime.Trim().ToLower().Contains(_searchedTerm.Trim().ToLower()))
-                        || !string.IsNullOrEmpty(x.ExpenseTitle) && x.ExpenseTitle.Trim().ToLower().Contains(_searchedTerm.Trim().ToLower()));
+                    string term = _searchedTerm.Trim().ToLower();
+                    _query = _query.Where(x => x.Expense.Title.ToLower().Contains(term)
+                        || x.Description.ToLower().Contains(term));
                 }
-                int _skip = (_pageNo - 1) * _pageSize;
                 totalRecords = await _query.CountAsync();
-                _query = _query.Skip(_skip).Take(_pageSize);
-                _result = await _query.OrderByDescending(x => x.ID).ToListAsync();
+                int _skip = (_pageNo - 1) * _pageSize;
+                var items = await _query.OrderByDescending(x => x.ID).Skip(_skip).Take(_pageSize).ToListAsync();
+                _result = items.Select(x => new ShowExpenseVM
+                {
+                    ID = x.ID,
+                    EventID = x.EventID,
+                    ShowID = x.ShowID,
+                    ExpenseID = x.ExpenseID,
+                    Date = x.Date,
+                    Amount = x.Amount,
+                    Description = x.Description,
+                    ShowDateTime = x.Show != null ? x.Show.Date.ToString("dddd, dd MMMM yyyy") + " " + DateTime.Today.Add(x.Show.Time).ToString("hh:mm tt") : string.Empty,
+                    ExpenseTitle = x.Expense?.Title ?? string.Empty
+                }).ToList();
             }
             catch (Exception ex)
             {

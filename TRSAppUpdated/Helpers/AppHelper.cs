@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using System.Net.Mail;
@@ -21,6 +21,25 @@ namespace TRSAppUpdated.Helpers
         public static string _SandboxURL { get; set; } = "https://sandbox.jazzcash.com.pk/ApplicationAPI/API/Payment/DoTransaction";
         public static string _ProductionURL { get; set; } = "https://jazzcash.com.pk/ApplicationAPI/API/Payment/DoTransaction";
         //Jazzcash Params End
+
+        public static void ConfigureSettings(IConfiguration configuration)
+        {
+            var appUrl = configuration["AppUrl"];
+            if (!string.IsNullOrEmpty(appUrl))
+            {
+                _appUrl = appUrl.EndsWith("/") ? appUrl : appUrl + "/";
+            }
+            var jazzCash = configuration.GetSection("JazzCash");
+            if (jazzCash.Exists())
+            {
+                _MerchantID = jazzCash["MerchantID"] ?? _MerchantID;
+                _Password = jazzCash["Password"] ?? _Password;
+                _IntegritySalt = jazzCash["IntegritySalt"] ?? _IntegritySalt;
+                _ReturnURL = jazzCash["ReturnURL"] ?? (_appUrl + "Reservation/Success");
+                _SandboxURL = jazzCash["SandboxURL"] ?? _SandboxURL;
+                _ProductionURL = jazzCash["ProductionURL"] ?? _ProductionURL;
+            }
+        }
         public static string HashWithSalt(this string password)
         {
             string saltstring = "CHYzqeN4plZekNC88Umm1Q==";
@@ -38,12 +57,15 @@ namespace TRSAppUpdated.Helpers
             return hashed;
         }
         //Send Password Reset Email
-        public static void SendVerificationEmail(string emailAddress, string verificationType, string verificationLink)
+        public static async Task SendVerificationEmailAsync(string emailAddress, string verificationType, string verificationLink, IConfiguration? configuration = null)
         {
             // Configure email settings
-            string _senderEmail = "eventlandinformation@gmail.com";
-            string _senderName = "Event Land";
-            string _logoUrl = "https://ik.imagekit.io/mg7bre0yk/web-logo.png";
+            string _senderEmail = configuration?["EmailSettings:SenderEmail"] ?? "eventlandinformation@gmail.com";
+            string _senderPassword = configuration?["EmailSettings:Password"] ?? "ygjjncvsgjplzjwq";
+            string _smtpHost = configuration?["EmailSettings:SmtpHost"] ?? "smtp.gmail.com";
+            int _smtpPort = int.TryParse(configuration?["EmailSettings:Port"], out var port) ? port : 587;
+            string _senderName = configuration?["EmailSettings:SenderName"] ?? "Event Land";
+            string _logoUrl = configuration?["EmailSettings:LogoUrl"] ?? "https://ik.imagekit.io/mg7bre0yk/web-logo.png";
             string _subject = verificationType.ToLower() == "verify email" ? "Email Verification" : "Reset Password";
             string _btnText = verificationType.ToLower() == "verify email" ? "Login To Continue" : "Reset Password";
             string _paraText = verificationType.ToLower() == "verify email" ? "verify your email" : "reset your password";
@@ -109,23 +131,23 @@ namespace TRSAppUpdated.Helpers
 </body>
 </html>
 ";
-            // Create and configure the email message
-            MailMessage message = new MailMessage();
+            using var message = new MailMessage();
             message.From = new MailAddress(_senderEmail, _senderName);
             message.To.Add(new MailAddress(emailAddress));
             message.Subject = _subject;
             message.Body = _body;
             message.IsBodyHtml = true;
 
-            // Configure the SMTP client
-            using (SmtpClient smtpClient = new SmtpClient("smtp.gmail.com", 587))
-            {
-                smtpClient.UseDefaultCredentials = false;
-                smtpClient.Credentials = new System.Net.NetworkCredential(_senderEmail, "ygjjncvsgjplzjwq");
-                smtpClient.EnableSsl = true;
-                // Send the email
-                smtpClient.Send(message);
-            }
+            using var smtpClient = new SmtpClient(_smtpHost, _smtpPort);
+            smtpClient.UseDefaultCredentials = false;
+            smtpClient.Credentials = new System.Net.NetworkCredential(_senderEmail, _senderPassword);
+            smtpClient.EnableSsl = true;
+            await smtpClient.SendMailAsync(message);
+        }
+
+        public static void SendVerificationEmail(string emailAddress, string verificationType, string verificationLink)
+        {
+            SendVerificationEmailAsync(emailAddress, verificationType, verificationLink).GetAwaiter().GetResult();
         }
         //Compress Size
         public static async Task<byte[]> CompressImageAsync(IFormFile imageFile, int maxFileSizeInBytes = 1 * 1024 * 1024)

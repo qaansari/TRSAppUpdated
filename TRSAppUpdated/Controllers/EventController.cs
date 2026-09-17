@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
@@ -23,6 +23,7 @@ namespace TRSAppUpdated.Controllers
         private readonly IEventStatusService _eventStatusService;
         private readonly ICategoryService _categoryService;
         private readonly IEventService _service;
+        private readonly ICacheService _cacheService;
         private readonly string _Title = "Event";
         private readonly int _UserID;
         public EventController(AppDbContext context, IHttpContextAccessor httpContextAccessor,
@@ -30,7 +31,8 @@ namespace TRSAppUpdated.Controllers
             ICountryService countryService, ICityService cityService,
             IVenueService venueService,
             ITicketService ticketService, IAuditoriumService auditoriumService,
-            IEventStatusService eventStatusService, ICategoryService categoryService, IEventService service)
+            IEventStatusService eventStatusService, ICategoryService categoryService,
+            IEventService service, ICacheService cacheService)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;
@@ -44,6 +46,7 @@ namespace TRSAppUpdated.Controllers
             _eventStatusService = eventStatusService;
             _categoryService = categoryService;
             _service = service;
+            _cacheService = cacheService;
             _UserID = Convert.ToInt32(_httpContextAccessor.HttpContext.User.FindFirstValue("UserID"));
         }
         [Authorize(Roles = "Super Admin,Admin,Moderator,User")]
@@ -130,7 +133,7 @@ namespace TRSAppUpdated.Controllers
             return View(_item);
         }
         //AddOrEdit (POST)
-        [Authorize(Roles = "Super Admin")]
+        [Authorize(Roles = "Super Admin,Admin")]
         [HttpPost]
         public async Task<IActionResult> AddOrEdit(EventVM Model)
         {
@@ -303,6 +306,8 @@ namespace TRSAppUpdated.Controllers
                         }
                         await _context.SaveChangesAsync();
                     }
+                    _cacheService.Remove(CacheKeys.EventsList);
+                    _cacheService.Remove(CacheKeys.DashboardMetrics);
                     return RedirectToAction("Index");
                 }
             }
@@ -329,6 +334,8 @@ namespace TRSAppUpdated.Controllers
                     _context.ChangeTracker.Clear();
                     _context.Entry(_item).State = EntityState.Modified;
                     await _context.SaveChangesAsync();
+                    _cacheService.Remove(CacheKeys.EventsList);
+                    _cacheService.Remove(CacheKeys.DashboardMetrics);
                     TempData["Message"] = $"1,{_Title} Successfully Deleted";
                 }
                 else
@@ -361,6 +368,8 @@ namespace TRSAppUpdated.Controllers
                     _context.ChangeTracker.Clear();
                     _context.Entry(_item).State = EntityState.Modified;
                     await _context.SaveChangesAsync();
+                    _cacheService.Remove(CacheKeys.EventsList);
+                    _cacheService.Remove(CacheKeys.DashboardMetrics);
                     TempData["Message"] = $"1,{_Title} Successfully Ended";
                 }
                 else

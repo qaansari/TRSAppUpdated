@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
@@ -18,11 +18,13 @@ namespace TRSAppUpdated.Controllers
         private readonly ILogger<VenueController> _logger;
         private readonly ICityService _cityService;
         private readonly ICountryService _countryService;
+        private readonly ICacheService _cacheService;
         private readonly string _Title = "Venue";
         private readonly int _UserID;
+
         public VenueController(AppDbContext context, IHttpContextAccessor httpContextAccessor,
             IWebHostEnvironment webHostEnvironment, ILogger<VenueController> logger, ICityService cityService,
-            ICountryService countryService)
+            ICountryService countryService, ICacheService cacheService)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;
@@ -30,8 +32,10 @@ namespace TRSAppUpdated.Controllers
             _logger = logger;
             _countryService = countryService;
             _cityService = cityService;
+            _cacheService = cacheService;
             _UserID = Convert.ToInt32(_httpContextAccessor.HttpContext.User.FindFirstValue("UserID"));
         }
+
         //Index (Get All)
         public async Task<IActionResult> Index(int _pageNo = 1, int _pageSize = 10, string _searchedTerm = "")
         {
@@ -50,6 +54,7 @@ namespace TRSAppUpdated.Controllers
             }
             return View(new List<VenueVM>());
         }
+
         // GetPartial
         [HttpGet]
         public async Task<IActionResult> GetPartial(int _pageNo = 1, int _pageSize = 10, string _searchedTerm = "")
@@ -70,6 +75,7 @@ namespace TRSAppUpdated.Controllers
             }
             return PartialView($"_{_partialViewName}TablePartial", new List<VenueVM>());
         }
+
         //AddOrEdit (GET)
         public IActionResult AddOrEdit(int ID = 0)
         {
@@ -85,9 +91,9 @@ namespace TRSAppUpdated.Controllers
                         {
                             ID = x.ID,
                             Title = x.Title,
-                            Address = x.Address,
                             CountryID = x.City.CountryID,
                             CityID = x.CityID,
+                            Address = x.Address,
                             ImagePath = x.ImagePath,
                             CreatedByUserID = x.CreatedByUserID,
                             CreatedDateTime = x.CreatedDateTime,
@@ -101,6 +107,7 @@ namespace TRSAppUpdated.Controllers
             }
             return View(_item);
         }
+
         //AddOrEdit (POST)
         [HttpPost]
         public async Task<IActionResult> AddOrEdit(VenueVM Model)
@@ -129,21 +136,22 @@ namespace TRSAppUpdated.Controllers
                         if (_item != null)
                         {
                             _item.Title = Model.Title.Trim();
-                            _item.Address = Model.Address.Trim();
                             _item.CityID = Model.CityID;
+                            _item.Address = Model.Address.Trim();
                             _item.UpdatedByUserID = _UserID;
                             _item.UpdatedDateTime = DateTime.UtcNow.AddHours(5);
                             _context.ChangeTracker.Clear();
                             _context.Entry(_item).State = EntityState.Modified;
                             await _context.SaveChangesAsync();
+                            _cacheService.Remove(CacheKeys.Venues);
                             TempData["Message"] = $"1,{_Title} Successfully Updated";
                         }
                     }
                     else
                     {
                         var isExists = _context.Venues.Where(x => !x.IsDeleted
-                            && x.Title.Trim().ToLower() == Model.Title.Trim().ToLower()
-                            && x.CityID == Model.CityID)
+                            && x.CityID == Model.CityID
+                            && x.Title.Trim().ToLower() == Model.Title.Trim().ToLower())
                         .Any();
                         if (isExists)
                         {
@@ -151,12 +159,13 @@ namespace TRSAppUpdated.Controllers
                             return View(Model);
                         }
                         _item.Title = Model.Title.Trim();
-                        _item.Address = Model.Address.Trim();
                         _item.CityID = Model.CityID;
+                        _item.Address = Model.Address.Trim();
                         _item.CreatedByUserID = _UserID;
                         _item.CreatedDateTime = DateTime.UtcNow.AddHours(5);
                         _context.Venues.Add(_item);
                         await _context.SaveChangesAsync();
+                        _cacheService.Remove(CacheKeys.Venues);
                         TempData["Message"] = $"1,{_Title} Successfully Added";
                     }
                     if (_item != null && Model.ImageFile != null)
@@ -180,13 +189,13 @@ namespace TRSAppUpdated.Controllers
                     return RedirectToAction("Index");
                 }
             }
-
             catch (Exception ex)
             {
                 _logger.LogError($"Error occured at AddOrEdit (POST) in {_Title} Controller due to {ex}");
             }
             return View(Model);
         }
+
         [HttpPost]
         public async Task<IActionResult> Delete(int ID)
         {
@@ -202,6 +211,7 @@ namespace TRSAppUpdated.Controllers
                     _context.ChangeTracker.Clear();
                     _context.Entry(_item).State = EntityState.Modified;
                     await _context.SaveChangesAsync();
+                    _cacheService.Remove(CacheKeys.Venues);
                     TempData["Message"] = $"1,{_Title} Successfully Deleted";
                 }
                 else
@@ -215,16 +225,15 @@ namespace TRSAppUpdated.Controllers
             }
             return RedirectToAction("Index");
         }
+
         //Get List
         [NonAction]
         public async Task<(List<VenueVM> _result, int totalRecords)> GetList(int _pageNo, int _pageSize, string _searchedTerm)
         {
-
             var _result = new List<VenueVM>();
             int totalRecords = 0;
             try
             {
-                // For AJAX calls
                 var _query = _context.Venues
                     .Where(x => !x.IsDeleted)
                            .Select(x => new VenueVM()
@@ -240,16 +249,18 @@ namespace TRSAppUpdated.Controllers
                            .AsQueryable();
                 if (!string.IsNullOrEmpty(_searchedTerm))
                 {
+                    string term = _searchedTerm.Trim().ToLower();
                     _query = _query
-                        .Where(x => x.Title.Trim().ToLower().Contains(_searchedTerm.Trim().ToLower())
-                    || x.Address.Trim().ToLower().Contains(_searchedTerm.Trim().ToLower())
-                    || x.CountryTitle.Trim().ToLower().Contains(_searchedTerm.Trim().ToLower())
-                    || x.CountryTitle.Trim().ToLower().Contains(_searchedTerm.Trim().ToLower()));
+                        .Where(x => x.Title.Trim().ToLower().Contains(term)
+                    || x.Address.Trim().ToLower().Contains(term)
+                    || x.CityTitle.Trim().ToLower().Contains(term)
+                    || x.CountryTitle.Trim().ToLower().Contains(term));
                 }
-                int _skip = (_pageNo - 1) * _pageSize;
                 totalRecords = await _query.CountAsync();
-                _query = _query.Skip(_skip).Take(_pageSize);
-                _result = await _query.OrderByDescending(x => x.ID).ToListAsync();
+                int _skip = (_pageNo - 1) * _pageSize;
+
+                // Fixed: OrderBy before Skip/Take
+                _result = await _query.OrderByDescending(x => x.ID).Skip(_skip).Take(_pageSize).ToListAsync();
             }
             catch (Exception ex)
             {

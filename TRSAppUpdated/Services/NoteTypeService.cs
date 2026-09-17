@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using TRSAppUpdated.Helpers;
 using TRSAppUpdated.Interfaces;
 using TRSAppUpdated.Models;
 using TRSAppUpdated.ViewModels;
@@ -9,33 +10,40 @@ namespace TRSAppUpdated.Services
     {
         private readonly AppDbContext _context;
         private readonly ILogger<NoteTypeService> _logger;
+        private readonly ICacheService _cacheService;
         private readonly string _Title = "Note Type";
-        public NoteTypeService(AppDbContext context, ILogger<NoteTypeService> logger)
+
+        public NoteTypeService(AppDbContext context, ILogger<NoteTypeService> logger, ICacheService cacheService)
         {
             _context = context;
             _logger = logger;
+            _cacheService = cacheService;
         }
-        //Get All
+
+        //Get All with In-Memory Caching
         public List<NoteTypeVM> GetAll()
         {
-            try
+            return _cacheService.GetOrCreate(CacheKeys.NoteTypes, () =>
             {
-                var _result = _context.NoteTypes.Where(x => !x.IsDeleted)
-                             .Select(x => new NoteTypeVM()
-                             {
-                                 ID = x.ID,
-                                 Title = x.Title,
-                             })
-                             .AsNoTracking()
-                             .OrderBy(x => x.Title)
-                             .ToList();
-                return _result ?? new List<NoteTypeVM>();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error occured at GetAll in {_Title} Service due to {ex}");
-            }
-            return new List<NoteTypeVM>();
+                try
+                {
+                    var result = _context.NoteTypes.Where(x => !x.IsDeleted)
+                                 .Select(x => new NoteTypeVM()
+                                 {
+                                     ID = x.ID,
+                                     Title = x.Title,
+                                 })
+                                 .AsNoTracking()
+                                 .OrderBy(x => x.Title)
+                                 .ToList();
+                    return result ?? new List<NoteTypeVM>();
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError($"Error occured at GetAll in {_Title} Service due to {ex}");
+                }
+                return new List<NoteTypeVM>();
+            }, TimeSpan.FromHours(4));
         }
     }
 }
