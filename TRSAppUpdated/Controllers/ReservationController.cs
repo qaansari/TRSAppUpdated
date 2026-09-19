@@ -492,10 +492,24 @@ namespace TRSAppUpdated.Controllers
                 {
                     seats = $"<span class='seats-badge'>First Come First Sit</span>";
                 }
-                string _docWidth = "490mm";
-                string _docHeight = "218mm";
+                string _docWidth = "210mm";
+                string _docHeight = "80mm";
                 string logoImageSrc = GetImageSource("web-logo-light.png", "assets/images");
                 string eventImageSrc = GetImageSource(_item.EventImagePath, "assets/images/events");
+
+                bool hasEventImage = !string.IsNullOrEmpty(eventImageSrc);
+                string infoColumnWidth = hasEventImage ? "58%" : "100%";
+                string imageHtml = hasEventImage
+                    ? $@"<div class='image_info'>
+                            <img src='{eventImageSrc}' class='event_img'/>
+                         </div>"
+                    : "";
+                string logoHtml = !string.IsNullOrEmpty(logoImageSrc)
+                    ? $@"<div class='logo_img_section'>
+                           <img src='{logoImageSrc}' class='logo_img' />
+                        </div>"
+                    : "";
+
                 string html = $@"
 <!DOCTYPE html>
 <html>
@@ -503,125 +517,147 @@ namespace TRSAppUpdated.Controllers
 <meta charset='UTF-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0'>
 <style>
-    
-    body {{
-        margin: 0 auto;
-        padding: 0;
-        font-family: 'Poppins', sans-serif;
-        background:  rgb(255,255,255);
-        width:{_docWidth};
-        height:{_docHeight};
+    @page {{
+        size: {_docWidth} {_docHeight};
+        margin: 0;
     }}
-.ticket-container {{
+    * {{
+        box-sizing: border-box;
+        page-break-inside: avoid !important;
+        page-break-after: avoid !important;
+        page-break-before: avoid !important;
+    }}
+    ::-webkit-scrollbar {{
+        display: none !important;
+        width: 0px !important;
+        height: 0px !important;
+        background: transparent !important;
+    }}
+    html, body {{
+        margin: 0;
+        padding: 0;
+        font-family: 'Poppins', Arial, sans-serif;
+        background: #ffffff;
         width: 100%;
         height: 100%;
-        margin: 0 auto;
-        background: rgb(255,255,255);
-        border-radius: 10px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }}
+    .ticket-container {{
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        background: #ffffff;
+        overflow: hidden;
     }}
     .ticket-header {{
         background: linear-gradient(135deg, rgb(26,164,139), rgb(69,165,121));
-        color: #fff;
-        padding: 20px;
+        color: #ffffff;
+        padding: 6px 15px;
         text-align: center;
     }}
     .ticket-header h2 {{
         margin: 0;
-        font-size: 24px;
+        font-size: 16px;
         font-weight: 600;
+        letter-spacing: 1px;
     }}
     .ticket-body {{
-        padding: 15px;
+        padding: 6px 16px 2px 16px;
     }}
-    .ticket_heading {{
+    .logo_img_section {{
         text-align: center;
-        text-transform: uppercase;
+        margin-bottom: 2px;
     }}
-    .ticket_heading h2 {{
-        font-size: 24px;
+    .logo_img {{
+        max-height: 60px;
+        max-width: 200px;
+        width: auto;
+        height: auto;
+    }}
+    .ticket-number {{
+        background: rgb(248,249,250);
+        padding: 4px 10px;
+        border-radius: 5px;
+        text-align: center;
+        margin: 3px 0 6px 0;
+        border: 1px dashed rgb(200,200,200);
+    }}
+    .ticket-number h3 {{
+        margin: 0;
+        font-size: 16px;
         color: rgb(26,164,139);
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        font-weight: 700;
     }}
     .ticket-content {{
-        display: inline-block;
         width: 100%;
-        vertical-align: top;
     }}
     .ticket-info {{
         display: inline-block;
-        width: 38%;
+        width: {infoColumnWidth};
         vertical-align: top;
     }}
     .image_info {{
         display: inline-block;
-        width: 60%;
+        width: 39%;
         vertical-align: top;
         text-align: right;
     }}
     .event_img {{
-        border-radius: 10px;
+        border-radius: 6px;
         width: 100%;
-        height: 380px;
+        max-height: 115px;
+        height: auto;
+        object-fit: cover;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        border: 1px solid #eaeaea;
     }}
-    .info-row {{
-        display: flex;
-        margin-bottom: 12px;
-        padding-bottom: 12px;
-        border-bottom: 1px solid rgb(238,238,238);
+    .info-table {{
+        width: 100%;
+        border-collapse: collapse;
+    }}
+    .info-table td {{
+        padding: 2.5px 0;
+        vertical-align: middle;
+        font-size: 10px;
+        border-bottom: 1px solid rgb(240,240,240);
+    }}
+    .info-table tr:last-child td {{
+        border-bottom: none;
     }}
     .info-label {{
         font-weight: 600;
-        width: 200px;
-        color: rgb(19,7,22);
+        width: 110px;
+        color: rgb(40,40,40);
     }}
     .info-value {{
-        flex: 1;
-        color: rgb(10,3,3);
-    }}
-    .ticket-number {{
-        background: rgb(248,249,250);
-        padding: 15px;
-        border-radius: 8px;
-        text-align: center;
-        margin: 20px 0;
-        border: 1px dashed rgb(221,221,221);
-    }}
-    .ticket-number h3 {{
-        margin: 0;
-        font-size: 28px;
-        color: rgb(26,164,139);
-        letter-spacing: 2px;
-        text-transform: uppercase;
-    }}
-    .logo_img_section {{
-        text-align: center;
-    }}
-    .logo_img {{
-        width: 200px;
-        height: auto;
-    }}
-    .footer {{
-        text-align: center;
-        padding: 15px;
-        color: rgb(153,153,153);
-        font-size: 12px;
-        background: rgb(249,249,249);
-        border-top: 1px solid rgb(238,238,238);
+        color: rgb(15,15,15);
     }}
     .seats-badge {{
         display: inline-block;
         background: rgb(88,255,217);
         color: rgb(16,12,12);
-        padding: 5px 10px;
-        border-radius: 5px;
+        padding: 2px 5px;
+        border-radius: 3px;
         font-weight: 600;
-        margin-right: 5px;
-        margin-bottom: 5px;
+        font-size: 9.5px;
+        margin-right: 2px;
+        margin-bottom: 2px;
     }}
-.seat_category{{
-    font-weight: 600;
-    text-transform: uppercase;
-}}
+    .seat_category {{
+        font-weight: 600;
+        text-transform: uppercase;
+    }}
+    .footer {{
+        text-align: center;
+        padding: 5px 10px;
+        color: rgb(120,120,120);
+        font-size: 9px;
+        background: rgb(249,249,249);
+        border-top: 1px solid rgb(238,238,238);
+        margin-top: 5px;
+    }}
 </style>
 </head>
 <body>
@@ -630,29 +666,36 @@ namespace TRSAppUpdated.Controllers
             <h2>E-Ticket</h2>
         </div>
         <div class='ticket-body'>
-            <div class='logo_img_section'>
-               <img src='{logoImageSrc}' class=""logo_img"" />
-            </div>
-            <div class='ticket_heading'>
-                <h2>E-Ticket</h2>
-            </div>
+            {logoHtml}
             <div class='ticket-number'>
                 <h3>{_item.TicketNumber}</h3>
             </div>
             <div class='ticket-content'>
                 <div class='ticket-info'>
-                    <div class='info-row'><div class='info-label'>Event Name:</div><div class='info-value'><b>{_item.EventName.ToUpper()}</b></div></div>
-                    <div class='info-row'><div class='info-label'>Show Date:</div><div class='info-value'><b>{_item.ShowDateTime.ToUpper()}</b></div></div>
-                    <div class='info-row'><div class='info-label'>Customer Name:</div><div class='info-value'><b>{_item.CustomerName.ToUpper()}</b></div></div>
-                    <div class='info-row'><div class='info-label'>Phone Number:</div><div class='info-value'><b>{_item.CustomerPhone.ToUpper()}</b></div></div>
-                    <div class='info-row'>
-                        <div class='info-label'>Reserved Seats: ({seatLabelsList.Count.ToString()})</div>
-                        <div class='info-value'><span class='seat_category'>{_item.TicketCategory} - </span>{seats}</div>
-                    </div>
+                    <table class='info-table'>
+                        <tr>
+                            <td class='info-label'>Event Name:</td>
+                            <td class='info-value'><b>{_item.EventName.ToUpper()}</b></td>
+                        </tr>
+                        <tr>
+                            <td class='info-label'>Show Date:</td>
+                            <td class='info-value'><b>{_item.ShowDateTime.ToUpper()}</b></td>
+                        </tr>
+                        <tr>
+                            <td class='info-label'>Customer Name:</td>
+                            <td class='info-value'><b>{_item.CustomerName.ToUpper()}</b></td>
+                        </tr>
+                        <tr>
+                            <td class='info-label'>Phone Number:</td>
+                            <td class='info-value'><b>{_item.CustomerPhone.ToUpper()}</b></td>
+                        </tr>
+                        <tr>
+                            <td class='info-label'>Reserved Seats: ({seatLabelsList.Count})</td>
+                            <td class='info-value'><span class='seat_category'>{_item.TicketCategory} - </span>{seats}</td>
+                        </tr>
+                    </table>
                 </div>
-                <div class='image_info'>
-                    <img src='{eventImageSrc}' class='event_img'/>
-                </div>
+                {imageHtml}
             </div>
         </div>
         <div class='footer'>
@@ -671,15 +714,14 @@ namespace TRSAppUpdated.Controllers
                         ColorMode = ColorMode.Color,
                         Orientation = Orientation.Portrait,
                         PaperSize = new PechkinPaperSize(_docWidth, _docHeight),
-                        Margins = new MarginSettings { Top = 5, Bottom = 5, Left = 5, Right = 5 }
+                        Margins = new MarginSettings { Top = 0, Bottom = 0, Left = 0, Right = 0 }
                     },
                     Objects = {
                     new ObjectSettings()
                     {
                         PagesCount = true,
                         HtmlContent = html,
-                        WebSettings = { DefaultEncoding = "utf-8", LoadImages = true },
-                        HeaderSettings = { FontSize = 9, Right = "" }
+                        WebSettings = { DefaultEncoding = "utf-8", LoadImages = true }
                     }
                 }
                 };
