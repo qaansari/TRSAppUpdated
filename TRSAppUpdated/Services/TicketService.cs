@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using TRSAppUpdated.Interfaces;
 using TRSAppUpdated.Models;
 using TRSAppUpdated.ViewModels;
@@ -20,7 +20,7 @@ namespace TRSAppUpdated.Services
         {
             try
             {
-                var showIDList = _context.Shows.Where(x => !x.IsDeleted && !x.IsEnded && x.EventID == EventID)
+                var showIDList = _context.Shows.Where(x => !x.IsDeleted && x.EventID == EventID)
                                                    .AsNoTracking()
                                                    .Select(x => x.ID)
                                                    .ToList();
@@ -32,7 +32,9 @@ namespace TRSAppUpdated.Services
                         ID = x.ID,
                         ShowID = x.ShowID,
                         CostPrice = x.CostPrice,
-                        FormattedSeatNumber = !x.IsReserved ? x.Seat.Column.Row.RowLabel + x.Seat.SeatNumber : x.Seat.Column.Row.RowLabel + x.Seat.SeatNumber + " " + "(Reserved)",
+                        FormattedSeatNumber = x.Seat != null && x.Seat.Column != null && x.Seat.Column.Row != null
+                            ? (!x.IsReserved ? x.Seat.Column.Row.RowLabel + x.Seat.SeatNumber : x.Seat.Column.Row.RowLabel + x.Seat.SeatNumber + " (Reserved)")
+                            : (!x.IsReserved ? $"Ticket #{x.ID}" : $"Ticket #{x.ID} (Reserved)"),
                     })
                     .ToList();
                 return _ticketList ?? new List<TicketVM>();

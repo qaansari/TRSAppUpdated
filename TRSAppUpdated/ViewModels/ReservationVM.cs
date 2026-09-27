@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using TRSAppUpdated.Models;
 
 namespace TRSAppUpdated.ViewModels
@@ -7,37 +7,56 @@ namespace TRSAppUpdated.ViewModels
     {
         public int ID { get; set; }
         public int EventID { get; set; }
-        [Required(ErrorMessage = "Please fill out this field")]
-        [StringLength(20, ErrorMessage = "Please fill out maximum 20 characters")]
+
+        [Required(ErrorMessage = "Please enter ticket number")]
+        [StringLength(20, ErrorMessage = "Ticket number cannot exceed 20 characters")]
         public string TicketNumber { get; set; }
-        [Required(ErrorMessage = "Please fill out this field")]
-        [MinLength(4, ErrorMessage = "Please fill out minimum 4 characters")]
-        [StringLength(41, ErrorMessage = "Please fill out maximum 41 characters")]
+
+        [Required(ErrorMessage = "Please enter customer name")]
+        [MinLength(3, ErrorMessage = "Customer name must be at least 3 characters")]
+        [StringLength(50, ErrorMessage = "Customer name cannot exceed 50 characters")]
         public string CustomerName { get; set; }
-        [Required(ErrorMessage = "Please fill out this field")]
-        [MinLength(11, ErrorMessage = "Please fill out minimum 11 characters")]
-        [StringLength(20, ErrorMessage = "Please fill out maximum 20 characters")]
+
+        [Required(ErrorMessage = "Please enter customer phone")]
+        [MinLength(10, ErrorMessage = "Customer phone must be at least 10 characters")]
+        [StringLength(20, ErrorMessage = "Customer phone cannot exceed 20 characters")]
         public string CustomerPhone { get; set; }
-        [Required(ErrorMessage = "Please fill out this field")]
+
+        [Required(ErrorMessage = "Please select at least one ticket")]
         public List<int>? TicketIDs { get; set; }
-        [Range(1, double.MaxValue, ErrorMessage = "Please fill out this field")]
+
+        [Range(0, double.MaxValue, ErrorMessage = "Please enter a valid cost price")]
         public double CostPrice { get; set; }
+
+        [Range(0, double.MaxValue, ErrorMessage = "Please enter a valid discount")]
         public double Discount { get; set; }
+
+        [Range(0, double.MaxValue, ErrorMessage = "Please enter a valid sale price")]
         public double SalePrice { get; set; }
+
+        [Range(0, double.MaxValue, ErrorMessage = "Please enter a valid amount paid")]
         public double AmountPaid { get; set; }
+
+        [Range(0, double.MaxValue, ErrorMessage = "Please enter a valid amount remaining")]
         public double AmountRemaining { get; set; }
+
         public bool IsFullyPaid { get; set; } = false;
         public IFormFile? ImageFile { get; set; }
-        [MinLength(4, ErrorMessage = "Please fill out minimum 4 characters")]
-        [StringLength(50, ErrorMessage = "Please fill out maximum 50 characters")]
+
+        [StringLength(50, ErrorMessage = "Transaction ID cannot exceed 50 characters")]
         public string? TransactionID { get; set; }
+
         public DateTime? BookingDateTime { get; set; }
-        [Range(1, int.MaxValue, ErrorMessage = "Please fill out this field")]
+
+        [Range(1, int.MaxValue, ErrorMessage = "Please select a show")]
         public int ShowID { get; set; }
-        [Range(1, int.MaxValue, ErrorMessage = "Please fill out this field")]
+
+        [Range(1, int.MaxValue, ErrorMessage = "Please select a payment mode")]
         public int PaymentModeID { get; set; }
-        [Range(1, int.MaxValue, ErrorMessage = "Please fill out this field")]
+
+        [Range(1, int.MaxValue, ErrorMessage = "Please select a reservation status")]
         public int ReservationStatusID { get; set; }
+
         public int? ClosedByUserID { get; set; }
         public DateTime? ClosingDateTime { get; set; }
         public bool? IsApproved { get; set; }

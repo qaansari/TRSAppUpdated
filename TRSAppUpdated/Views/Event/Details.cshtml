@@ -1,4 +1,4 @@
-﻿@model EventVM
+@model EventVM
 @{
     ViewData["Title"] = $"{Model.Title} Details";
     var _Message = TempData["Message"] as string;
@@ -278,7 +278,7 @@
                                                                             <a class="btn btn-danger sm-btn closeRsvBtn" data-id="@(item.ID)">Close</a>
                                                                         }
                                                                     }
-                                                                    @if (isSuperAdmin && !string.IsNullOrEmpty(Model.EventStatusTitle)
+                                                                    @if ((isSuperAdmin || isAdmin) && !string.IsNullOrEmpty(Model.EventStatusTitle)
                                                                                                                     && Model.EventStatusTitle.Trim().ToLower() != "ended")
                                                                     {
                                                                         <a asp-action="AddOrEdit" asp-controller="Reservation" asp-route-ID="@(item.ID)" asp-route-EventID="@(Model.ID)" class="btn btn-primary sm-btn">Edit</a>

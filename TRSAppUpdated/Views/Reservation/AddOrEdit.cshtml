@@ -1,4 +1,4 @@
-﻿@using Newtonsoft.Json
+@using Newtonsoft.Json
 @model ReservationVM
 @{
     string _fn = "Add";
@@ -12,7 +12,7 @@
     bool isSuperAdmin = (await _authorizationService.AuthorizeAsync(User, "SuperAdmin")).Succeeded ? true : false;
     bool isAdmin = (await _authorizationService.AuthorizeAsync(User, "Admin")).Succeeded ? true : false;
 }
-@if (isSuperAdmin || (isAdmin && Model.ID == 0))
+@if (isSuperAdmin || isAdmin)
 {
     <div class="row">
         <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
@@ -22,6 +22,7 @@
                 </div>
                 <div class="card-body">
                     <form class="separate-form rsv_form" enctype="multipart/form-data" method="post" asp-action="AddOrEdit">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
                         <input type="hidden" asp-for="ID" />
                         <input type="hidden" asp-for="ClosedByUserID" />
                         <input type="hidden" asp-for="ClosingDateTime" />
@@ -29,6 +30,7 @@
                         <input type="hidden" asp-for="EventID" />
                         <input type="hidden" asp-for="CreatedByUserID" />
                         <input type="hidden" asp-for="CreatedDateTime" />
+                        <input type="hidden" asp-for="IsFullyPaid" id="IsFullyPaid" />
                         <div class="row">
                             <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
                                 <div class="form-group">
@@ -58,7 +60,7 @@
                                 <div class="form-group">
                                     <label class="col-form-label">Tickets <span class="text-danger">*</span></label>
                                     <ejs-multiselect cssClass="form-control form-control-sm" dataSource="@(ViewData["TicketList"])" placeholder="Select tickets"
-                                                     allowFiltering="true" ejs-for="TicketIDs" popupHeight="220px" enabled="@(Model.ID == 0 ? false : true)">
+                                                      allowFiltering="true" ejs-for="TicketIDs" popupHeight="220px" enabled="@(Model.ID == 0 ? false : true)">
                                         <e-multiselect-fields value="ID" text="FormattedSeatNumber"></e-multiselect-fields>
                                     </ejs-multiselect>
                                     <span asp-validation-for="TicketIDs"></span>
@@ -67,39 +69,49 @@
                             <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
                                 <div class="form-group">
                                     <label class="col-form-label">Cost Price <span class="text-danger">*</span></label>
-                                    <input class="form-control" type="number" placeholder="Enter Cost Price" asp-for="CostPrice" readonly>
+                                    <input class="form-control" type="number" step="any" placeholder="Enter Cost Price" asp-for="CostPrice" readonly>
+                                    <span asp-validation-for="CostPrice"></span>
                                 </div>
                             </div>
                             <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
                                 <div class="form-group">
                                     <label class="col-form-label">Sale Price <span class="text-danger">*</span></label>
-                                    <input class="form-control" type="number" placeholder="Enter Sale Price" asp-for="SalePrice">
+                                    <input class="form-control" type="number" step="any" placeholder="Enter Sale Price" asp-for="SalePrice">
                                     <span asp-validation-for="SalePrice"></span>
                                 </div>
                             </div>
                             <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
                                 <div class="form-group">
                                     <label class="col-form-label">Discount</label>
-                                    <input class="form-control" type="number" placeholder="Enter Discount" asp-for="Discount" readonly>
+                                    <input class="form-control" type="number" step="any" placeholder="Enter Discount" asp-for="Discount" readonly>
                                 </div>
                             </div>
                             <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
                                 <div class="form-group">
-                                    <label class="col-form-label">Amount Paid<span class="text-danger">*</span></label>
-                                    <input class="form-control" type="number" placeholder="Enter Amount Paid" asp-for="AmountPaid">
+                                    <label class="col-form-label">Amount Paid <span class="text-danger">*</span></label>
+                                    <input class="form-control" type="number" step="any" placeholder="Enter Amount Paid" asp-for="AmountPaid">
                                     <span asp-validation-for="AmountPaid"></span>
                                 </div>
                             </div>
                             <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
                                 <div class="form-group">
-                                    <label class="col-form-label">Amount Remaining<span class="text-danger">*</span></label>
-                                    <input class="form-control" type="number" placeholder="Enter Amount Remaining" asp-for="AmountRemaining" readonly="true">
+                                    <label class="col-form-label d-flex justify-content-between align-items-center">
+                                        <span>Amount Remaining <span class="text-danger">*</span></span>
+                                        <span id="paymentStatusBadge"></span>
+                                    </label>
+                                    <div class="input-group">
+                                        <input class="form-control" type="number" step="any" placeholder="Enter Amount Remaining" asp-for="AmountRemaining">
+                                        <button class="btn btn-outline-success" type="button" id="btnPayRemaining" title="Pay remaining amount (Make Fully Paid)">
+                                            <i class="bx bx-check-double"></i> Pay Remaining
+                                        </button>
+                                    </div>
+                                    <span asp-validation-for="AmountRemaining"></span>
                                 </div>
                             </div>
                             <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
                                 <div class="form-group">
                                     <label class="col-form-label">Reservation Status <span class="text-danger">*</span></label>
-                                    <ejs-dropdownlist cssClass="form-control form-control-sm" dataSource="@(ViewData["ReservationStatusList"])" placeholder="Select an reservation status"
+                                    <ejs-dropdownlist id="ReservationStatusID" cssClass="form-control form-control-sm" dataSource="@(ViewData["ReservationStatusList"])" placeholder="Select a reservation status"
                                                       allowFiltering="true" ejs-for="ReservationStatusID" popupHeight="220px">
                                         <e-dropdownlist-fields value="ID" text="Title"></e-dropdownlist-fields>
                                     </ejs-dropdownlist>
@@ -121,7 +133,8 @@
                                 <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6 col-6">
                                     <div class="form-group">
                                         <div class="checkbox">
-                                            <input id="isApprovedChk" type="checkbox" name="IsApproved" @(Model.IsApproved != null && Model.IsApproved.Value == true ? "checked" : "")>
+                                            <input id="isApprovedChk" type="checkbox" name="IsApproved" value="true" @(Model.IsApproved != null && Model.IsApproved.Value == true ? "checked" : "")>
+                                            <input type="hidden" name="IsApproved" value="false" />
                                             <label for="isApprovedChk">Approved</label>
                                         </div>
                                     </div>
@@ -139,19 +152,20 @@
                                 <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
                                     <div class="form-group">
                                         <label class="col-form-label">Action Date Time</label>
-                                        <ejs-datetimepicker cssClass="form-control" ejs-for="ActionDateTime"></ejs-datetimepicker>
+                                        <ejs-datetimepicker cssClass="form-control" ejs-for="ActionDateTime" format="yyyy-MM-dd hh:mm a"></ejs-datetimepicker>
                                     </div>
                                 </div>
                             }
                             else
                             {
+                                <input type="hidden" asp-for="IsApproved" />
                                 <input type="hidden" asp-for="ActionByUserID" />
                                 <input type="hidden" asp-for="ActionDateTime" />
                             }
                             <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
                                 <div class="form-group">
                                     <label class="col-form-label">Booking Date Time</label>
-                                    <ejs-datetimepicker cssClass="form-control" ejs-for="BookingDateTime"></ejs-datetimepicker>
+                                    <ejs-datetimepicker cssClass="form-control" ejs-for="BookingDateTime" format="yyyy-MM-dd hh:mm a"></ejs-datetimepicker>
                                 </div>
                             </div>
                         </div>
@@ -164,8 +178,9 @@
                             </div>
                             <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
                                 <div class="form-group">
-                                    <label class="col-form-label">Transaction ID <span class="text-danger">*</span></label>
+                                    <label class="col-form-label">Transaction ID <span class="text-danger transaction-required">*</span></label>
                                     <input class="form-control" type="text" asp-for="TransactionID">
+                                    <span asp-validation-for="TransactionID"></span>
                                 </div>
                             </div>
                             <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
@@ -195,22 +210,24 @@
     </div>
     <script>
         function showChange() {
-            var showObj = document.getElementById('ShowID').ej2_instances[0];
-            var tickets = document.getElementById('TicketIDs').ej2_instances[0];
-            tickets.enabled = true;
-            var tempQuery = new ej.data.Query().where('ShowID', 'equal', showObj.value);
-            tickets.query = tempQuery;
-            tickets.text = null;
-            tickets.dataBind();
+            var showObj = document.getElementById('ShowID')?.ej2_instances?.[0];
+            var tickets = document.getElementById('TicketIDs')?.ej2_instances?.[0];
+            if (showObj && tickets) {
+                tickets.enabled = true;
+                var tempQuery = new ej.data.Query().where('ShowID', 'equal', showObj.value);
+                tickets.query = tempQuery;
+                tickets.text = null;
+                tickets.dataBind();
+            }
         }
     </script>
 
     @section Scripts {
         <script>
-            const ticketList = @Html.Raw(JsonConvert.SerializeObject(ViewData["TicketList"]));
-            console.log(ticketList);
+            const ticketList = @Html.Raw(JsonConvert.SerializeObject(ViewData["TicketList"] ?? new List<object>()));
+
             function getSelectedTicketCost(ticketIds) {
-                if (!ticketIds || !ticketList) return 0;
+                if (!ticketIds || !Array.isArray(ticketIds) || !ticketList) return 0;
 
                 let total = 0;
                 ticketList.forEach(ticket => {
@@ -218,16 +235,18 @@
                         total += parseFloat(ticket.CostPrice) || 0;
                     }
                 });
-                console.log();
                 return total;
             }
 
             function updateCostPrice() {
                 try {
-                    const ticketDropdown = $('[name="TicketIDs"]');
-                    const ticketIds = $(ticketDropdown).val()?.map(x => parseInt(x)) || [];
+                    const ticketMulti = document.getElementById('TicketIDs')?.ej2_instances?.[0];
+                    let ticketIds = ticketMulti ? ticketMulti.value : [];
+                    if (!ticketIds || !Array.isArray(ticketIds)) {
+                        const val = $('[name="TicketIDs"]').val();
+                        ticketIds = Array.isArray(val) ? val.map(x => parseInt(x)) : (val ? val.split(',').map(x => parseInt(x)) : []);
+                    }
                     const cost = getSelectedTicketCost(ticketIds);
-                    console.log(cost);
                     $('[name="CostPrice"]').val(cost.toFixed(2));
                     updateDiscount();
                     updateAmountRemaining();
@@ -239,15 +258,14 @@
             function updateDiscount() {
                 try {
                     const costPrice = parseFloat($('[name="CostPrice"]').val()) || 0;
-                    const salePrice = parseFloat($('[name="SalePrice"]').val()) || 0;
+                    let salePrice = parseFloat($('[name="SalePrice"]').val()) || 0;
 
-                    if (salePrice > costPrice) {
+                    if (costPrice > 0 && salePrice > costPrice) {
                         alert('Sale Price cannot be greater than Cost Price.');
-                        $('[name="SalePrice"]').val('');
-                        $('[name="Discount"]').val('');
-                        return;
+                        $('[name="SalePrice"]').val(costPrice.toFixed(2));
+                        salePrice = costPrice;
                     }
-                    const discount = costPrice - salePrice;
+                    const discount = Math.max(0, costPrice - salePrice);
                     $('[name="Discount"]').val(discount.toFixed(2));
                 } catch (e) {
                     console.error("Error in updateDiscount:", e);
@@ -257,30 +275,78 @@
             function updateAmountRemaining() {
                 try {
                     const salePrice = parseFloat($('[name="SalePrice"]').val()) || 0;
-                    const amountPaid = parseFloat($('[name="AmountPaid"]').val()) || 0;
+                    let amountPaid = parseFloat($('[name="AmountPaid"]').val());
 
-                    if (amountPaid > salePrice) {
-                        alert('Amount Paid cannot be greater than Sale Price.');
-                        $('[name="AmountPaid"]').val('');
-                        $('[name="AmountRemaining"]').val('');
-                        return;
+                    if (isNaN(amountPaid) || amountPaid < 0) {
+                        amountPaid = 0;
                     }
 
-                    const remaining = salePrice - amountPaid;
+                    if (salePrice > 0 && amountPaid > salePrice) {
+                        alert('Amount Paid cannot be greater than Sale Price.');
+                        amountPaid = salePrice;
+                        $('[name="AmountPaid"]').val(salePrice.toFixed(2));
+                    }
+
+                    const remaining = Math.max(0, salePrice - amountPaid);
                     $('[name="AmountRemaining"]').val(remaining.toFixed(2));
+                    updatePaymentStatusBadge();
                 } catch (e) {
                     console.error("Error in updateAmountRemaining:", e);
                 }
             }
 
+            function updateAmountPaidFromRemaining() {
+                try {
+                    const salePrice = parseFloat($('[name="SalePrice"]').val()) || 0;
+                    let remaining = parseFloat($('[name="AmountRemaining"]').val());
+
+                    if (isNaN(remaining) || remaining < 0) {
+                        remaining = 0;
+                        $('[name="AmountRemaining"]').val('0.00');
+                    }
+
+                    if (salePrice > 0 && remaining > salePrice) {
+                        alert('Amount Remaining cannot be greater than Sale Price.');
+                        remaining = salePrice;
+                        $('[name="AmountRemaining"]').val(salePrice.toFixed(2));
+                    }
+
+                    const paid = Math.max(0, salePrice - remaining);
+                    $('[name="AmountPaid"]').val(paid.toFixed(2));
+                    updatePaymentStatusBadge();
+                } catch (e) {
+                    console.error("Error in updateAmountPaidFromRemaining:", e);
+                }
+            }
+
+            function updatePaymentStatusBadge() {
+                const remaining = parseFloat($('[name="AmountRemaining"]').val()) || 0;
+                const salePrice = parseFloat($('[name="SalePrice"]').val()) || 0;
+                const badge = $('#paymentStatusBadge');
+                const isFullyPaidInput = $('#IsFullyPaid');
+
+                if (salePrice > 0 && remaining <= 0) {
+                    badge.html('<span class="badge bg-success"><i class="bx bx-check-circle"></i> Fully Paid</span>');
+                    isFullyPaidInput.val('true');
+                } else if (remaining > 0) {
+                    badge.html('<span class="badge bg-warning text-dark"><i class="bx bx-time"></i> Remaining: ' + remaining.toFixed(2) + '</span>');
+                    isFullyPaidInput.val('false');
+                } else {
+                    badge.html('');
+                    isFullyPaidInput.val('false');
+                }
+            }
+
             function toggleOptionalRow() {
                 try {
-                     const dropdownObj = document.getElementById('PaymentMode')?.ej2_instances?.[0];
-                    const selectedText = dropdownObj.text?.trim().toLowerCase();
+                    const dropdownObj = document.getElementById('PaymentMode')?.ej2_instances?.[0];
+                    const selectedText = dropdownObj?.text?.trim().toLowerCase();
                     if (selectedText && selectedText !== 'cash') {
                         $('.optional-row').slideDown();
+                        $('.transaction-required').show();
                     } else {
                         $('.optional-row').slideUp();
+                        $('.transaction-required').hide();
                     }
                 } catch (e) {
                     console.error("Error in toggleOptionalRow:", e);
@@ -288,73 +354,98 @@
             }
 
             $(document).ready(function () {
-                $('.rsvSumbitButton').click(function(){
+                $('.rsvSumbitButton').click(function () {
+                    // Final verification of amounts before submission
+                    const salePrice = parseFloat($('[name="SalePrice"]').val()) || 0;
+                    const amountPaid = parseFloat($('[name="AmountPaid"]').val()) || 0;
+                    const remaining = Math.max(0, salePrice - amountPaid);
+                    $('[name="AmountRemaining"]').val(remaining.toFixed(2));
+                    $('#IsFullyPaid').val(remaining <= 0 ? 'true' : 'false');
+
                     $('.rsv_form').submit();
                 });
+
+                // Pay Remaining button click
+                $('#btnPayRemaining').click(function () {
+                    const salePrice = parseFloat($('[name="SalePrice"]').val()) || 0;
+                    $('[name="AmountPaid"]').val(salePrice.toFixed(2));
+                    $('[name="AmountRemaining"]').val('0.00');
+                    $('#IsFullyPaid').val('true');
+                    updatePaymentStatusBadge();
+
+                    Lobibox.notify('info', {
+                        pauseDelayOnHover: true,
+                        size: 'mini',
+                        icon: 'bx bx-check',
+                        continueDelayOnInactiveTab: false,
+                        position: 'bottom right',
+                        msg: 'Remaining amount marked as paid (Full Payment).',
+                        soundPath: '/assets/sounds/'
+                    });
+                });
+
                 try {
                     $('.optional-row').hide();
-                   toggleOptionalRow();
-                        if ($("#isApprovedChk").is(":checked")) {
-                    $("#isApprovedChk").val("true");
-            } else {
-                        $("#isApprovedChk").val("false");
-            }
-             $('#isApprovedChk').change(function() {
-                    if (!$(this).is(':checked')) {
-                        $(this).val(false); // Set to null if unchecked
-                    } else {
-                        $(this).val(true); // Set to true if checked
-                    }
-                });
+                    toggleOptionalRow();
+                    updatePaymentStatusBadge();
+
                     // Ticket change => update cost price
-                                const ticketMulti = document.getElementById('TicketIDs')?.ej2_instances?.[0];
-            if (ticketMulti) {
-                ticketMulti.addEventListener('change', updateCostPrice);
-            }
-                    // Sale price change => update discount
-                    $('[name="SalePrice"]').on('input', updateDiscount);
+                    const ticketMulti = document.getElementById('TicketIDs')?.ej2_instances?.[0];
+                    if (ticketMulti) {
+                        ticketMulti.addEventListener('change', updateCostPrice);
+                    }
+
+                    // Sale price change => update discount and remaining
+                    $('[name="SalePrice"]').on('input', function () {
+                        updateDiscount();
+                        updateAmountRemaining();
+                    });
 
                     // Amount paid change => update remaining
                     $('[name="AmountPaid"]').on('input', updateAmountRemaining);
 
+                    // Amount remaining change => update amount paid
+                    $('[name="AmountRemaining"]').on('input', updateAmountPaidFromRemaining);
+
                     // Payment mode change => toggle optional row
-                        const paymentDropdown = document.getElementById('PaymentMode')?.ej2_instances?.[0];
+                    const paymentDropdown = document.getElementById('PaymentMode')?.ej2_instances?.[0];
                     if (paymentDropdown) {
                         paymentDropdown.addEventListener('change', toggleOptionalRow);
                     }
-                    $('#ImageFile').on('change', function(event) {
-                    const file = event.target.files[0];
-                    if (file) {
-                        const formData = new FormData();
-                        formData.append('file', file);
 
-                        $.ajax({
-                            url: '/ImageProcess/ExtractTextFromImage',
-                            type: 'POST',
-                            data: formData,
-                            processData: false,
-                            contentType: false,
-                            success: function(data) {
-                                $('#extractedText').val(data.text);
-                            },
-                            error: function(xhr, status, error) {
-                                console.error('Error:', error);
-                                alert('Failed to extract text from the image.');
-                            }
-                        });
-                    }
-                });
-                $("#ImageFile").change(
-                function PreviewSelectedImage() {
-                    var imageFile = document.getElementById("ImageFile");
-                    var imagePreview = document.getElementById("imgPreview");
-                    var imageReader = new FileReader();
-                    imageReader.onload = function (e) {
-                        imagePreview.src = e.target.result;
-                        imagePreview.style.display = "block";
-                    };
-                    imageReader.readAsDataURL(imageFile.files[0]);
-                });
+                    $('#ImageFile').on('change', function (event) {
+                        const file = event.target.files[0];
+                        if (file) {
+                            const formData = new FormData();
+                            formData.append('file', file);
+
+                            $.ajax({
+                                url: '/ImageProcess/ExtractTextFromImage',
+                                type: 'POST',
+                                data: formData,
+                                processData: false,
+                                contentType: false,
+                                success: function (data) {
+                                    $('#extractedText').val(data.text);
+                                },
+                                error: function (xhr, status, error) {
+                                    console.error('Error:', error);
+                                    alert('Failed to extract text from the image.');
+                                }
+                            });
+                        }
+                    });
+
+                    $("#ImageFile").change(function PreviewSelectedImage() {
+                        var imageFile = document.getElementById("ImageFile");
+                        var imagePreview = document.getElementById("imgPreview");
+                        var imageReader = new FileReader();
+                        imageReader.onload = function (e) {
+                            imagePreview.src = e.target.result;
+                            imagePreview.style.display = "block";
+                        };
+                        imageReader.readAsDataURL(imageFile.files[0]);
+                    });
                 } catch (e) {
                     console.error("Document ready error:", e);
                 }

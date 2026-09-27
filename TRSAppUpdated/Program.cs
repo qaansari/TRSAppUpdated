@@ -166,6 +166,16 @@ namespace TRSAppUpdated
                 await next();
             });
 
+            // Request Localization to ensure standard datetime format parsing (en-US / ISO)
+            var defaultCulture = new System.Globalization.CultureInfo("en-US");
+            var localizationOptions = new RequestLocalizationOptions
+            {
+                DefaultRequestCulture = new Microsoft.AspNetCore.Localization.RequestCulture(defaultCulture),
+                SupportedCultures = new List<System.Globalization.CultureInfo> { defaultCulture, new System.Globalization.CultureInfo("en-GB") },
+                SupportedUICultures = new List<System.Globalization.CultureInfo> { defaultCulture, new System.Globalization.CultureInfo("en-GB") }
+            };
+            app.UseRequestLocalization(localizationOptions);
+
             app.UseRouting();
 
             app.UseRateLimiter();
