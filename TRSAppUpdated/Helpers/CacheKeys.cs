@@ -15,5 +15,17 @@ namespace TRSAppUpdated.Helpers
         public const string DashboardMetrics = "DASHBOARD_METRICS";
         public const string EventsList = "LOOKUP_EVENTS_ALL";
         public const string ShowsList = "LOOKUP_SHOWS_ALL";
+
+        // View Tickets Cache
+        public const string ViewTicketsPrefix = "VIEW_TICKETS_";
+        public static string ViewTickets(int showId, int eventId) => $"{ViewTicketsPrefix}{showId}_{eventId}";
+
+        // Event Details Cache
+        public const string EventDetailsPrefix = "EVENT_DETAILS_";
+        public static string EventDetails(int eventId) => $"{EventDetailsPrefix}{eventId}";
+
+        // Reservation Details Cache
+        public const string ReservationDetailsPrefix = "RESERVATION_DETAILS_";
+        public static string ReservationDetails(int reservationId) => $"{ReservationDetailsPrefix}{reservationId}";
     }
 }

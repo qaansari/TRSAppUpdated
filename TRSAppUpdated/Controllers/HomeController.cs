@@ -98,7 +98,7 @@ namespace TRSAppUpdated.Controllers
                             }
                         }
                         TempData["Message"] = "1,A verification email has been sent to your email";
-                        string _verificationLink = AppHelper._appUrl + "User/VerifyEmail?token=" + user.UserToken;
+                        string _verificationLink = AppHelper._appUrl + "Home/VerifyEmail?token=" + user.UserToken;
                         await AppHelper.SendVerificationEmailAsync(user.Email, "verify email", _verificationLink, _configuration);
                         return View(Model);
                     }
@@ -143,7 +143,7 @@ namespace TRSAppUpdated.Controllers
             catch (Exception ex)
             {
                 _logger.LogError($"Error occured at Index (POST) in {_Title} Controller due to {ex}");
-                TempData["Message"] = $"0,Login error: {ex.Message}";
+                TempData["Message"] = "0,An error occurred while logging in. Please check your credentials.";
             }
             return View(Model);
         }
@@ -167,6 +167,20 @@ namespace TRSAppUpdated.Controllers
             try
             {
                 ViewData["CountryList"] = _countryService.GetAll();
+
+                // Security: Public registration MUST always assign the standard User role (RoleID = 4)
+                Model.RoleID = 4;
+
+                if (string.IsNullOrWhiteSpace(Model.Password))
+                {
+                    ModelState.AddModelError("Password", "Password is required");
+                }
+
+                if (Model.ImageFile != null && !AppHelper.IsValidImageFile(Model.ImageFile, out var imgError))
+                {
+                    ModelState.AddModelError("ImageFile", imgError ?? "Invalid image file");
+                }
+
                 if (ModelState.IsValid)
                 {
                     if (Model.CountryID == 0 || Model.CountryID == null)
@@ -174,14 +188,14 @@ namespace TRSAppUpdated.Controllers
                         ModelState.AddModelError(nameof(Model.CountryID), "Please select a country");
                         return View(Model);
                     }
-                    var isEmailExists = _context.Users.Where(x => !x.IsDeleted
+                    var isEmailExists = await _context.Users.Where(x => !x.IsDeleted
                            && x.Email.Trim().ToLower() == Model.Email.Trim().ToLower())
                         .Select(x => x.Email)
-                       .Any();
-                    var isMobileNoExists = _context.Users.Where(x => !x.IsDeleted
+                       .AnyAsync();
+                    var isMobileNoExists = await _context.Users.Where(x => !x.IsDeleted
                           && x.ContactNumber.Trim().ToLower() == Model.ContactNumber.Trim().ToLower())
                        .Select(x => x.ContactNumber)
-                      .Any();
+                      .AnyAsync();
                     if (isEmailExists)
                     {
                         TempData["Message"] = $"0,Email Already Taken";
@@ -192,34 +206,27 @@ namespace TRSAppUpdated.Controllers
                         TempData["Message"] = $"0,Contact Number Already Taken";
                         return View(Model);
                     }
+                    var now = AppHelper.NowPakistan;
                     var _item = new User();
                     _item.FirstName = Model.FirstName.Trim();
                     _item.LastName = Model.LastName.Trim();
                     _item.ContactNumber = Model.ContactNumber.Trim();
-                    _item.RoleID = Model.RoleID;
+                    _item.RoleID = 4; // Hardened against parameter tampering
                     _item.CountryID = Model.CountryID;
                     _item.Email = Model.Email.Trim();
                     _item.Password = Model.Password.Trim().HashWithSalt();
                     _item.IsActive = Model.IsActive;
                     _item.IsVerified = Model.IsVerified;
-                    _item.UserToken = Guid.NewGuid().ToString();
-                    _item.TokenExpiryTime = DateTime.UtcNow.AddHours(5).AddMinutes(10);
-                    _item.CreatedDateTime = DateTime.UtcNow.AddHours(5);
+                    _item.UserToken = Guid.NewGuid().ToString("N");
+                    _item.TokenExpiryTime = now.AddMinutes(15);
+                    _item.CreatedDateTime = now;
                     _context.Users.Add(_item);
                     await _context.SaveChangesAsync();
                     if (_item != null && Model.ImageFile != null)
                     {
-                        var folderPath = Path.Combine(_webHostEnvironment.WebRootPath, "assets", "images", "users");
-                        if (!Directory.Exists(folderPath))
-                        {
-                            Directory.CreateDirectory(folderPath);
-                        }
-                        var _fileName = $"user" + "_" + _item.CreatedDateTime.Value.ToString("yyyyddMMhhmmss") + Path.GetExtension(Model.ImageFile.FileName);
-                        _item.ImagePath = _fileName.Trim();
-                        _item.UpdatedDateTime = DateTime.UtcNow.AddHours(5);
-                        var _filePath = Path.Combine(folderPath, _fileName);
-                        var compressedBytes = await AppHelper.CompressImageAsync(Model.ImageFile);
-                        await System.IO.File.WriteAllBytesAsync(_filePath, compressedBytes);
+                        var fileName = await AppHelper.SaveUploadedImageAsync(Model.ImageFile, _webHostEnvironment.WebRootPath, "users", "user");
+                        _item.ImagePath = fileName;
+                        _item.UpdatedDateTime = now;
                         _context.ChangeTracker.Clear();
                         _context.Entry(_item).State = EntityState.Modified;
                         await _context.SaveChangesAsync();
@@ -302,15 +309,13 @@ namespace TRSAppUpdated.Controllers
                         TempData["Message"] = "0,No user found for given email";
                         return View(Model);
                     }
-                    if (!string.IsNullOrEmpty(_user.UserToken) && _user.TokenExpiryTime.HasValue)
+                    var now = AppHelper.NowPakistan;
+                    if (string.IsNullOrEmpty(_user.UserToken) || !_user.TokenExpiryTime.HasValue || now > _user.TokenExpiryTime.Value)
                     {
-                        if (DateTime.UtcNow.AddHours(5) > _user.TokenExpiryTime.Value)
-                        {
-                            _user.UserToken = Guid.NewGuid().ToString();
-                            _user.TokenExpiryTime = DateTime.UtcNow.AddHours(5).AddMinutes(10);
-                            _context.Entry(_user).State = EntityState.Modified;
-                            await _context.SaveChangesAsync();
-                        }
+                        _user.UserToken = Guid.NewGuid().ToString("N");
+                        _user.TokenExpiryTime = now.AddMinutes(15);
+                        _context.Entry(_user).State = EntityState.Modified;
+                        await _context.SaveChangesAsync();
                     }
                     TempData["Message"] = "1,A reset password link has been sent to your email";
                     string _verificationLink = AppHelper._appUrl + "Home/ResetPassword?token=" + _user.UserToken;
@@ -335,13 +340,21 @@ namespace TRSAppUpdated.Controllers
             if (ModelState.IsValid)
             {
                 var _user = _userService.GetUserByToken(Model.UserToken);
-                if (_user != null)
+                var now = AppHelper.NowPakistan;
+                if (_user != null && _user.TokenExpiryTime.HasValue && _user.TokenExpiryTime.Value >= now)
                 {
                     _user.Password = Model.Password.Trim().HashWithSalt();
+                    _user.UserToken = null; // Invalidate token to prevent reuse
+                    _user.TokenExpiryTime = null;
+                    _user.UpdatedDateTime = now;
                     _context.Entry(_user).State = EntityState.Modified;
                     await _context.SaveChangesAsync();
                     TempData["Message"] = "1,Password Successfully Updated";
                     return RedirectToAction("Index");
+                }
+                else
+                {
+                    TempData["Message"] = "0,Invalid or expired password reset link. Please request a new one.";
                 }
             }
             return View(Model);

@@ -15,6 +15,7 @@ using TRSAppUpdated.ViewModels;
 
 namespace TRSAppUpdated.Controllers
 {
+    [Authorize]
     public class ReservationController : Controller
     {
         private readonly AppDbContext _context;
@@ -181,49 +182,57 @@ namespace TRSAppUpdated.Controllers
         }
         //Details
         [Authorize(Roles = "Super Admin,Admin,Moderator,User")]
-        public IActionResult Details(int ID = 0, int EventID = 0)
+        public async Task<IActionResult> Details(int ID = 0, int EventID = 0)
         {
-
             var _item = new ReservationDetailVM();
             try
             {
                 if (EventID != 0)
                 {
                     ViewBag.EventID = EventID;
-                    ViewBag.IsGeneralEvent = _context.Events
+                    ViewBag.IsGeneralEvent = await _context.Events
                         .Where(x => !x.IsDeleted && x.ID == EventID)
                         .AsNoTracking()
                         .Select(x => x.IsGeneral)
-                        .FirstOrDefault();
+                        .FirstOrDefaultAsync();
                 }
                 if (ID != 0)
                 {
-                    _item = _reservationService.GetDetailsByID(ID);
+                    _item = await _reservationService.GetDetailsByIDAsync(ID);
+                    if (!User.IsInRole("Super Admin") && !User.IsInRole("Admin") && _item.CreatedByUserID != _UserID)
+                    {
+                        return Forbid();
+                    }
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error occured at AddOrEdit (GET) in {_Title} Controller due to {ex}");
+                _logger.LogError(ex, "Error occurred at Details in {Title} Controller", _Title);
             }
             return View(_item);
         }
         [Authorize(Roles = "Super Admin,Admin,Moderator,User")]
-        public IActionResult GetPDF(int ID = 0, int EventID = 0)
+        public async Task<IActionResult> GetPDF(int ID = 0, int EventID = 0)
         {
             var _item = new ReservationDetailVM();
             try
             {
                 if (EventID != 0)
                     ViewBag.EventID = EventID;
-                bool isGenEvent = _context.Events
+                bool isGenEvent = await _context.Events
                        .Where(x => !x.IsDeleted && x.ID == EventID)
                        .AsNoTracking()
                        .Select(x => x.IsGeneral)
-                       .FirstOrDefault();
-                
+                       .FirstOrDefaultAsync();
 
                 if (ID != 0)
-                    _item = _reservationService.GetDetailsByID(ID);
+                {
+                    _item = await _reservationService.GetDetailsByIDAsync(ID);
+                    if (!User.IsInRole("Super Admin") && !User.IsInRole("Admin") && _item.CreatedByUserID != _UserID)
+                    {
+                        return Forbid();
+                    }
+                }
 
                 var seatLabelsList = !string.IsNullOrEmpty(_item.SeatLabels)
                     ? _item.SeatLabels.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToList()
@@ -502,6 +511,7 @@ namespace TRSAppUpdated.Controllers
             }
         }
         //Close Reservation
+        [Authorize(Roles = "Super Admin,Admin")]
         [HttpPost]
         public async Task<IActionResult> Close(int ID, int EventID)
         {

@@ -9,6 +9,7 @@ using TRSAppUpdated.ViewModels;
 
 namespace TRSAppUpdated.Controllers
 {
+    [Authorize]
     public class EventController : Controller
     {
         private readonly AppDbContext _context;
@@ -145,6 +146,11 @@ namespace TRSAppUpdated.Controllers
                 ViewData["AuditoriumList"] = _auditoriumService.GetAll();
                 ViewData["CategoryList"] = _categoryService.GetAll();
                 ViewData["EventStatusList"] = _eventStatusService.GetAll();
+                if (Model.ImageFile != null && !AppHelper.IsValidImageFile(Model.ImageFile, out var imgError))
+                {
+                    TempData["Message"] = $"0,{imgError}";
+                    return View(Model);
+                }
                 if (ModelState.IsValid)
                 {
                     var _item = new Event();
@@ -267,21 +273,16 @@ namespace TRSAppUpdated.Controllers
                     {
                         if (Model.ImageFile != null)
                         {
-                            var folderPath = Path.Combine(_webHostEnvironment.WebRootPath, "assets", "images", "events");
-                            if (!Directory.Exists(folderPath))
+                            var savedFileName = await AppHelper.SaveUploadedImageAsync(Model.ImageFile, _webHostEnvironment.WebRootPath, "events", "event");
+                            if (!string.IsNullOrEmpty(savedFileName))
                             {
-                                Directory.CreateDirectory(folderPath);
+                                _item.ImagePath = savedFileName;
+                                _item.UpdatedByUserID = _UserID;
+                                _item.UpdatedDateTime = AppHelper.NowPakistan;
+                                _context.ChangeTracker.Clear();
+                                _context.Entry(_item).State = EntityState.Modified;
+                                await _context.SaveChangesAsync();
                             }
-                            var _fileName = $"event" + "_" + _item.CreatedDateTime.ToString("yyyyddMMhhmmss") + Path.GetExtension(Model.ImageFile.FileName);
-                            _item.ImagePath = _fileName.Trim();
-                            _item.UpdatedByUserID = _UserID;
-                            _item.UpdatedDateTime = DateTime.UtcNow.AddHours(5);
-                            var _filePath = Path.Combine(folderPath, _fileName);
-                            var compressedBytes = await AppHelper.CompressImageAsync(Model.ImageFile);
-                            await System.IO.File.WriteAllBytesAsync(_filePath, compressedBytes);
-                            _context.ChangeTracker.Clear();
-                            _context.Entry(_item).State = EntityState.Modified;
-                            await _context.SaveChangesAsync();
                         }
                         if (Model.EventCategoryIDs != null && Model.EventCategoryIDs.Count > 0)
                         {
@@ -300,14 +301,20 @@ namespace TRSAppUpdated.Controllers
                                     CategoryID = categoryID,
                                     EventID = _item.ID,
                                     CreatedByUserID = _UserID,
-                                    CreatedDateTime = DateTime.UtcNow.AddHours(5),
+                                    CreatedDateTime = AppHelper.NowPakistan,
                                 });
                             }
                         }
                         await _context.SaveChangesAsync();
                     }
                     _cacheService.Remove(CacheKeys.EventsList);
+                    _cacheService.Remove(CacheKeys.EventDetails(Model.ID));
+                    if (_item != null)
+                    {
+                        _cacheService.Remove(CacheKeys.EventDetails(_item.ID));
+                    }
                     _cacheService.Remove(CacheKeys.DashboardMetrics);
+                    _cacheService.RemoveByPrefix(CacheKeys.ViewTicketsPrefix);
                     return RedirectToAction("Index");
                 }
             }
@@ -330,12 +337,14 @@ namespace TRSAppUpdated.Controllers
                 {
                     _item.IsDeleted = true;
                     _item.DeletedByUserID = _UserID;
-                    _item.DeletedDateTime = DateTime.UtcNow.AddHours(5);
+                    _item.DeletedDateTime = AppHelper.NowPakistan;
                     _context.ChangeTracker.Clear();
                     _context.Entry(_item).State = EntityState.Modified;
                     await _context.SaveChangesAsync();
                     _cacheService.Remove(CacheKeys.EventsList);
+                    _cacheService.Remove(CacheKeys.EventDetails(ID));
                     _cacheService.Remove(CacheKeys.DashboardMetrics);
+                    _cacheService.RemoveByPrefix(CacheKeys.ViewTicketsPrefix);
                     TempData["Message"] = $"1,{_Title} Successfully Deleted";
                 }
                 else
@@ -364,11 +373,12 @@ namespace TRSAppUpdated.Controllers
                 {
                     _item.EventStatusID = _status.ID;
                     _item.UpdatedByUserID = _UserID;
-                    _item.UpdatedDateTime = DateTime.UtcNow.AddHours(5);
+                    _item.UpdatedDateTime = AppHelper.NowPakistan;
                     _context.ChangeTracker.Clear();
                     _context.Entry(_item).State = EntityState.Modified;
                     await _context.SaveChangesAsync();
                     _cacheService.Remove(CacheKeys.EventsList);
+                    _cacheService.Remove(CacheKeys.EventDetails(ID));
                     _cacheService.Remove(CacheKeys.DashboardMetrics);
                     TempData["Message"] = $"1,{_Title} Successfully Ended";
                 }
@@ -379,23 +389,46 @@ namespace TRSAppUpdated.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error occured at Delete (POST) in {_Title} Controller due to {ex}");
+                _logger.LogError($"Error occured at End (POST) in {_Title} Controller due to {ex}");
             }
             return RedirectToAction("Index");
         }
-        //Details
+        //Details - Cached and shallow-copied to prevent in-memory cache mutation
 
         [Authorize(Roles = "Super Admin,Admin,Moderator,User")]
         public async Task<IActionResult> Details(int ID)
         {
             try
             {
-                var _item = await _service.GetDetailsByID(ID);
-                if (!_httpContextAccessor.HttpContext.User.IsInRole("Super Admin") && !_httpContextAccessor.HttpContext.User.IsInRole("Admin"))
+                var cachedItem = await _service.GetDetailsByID(ID);
+                if (cachedItem == null || cachedItem.ID == 0)
                 {
-                    _item.ReservationList = _item.ReservationList.Count > 0 ? _item.ReservationList.Where(x => x.CreatedByUserID == _UserID).ToList() : new List<ReservationVM>();
+                    return View(new EventVM());
                 }
-                return View(_item ?? new EventVM());
+
+                var displayItem = cachedItem;
+                if (!User.IsInRole("Super Admin") && !User.IsInRole("Admin"))
+                {
+                    displayItem = new EventVM
+                    {
+                        ID = cachedItem.ID,
+                        Title = cachedItem.Title,
+                        StartDate = cachedItem.StartDate,
+                        EndDate = cachedItem.EndDate,
+                        Description = cachedItem.Description,
+                        CountryID = cachedItem.CountryID,
+                        CountryTitle = cachedItem.CountryTitle,
+                        CityTitle = cachedItem.CityTitle,
+                        VenueTitle = cachedItem.VenueTitle,
+                        AuditoriumTitle = cachedItem.AuditoriumTitle,
+                        EventStatusTitle = cachedItem.EventStatusTitle,
+                        ImagePath = cachedItem.ImagePath,
+                        ShowsList = cachedItem.ShowsList,
+                        EventCategoriesList = cachedItem.EventCategoriesList,
+                        ReservationList = cachedItem.ReservationList?.Where(x => x.CreatedByUserID == _UserID).ToList() ?? new List<ReservationVM>()
+                    };
+                }
+                return View(displayItem);
             }
             catch (Exception ex)
             {

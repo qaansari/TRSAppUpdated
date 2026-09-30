@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace TRSAppUpdated.ViewModels
 {
@@ -29,8 +29,7 @@ namespace TRSAppUpdated.ViewModels
         [StringLength(320, ErrorMessage = "Please fill out maximum 320 characters")]
         [DataType(DataType.EmailAddress, ErrorMessage = "Please enter a valid email address")]
         public string Email { get; set; }
-        [Required(ErrorMessage = "Please fill out this field")]
-        public string Password { get; set; }
+        public string? Password { get; set; }
         [Range(1, int.MaxValue, ErrorMessage = "Please fill out this field")]
         public int RoleID { get; set; }
         public int? CountryID { get; set; }

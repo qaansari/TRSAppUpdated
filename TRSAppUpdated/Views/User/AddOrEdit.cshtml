@@ -1,4 +1,4 @@
-﻿@model UserVM
+@model UserVM
 @{
     string _fn = "Add";
     if (Model.ID != 0)
@@ -65,14 +65,20 @@
                                 <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
                                     <div class="form-group">
                                         <label class="col-form-label">Password <span class="text-danger">*</span></label>
-                                        <input class="form-control" type="text" placeholder="Enter Password" asp-for="Password">
+                                        <input class="form-control" type="password" placeholder="Enter Password" asp-for="Password" autocomplete="new-password">
                                         <span asp-validation-for="Password"></span>
                                     </div>
                                 </div>
                             }
                             else
                             {
-                                <input class="form-control" type="hidden" placeholder="Enter Password" asp-for="Password">
+                                <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                                    <div class="form-group">
+                                        <label class="col-form-label">New Password <small class="text-muted">(leave blank to keep unchanged)</small></label>
+                                        <input class="form-control" type="password" placeholder="Enter New Password" asp-for="Password" autocomplete="new-password">
+                                        <span asp-validation-for="Password"></span>
+                                    </div>
+                                </div>
                             }
                             <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
                                 <div class="form-group">

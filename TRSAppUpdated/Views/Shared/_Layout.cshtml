@@ -1,8 +1,9 @@
-﻿@inject IHttpContextAccessor _HttpContextAccessor
+@inject IHttpContextAccessor _HttpContextAccessor
 @{
-    string _Username = _HttpContextAccessor.HttpContext.User.FindFirst("Username").Value;
-    string _RoleTitle = _HttpContextAccessor.HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.Role).Value;
-    string _ImagePath = _HttpContextAccessor.HttpContext.User.FindFirst("Image").Value;
+    var userPrincipal = _HttpContextAccessor.HttpContext?.User;
+    string _Username = userPrincipal?.FindFirst("Username")?.Value ?? "User";
+    string _RoleTitle = userPrincipal?.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? "";
+    string _ImagePath = userPrincipal?.FindFirst("Image")?.Value ?? "";
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -272,11 +273,6 @@
     <!-- Custom Script -->
     <script src="~/assets/js/custom.js"></script>
     <ejs-scripts></ejs-scripts>
-    @await RenderSectionAsync("Scripts", required: false)
-</body>
-
-</html>
-@section Scripts{
     <script>
         let timeoutWarning;
         let timeoutLogout;
@@ -286,17 +282,19 @@
 
             // Show warning 5 minutes before timeout (adjust as needed)
             timeoutWarning = setTimeout(function() {
-                Lobibox.confirm({
-                    msg: "Your session will expire in 5 minutes. Would you like to stay logged in?",
-                    callback: function(result) {
-                        if (result) {
-                            // Ping server to refresh session
-                            fetch('/Home/KeepAlive').then(() => {
-                                resetTimers();
-                            });
+                if (typeof Lobibox !== 'undefined') {
+                    Lobibox.confirm({
+                        msg: "Your session will expire in 5 minutes. Would you like to stay logged in?",
+                        callback: function(result) {
+                            if (result) {
+                                // Ping server to refresh session
+                                fetch('/Home/KeepAlive').then(() => {
+                                    resetTimers();
+                                });
+                            }
                         }
-                    }
-                });
+                    });
+                }
             }, 55 * 60 * 1000); // 55 minutes
             // Force logout after 60 minutes
             timeoutLogout = setTimeout(function() {
@@ -310,5 +308,8 @@
         // Initialize timers
         resetTimers();
     </script>
-}
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+
+</html>
 

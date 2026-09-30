@@ -62,7 +62,7 @@
                     @if (!string.IsNullOrEmpty(Model.Description))
                     {
                         <hr />
-                        <p class="event_desc_p"> @Html.Raw(Model.Description.Trim().Replace("\n", "<br>"))</p>
+                        <p class="event_desc_p">@Html.Raw(System.Net.WebUtility.HtmlEncode(Model.Description.Trim()).Replace("\n", "<br>"))</p>
                     }
                     @if (!string.IsNullOrEmpty(Model.ImagePath))
                     {
@@ -469,6 +469,7 @@
         </script>
         @if (_Message != null)
         {
+            var encodedMsg = System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(_Message.Substring(2));
             if (_Message.StartsWith("1"))
             {
                 <script>
@@ -479,7 +480,7 @@
                             icon: 'bx bx-info-circle',
                             continueDelayOnInactiveTab: false,
                             position: 'bottom right',
-                            msg: '@(_Message.Substring(2))',
+                            msg: '@Html.Raw(encodedMsg)',
                             soundPath: '/assets/sounds/'
                         });
                     });
@@ -495,7 +496,7 @@
                             icon: 'bx bx-info-circle',
                             continueDelayOnInactiveTab: false,
                             position: 'bottom right',
-                            msg: '@(_Message.Substring(2))',
+                            msg: '@Html.Raw(encodedMsg)',
                             soundPath: '/assets/sounds/'
                         });
                     });

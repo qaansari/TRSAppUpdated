@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace TRSAppUpdated.ViewModels
 {
@@ -23,14 +23,13 @@ namespace TRSAppUpdated.ViewModels
     }
     public class ResetPasswordVM
     {
-        [Required(ErrorMessage = "Please fill out this field")]
-        [MinLength(11, ErrorMessage = "Please fill out minimum 11 characters")]
-        [StringLength(320, ErrorMessage = "Please fill out maximum 320 characters")]
-        [DataType(DataType.EmailAddress, ErrorMessage = "Please enter a valid email address")]
+        [Required(ErrorMessage = "Invalid or missing reset token.")]
         public string UserToken { get; set; }
         [Required(ErrorMessage = "Please fill out this field")]
+        [MinLength(6, ErrorMessage = "Password must be at least 6 characters")]
         public string Password { get; set; }
         [Required(ErrorMessage = "Please fill out this field")]
+        [Compare("Password", ErrorMessage = "Password and Confirm Password do not match")]
         public string ConfirmPassword { get; set; }
     }
 }

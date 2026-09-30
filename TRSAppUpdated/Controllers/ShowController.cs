@@ -9,6 +9,7 @@ using TRSAppUpdated.ViewModels;
 
 namespace TRSAppUpdated.Controllers
 {
+    [Authorize]
     public class ShowController : Controller
     {
         private readonly AppDbContext _context;
@@ -105,7 +106,7 @@ namespace TRSAppUpdated.Controllers
                                     _item.Date = Model.Date.Value;
                                     _item.Time = Model.Time.Value;
                                     _item.UpdatedByUserID = _UserID;
-                                    _item.UpdatedDateTime = DateTime.UtcNow.AddHours(5);
+                                    _item.UpdatedDateTime = AppHelper.NowPakistan;
                                     _context.ChangeTracker.Clear();
                                     _context.Entry(_item).State = EntityState.Modified;
                                     await _context.SaveChangesAsync();
@@ -128,7 +129,7 @@ namespace TRSAppUpdated.Controllers
                                 _item.Date = Model.Date.Value;
                                 _item.Time = Model.Time.Value;
                                 _item.CreatedByUserID = _UserID;
-                                _item.CreatedDateTime = DateTime.UtcNow.AddHours(5);
+                                _item.CreatedDateTime = AppHelper.NowPakistan;
                                 _context.Shows.Add(_item);
                                 await _context.SaveChangesAsync();
 
@@ -150,12 +151,15 @@ namespace TRSAppUpdated.Controllers
                                     Discount = 0,
                                     Category = string.Empty,
                                     CreatedByUserID = _UserID,
-                                    CreatedDateTime = DateTime.UtcNow.AddHours(5),
+                                    CreatedDateTime = AppHelper.NowPakistan,
                                 }).ToList();
                                 await _context.Tickets.AddRangeAsync(_tickets);
                                 await _context.SaveChangesAsync();
                             }
                             _cacheService.Remove(CacheKeys.ShowsList);
+                            _cacheService.Remove(CacheKeys.ViewTickets(_item.ID, Model.EventID));
+                            _cacheService.Remove(CacheKeys.EventDetails(Model.EventID));
+                            _cacheService.Remove(CacheKeys.DashboardMetrics);
                         }
                     }
                     return RedirectToAction("Details", "Event", new { ID = Model.EventID });
@@ -180,7 +184,7 @@ namespace TRSAppUpdated.Controllers
                 {
                     _item.IsDeleted = true;
                     _item.DeletedByUserID = _UserID;
-                    _item.DeletedDateTime = DateTime.UtcNow.AddHours(5);
+                    _item.DeletedDateTime = AppHelper.NowPakistan;
                     _context.ChangeTracker.Clear();
                     _context.Entry(_item).State = EntityState.Modified;
                     var _tickets = _context.Tickets.Where(x => !x.IsDeleted && x.ShowID == ID).ToList();
@@ -190,6 +194,9 @@ namespace TRSAppUpdated.Controllers
                     }
                     await _context.SaveChangesAsync();
                     _cacheService.Remove(CacheKeys.ShowsList);
+                    _cacheService.Remove(CacheKeys.ViewTickets(ID, EventID));
+                    _cacheService.Remove(CacheKeys.EventDetails(EventID));
+                    _cacheService.Remove(CacheKeys.DashboardMetrics);
                     TempData["Message"] = $"1,{_Title} Successfully Deleted";
                 }
                 else
@@ -216,11 +223,13 @@ namespace TRSAppUpdated.Controllers
                 {
                     _item.IsEnded = true;
                     _item.UpdatedByUserID = _UserID;
-                    _item.UpdatedDateTime = DateTime.UtcNow.AddHours(5);
+                    _item.UpdatedDateTime = AppHelper.NowPakistan;
                     _context.ChangeTracker.Clear();
                     _context.Entry(_item).State = EntityState.Modified;
                     await _context.SaveChangesAsync();
                     _cacheService.Remove(CacheKeys.ShowsList);
+                    _cacheService.Remove(CacheKeys.ViewTickets(ID, EventID));
+                    _cacheService.Remove(CacheKeys.EventDetails(EventID));
                     TempData["Message"] = $"1,{_Title} Successfully Ended";
                 }
                 else
@@ -230,7 +239,7 @@ namespace TRSAppUpdated.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error occured at Delete (POST) in {_Title} Controller due to {ex}");
+                _logger.LogError($"Error occured at End (POST) in {_Title} Controller due to {ex}");
             }
             return RedirectToAction("Details", "Event", new { ID = EventID });
         }
@@ -309,11 +318,13 @@ namespace TRSAppUpdated.Controllers
                         ticket.IsRefunded = row.IsRefunded;
                         ticket.IsReserved = row.IsReserved;
                         ticket.UpdatedByUserID = _UserID;
-                        ticket.UpdatedDateTime = DateTime.UtcNow.AddHours(5);
+                        ticket.UpdatedDateTime = AppHelper.NowPakistan;
                         _context.Entry(ticket).State = EntityState.Modified;
                     }
                 }
                 await _context.SaveChangesAsync();
+                _cacheService.Remove(CacheKeys.ViewTickets(Model.ShowID, Model.EventID));
+                _cacheService.Remove(CacheKeys.EventDetails(Model.EventID));
                 TempData["Message"] = "1,Ticket Prices Successfully Updated";
             }
             catch (Exception ex)
@@ -322,80 +333,102 @@ namespace TRSAppUpdated.Controllers
             }
             return RedirectToAction("UpdateTickets", _Title, new { ID = Model.ShowID, EventID = Model.EventID });
         }
-        //View Tickets (GET)
+        //View Tickets (GET) - Optimized with In-Memory Caching & Flat Ticket Query
         [Authorize(Roles = "Super Admin,Admin,Moderator,User")]
-        public IActionResult ViewTickets(int ID, int EventID)
+        public async Task<IActionResult> ViewTickets(int ID, int EventID)
         {
-            // Get all rows with their columns from database
             try
             {
                 if (EventID != 0)
                 {
                     ViewBag.EventID = EventID;
                 }
-                var eventTickets = _context.Tickets
-                    .Include(x => x.Seat)
-                    .Include(x => x.Show)
-                    .ThenInclude(x => x.Event)
-                    .ThenInclude(x => x.Auditorium)
-                    .ThenInclude(x => x.Venue)
-                      .Include(x => x.Show)
-                    .ThenInclude(x => x.Event)
-                    .ThenInclude(x => x.Auditorium)
-                    .ThenInclude(x => x.Rows)
-                    .ThenInclude(x => x.Columns)
-                    .ThenInclude(x => x.Seats)
-                    .Where(x => x.ShowID == ID)
 
-                    .Where(t => !t.IsDeleted && t.Show.Event.ID == EventID)
-                    .ToList();
-
-                var firstTicket = eventTickets.FirstOrDefault();
-                var ticketBySeatId = eventTickets.Where(t => t.Seat != null).ToDictionary(t => t.Seat.ID, t => t);
-
-                var seatVM = new SeatVM()
+                var cacheKey = CacheKeys.ViewTickets(ID, EventID);
+                var seatVM = await _cacheService.GetOrCreateAsync(cacheKey, async () =>
                 {
-                    AuditoriumName = firstTicket?.Show?.Event?.Auditorium?.Title?.Trim(),
-                    EventName = firstTicket?.Show?.Event?.Title?.Trim(),
-                    VenueName = firstTicket?.Show?.Event?.Auditorium?.Venue?.Title?.Trim(),
-                    ShowDate = firstTicket?.Show?.Date,
-                    ReservedSeats = eventTickets.Count(x => x.IsReserved),
-                    EstimatedRevenue = eventTickets.Sum(x => x.CostPrice),
-                    AmountReceived = eventTickets.Where(x => x.IsReserved).Sum(x => x.SalePrice),
-                    AuditoriumAlignment = firstTicket?.Show?.Event?.Auditorium?.Alignment?.Trim(),
-                    Rows = firstTicket?.Show?.Event?.Auditorium?.Rows.OrderBy(row => row.ID).Select(row =>
-                    {
-                        var firstSeatInRow = row.Columns.SelectMany(c => c.Seats).FirstOrDefault();
-                        ticketBySeatId.TryGetValue(firstSeatInRow?.ID ?? 0, out var rowTicket);
-                        var rowPrice = rowTicket?.CostPrice ?? 0;
+                    var show = await _context.Shows
+                        .Include(s => s.Event)
+                            .ThenInclude(e => e.Auditorium)
+                                .ThenInclude(a => a.Venue)
+                        .Include(s => s.Event)
+                            .ThenInclude(e => e.Auditorium)
+                                .ThenInclude(a => a.Rows)
+                                    .ThenInclude(r => r.Columns)
+                                        .ThenInclude(c => c.Seats)
+                        .Where(s => !s.IsDeleted && s.ID == ID && s.EventID == EventID)
+                        .AsNoTracking()
+                        .FirstOrDefaultAsync();
 
-                        return new RowVM()
+                    if (show == null || show.Event?.Auditorium == null)
+                    {
+                        return new SeatVM();
+                    }
+
+                    var tickets = await _context.Tickets
+                        .Where(t => !t.IsDeleted && t.ShowID == ID)
+                        .Select(t => new
                         {
-                            RowLabel = row.RowLabel,
-                            CostPrice = rowPrice.ToString(),
-                            Category = rowTicket?.Category,
-                            Columns = row.Columns.OrderBy(col => col.ColumnNumber).Select(col => new ColumnVM()
+                            t.SeatID,
+                            t.CostPrice,
+                            t.SalePrice,
+                            t.IsReserved,
+                            t.Category
+                        })
+                        .AsNoTracking()
+                        .ToListAsync();
+
+                    // Group safely by SeatID to avoid duplicate key exceptions
+                    var ticketBySeatId = tickets
+                        .GroupBy(t => t.SeatID)
+                        .ToDictionary(g => g.Key, g => g.First());
+
+                    var aud = show.Event.Auditorium;
+                    return new SeatVM
+                    {
+                        AuditoriumName = aud.Title?.Trim(),
+                        EventName = show.Event.Title?.Trim(),
+                        VenueName = aud.Venue?.Title?.Trim(),
+                        ShowDate = show.Date,
+                        ReservedSeats = tickets.Count(x => x.IsReserved),
+                        EstimatedRevenue = tickets.Sum(x => x.CostPrice),
+                        AmountReceived = tickets.Where(x => x.IsReserved).Sum(x => x.SalePrice),
+                        AuditoriumAlignment = aud.Alignment?.Trim(),
+                        Rows = aud.Rows.OrderBy(row => row.ID).Select(row =>
+                        {
+                            var firstSeatInRow = row.Columns.SelectMany(c => c.Seats).FirstOrDefault();
+                            ticketBySeatId.TryGetValue(firstSeatInRow?.ID ?? 0, out var rowTicket);
+                            var rowPrice = rowTicket?.CostPrice ?? 0;
+
+                            return new RowVM
                             {
-                                ID = col.ID,
-                                ColumnNumber = col.ColumnNumber,
-                                SeatTickets = col.Seats.OrderBy(seat => seat.SeatNumber).Select(seat =>
+                                RowLabel = row.RowLabel,
+                                CostPrice = rowPrice.ToString(),
+                                Category = rowTicket?.Category,
+                                Columns = row.Columns.OrderBy(col => col.ColumnNumber).Select(col => new ColumnVM
                                 {
-                                    ticketBySeatId.TryGetValue(seat.ID, out var ticket);
-                                    return new TicketVM()
+                                    ID = col.ID,
+                                    ColumnNumber = col.ColumnNumber,
+                                    SeatTickets = col.Seats.OrderBy(seat => seat.SeatNumber).Select(seat =>
                                     {
-                                        SeatNumber = seat.SeatNumber,
-                                        IsReserved = ticket?.IsReserved ?? false
-                                    };
+                                        ticketBySeatId.TryGetValue(seat.ID, out var ticket);
+                                        return new TicketVM
+                                        {
+                                            SeatNumber = seat.SeatNumber,
+                                            IsReserved = ticket?.IsReserved ?? false
+                                        };
+                                    }).ToList()
                                 }).ToList()
-                            }).ToList()
-                        };
-                    }).ToList()
-                };
+                            };
+                        }).ToList()
+                    };
+                }, TimeSpan.FromMinutes(15), TimeSpan.FromHours(1));
+
                 return View(seatVM ?? new SeatVM());
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error occured at UpdateSeats (GET) in {_Title} Controller due to {ex}");
+                _logger.LogError($"Error occured at ViewTickets in {_Title} Controller due to {ex}");
             }
             return View(new SeatVM());
         }

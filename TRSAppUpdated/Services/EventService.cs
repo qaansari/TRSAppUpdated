@@ -101,90 +101,94 @@ namespace TRSAppUpdated.Services
             return (result, totalRecords);
         }
 
-        //Get Details By ID - Fixed in-memory date formatting
+        //Get Details By ID with In-Memory Caching
         public async Task<EventVM> GetDetailsByID(int ID)
         {
             try
             {
-                var ev = await _context.Events
-                    .Where(x => !x.IsDeleted && x.ID == ID)
-                    .Include(x => x.Auditorium).ThenInclude(a => a.Venue).ThenInclude(v => v.City).ThenInclude(c => c.Country)
-                    .Include(x => x.EventStatus)
-                    .Include(x => x.EventCategories).ThenInclude(ec => ec.Category)
-                    .Include(x => x.Shows.Where(s => !s.IsDeleted))
-                        .ThenInclude(s => s.Reservations.Where(r => !r.IsDeleted))
-                            .ThenInclude(r => r.ReservationStatus)
-                    .Include(x => x.Shows.Where(s => !s.IsDeleted))
-                        .ThenInclude(s => s.Reservations.Where(r => !r.IsDeleted))
-                            .ThenInclude(r => r.ActionByUser)
-                    .Include(x => x.Shows.Where(s => !s.IsDeleted))
-                        .ThenInclude(s => s.Reservations.Where(r => !r.IsDeleted))
-                            .ThenInclude(r => r.CreatedByUser)
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync();
-
-                if (ev == null)
+                var cacheKey = CacheKeys.EventDetails(ID);
+                return await _cacheService.GetOrCreateAsync(cacheKey, async () =>
                 {
-                    return new EventVM();
-                }
+                    var ev = await _context.Events
+                        .Where(x => !x.IsDeleted && x.ID == ID)
+                        .Include(x => x.Auditorium).ThenInclude(a => a.Venue).ThenInclude(v => v.City).ThenInclude(c => c.Country)
+                        .Include(x => x.EventStatus)
+                        .Include(x => x.EventCategories).ThenInclude(ec => ec.Category)
+                        .Include(x => x.Shows.Where(s => !s.IsDeleted))
+                            .ThenInclude(s => s.Reservations.Where(r => !r.IsDeleted))
+                                .ThenInclude(r => r.ReservationStatus)
+                        .Include(x => x.Shows.Where(s => !s.IsDeleted))
+                            .ThenInclude(s => s.Reservations.Where(r => !r.IsDeleted))
+                                .ThenInclude(r => r.ActionByUser)
+                        .Include(x => x.Shows.Where(s => !s.IsDeleted))
+                            .ThenInclude(s => s.Reservations.Where(r => !r.IsDeleted))
+                                .ThenInclude(r => r.CreatedByUser)
+                        .AsNoTracking()
+                        .FirstOrDefaultAsync();
 
-                var vm = new EventVM
-                {
-                    ID = ev.ID,
-                    Title = ev.Title,
-                    StartDate = ev.StartDate,
-                    EndDate = ev.EndDate,
-                    Description = ev.Description,
-                    CountryID = ev.Auditorium?.Venue?.City?.CountryID ?? 0,
-                    CountryTitle = ev.Auditorium?.Venue?.City?.Country?.Title ?? string.Empty,
-                    CityTitle = ev.Auditorium?.Venue?.City?.Title ?? string.Empty,
-                    VenueTitle = ev.Auditorium?.Venue?.Title ?? string.Empty,
-                    AuditoriumTitle = ev.Auditorium?.Title ?? string.Empty,
-                    EventStatusTitle = ev.EventStatus?.Title ?? string.Empty,
-                    ImagePath = ev.ImagePath,
-                    ShowsList = ev.Shows
-                        .Where(s => !s.IsDeleted)
-                        .OrderBy(s => s.Date)
-                        .Select(s => new ShowVM
-                        {
-                            ID = s.ID,
-                            Date = s.Date,
-                            Time = s.Time,
-                            IsEnded = s.IsEnded
-                        }).ToList(),
-                    EventCategoriesList = ev.EventCategories
-                        .Select(ec => ec.Category?.Title ?? string.Empty)
-                        .ToList()
-                };
-
-                var reservations = new List<ReservationVM>();
-                foreach (var show in ev.Shows.Where(s => !s.IsDeleted))
-                {
-                    string showDateStr = show.Date.ToString("dddd, dd MMMM yyyy") + " "
-                        + DateTime.Today.Add(show.Time).ToString("hh:mm tt");
-
-                    foreach (var r in show.Reservations.Where(r => !r.IsDeleted))
+                    if (ev == null)
                     {
-                        reservations.Add(new ReservationVM
-                        {
-                            ID = r.ID,
-                            TicketNumber = r.TicketNumber,
-                            ShowDateTime = showDateStr,
-                            CustomerName = r.CustomerName,
-                            CustomerPhone = r.CustomerPhone,
-                            AmountRemaining = r.AmountRemaining,
-                            SalePrice = r.SalePrice,
-                            CreatedByUserID = r.CreatedByUserID,
-                            AmountPaid = r.AmountPaid,
-                            IsApproved = r.IsApproved,
-                            ReservationStatusTitle = r.ReservationStatus?.Title ?? string.Empty,
-                            ApprovedByUserName = r.ActionByUser?.FullName ?? string.Empty,
-                            CreatedByUserName = r.CreatedByUser?.FullName ?? string.Empty,
-                        });
+                        return new EventVM();
                     }
-                }
-                vm.ReservationList = reservations;
-                return vm;
+
+                    var vm = new EventVM
+                    {
+                        ID = ev.ID,
+                        Title = ev.Title,
+                        StartDate = ev.StartDate,
+                        EndDate = ev.EndDate,
+                        Description = ev.Description,
+                        CountryID = ev.Auditorium?.Venue?.City?.CountryID ?? 0,
+                        CountryTitle = ev.Auditorium?.Venue?.City?.Country?.Title ?? string.Empty,
+                        CityTitle = ev.Auditorium?.Venue?.City?.Title ?? string.Empty,
+                        VenueTitle = ev.Auditorium?.Venue?.Title ?? string.Empty,
+                        AuditoriumTitle = ev.Auditorium?.Title ?? string.Empty,
+                        EventStatusTitle = ev.EventStatus?.Title ?? string.Empty,
+                        ImagePath = ev.ImagePath,
+                        ShowsList = ev.Shows
+                            .Where(s => !s.IsDeleted)
+                            .OrderBy(s => s.Date)
+                            .Select(s => new ShowVM
+                            {
+                                ID = s.ID,
+                                Date = s.Date,
+                                Time = s.Time,
+                                IsEnded = s.IsEnded
+                            }).ToList(),
+                        EventCategoriesList = ev.EventCategories
+                            .Select(ec => ec.Category?.Title ?? string.Empty)
+                            .ToList()
+                    };
+
+                    var reservations = new List<ReservationVM>();
+                    foreach (var show in ev.Shows.Where(s => !s.IsDeleted))
+                    {
+                        string showDateStr = show.Date.ToString("dddd, dd MMMM yyyy") + " "
+                            + DateTime.Today.Add(show.Time).ToString("hh:mm tt");
+
+                        foreach (var r in show.Reservations.Where(r => !r.IsDeleted))
+                        {
+                            reservations.Add(new ReservationVM
+                            {
+                                ID = r.ID,
+                                TicketNumber = r.TicketNumber,
+                                ShowDateTime = showDateStr,
+                                CustomerName = r.CustomerName,
+                                CustomerPhone = r.CustomerPhone,
+                                AmountRemaining = r.AmountRemaining,
+                                SalePrice = r.SalePrice,
+                                CreatedByUserID = r.CreatedByUserID,
+                                AmountPaid = r.AmountPaid,
+                                IsApproved = r.IsApproved,
+                                ReservationStatusTitle = r.ReservationStatus?.Title ?? string.Empty,
+                                ApprovedByUserName = r.ActionByUser?.FullName ?? string.Empty,
+                                CreatedByUserName = r.CreatedByUser?.FullName ?? string.Empty,
+                            });
+                        }
+                    }
+                    vm.ReservationList = reservations;
+                    return vm;
+                }, TimeSpan.FromMinutes(15), TimeSpan.FromHours(1)) ?? new EventVM();
             }
             catch (Exception ex)
             {

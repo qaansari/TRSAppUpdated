@@ -2,13 +2,14 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using TRSAppUpdated.Helpers;
 using TRSAppUpdated.Interfaces;
 using TRSAppUpdated.Models;
 using TRSAppUpdated.ViewModels;
 
 namespace TRSAppUpdated.Controllers
 {
-
+    [Authorize(Roles = "Super Admin,Admin")]
     public class ShowExpenseController : Controller
     {
         private readonly AppDbContext _context;
@@ -16,17 +17,20 @@ namespace TRSAppUpdated.Controllers
         private readonly ILogger<ShowExpenseController> _logger;
         private readonly IExpenseService _expenseService;
         private readonly IShowService _showService;
+        private readonly ICacheService _cacheService;
         private readonly string _Title = "Show Expense";
         private readonly int _UserID;
         public ShowExpenseController(AppDbContext context, IHttpContextAccessor httpContextAccessor,
             ILogger<ShowExpenseController> logger,
-            IExpenseService expenseService, IShowService showService)
+            IExpenseService expenseService, IShowService showService,
+            ICacheService cacheService)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;
             _logger = logger;
             _expenseService = expenseService;
             _showService = showService;
+            _cacheService = cacheService;
             _UserID = Convert.ToInt32(_httpContextAccessor.HttpContext.User.FindFirstValue("UserID"));
         }
         [Authorize(Roles = "Super Admin,Admin")]
@@ -143,10 +147,12 @@ namespace TRSAppUpdated.Controllers
                             _item.Amount = Model.Amount;
                             _item.Description = Model.Description;
                             _item.UpdatedByUserID = _UserID;
-                            _item.UpdatedDateTime = DateTime.UtcNow.AddHours(5);
+                            _item.UpdatedDateTime = AppHelper.NowPakistan;
                             _context.ChangeTracker.Clear();
                             _context.Entry(_item).State = EntityState.Modified;
                             await _context.SaveChangesAsync();
+                            _cacheService.Remove(CacheKeys.DashboardMetrics);
+                            _cacheService.Remove(CacheKeys.EventDetails(Model.EventID));
                             TempData["Message"] = $"1,{_Title} Successfully Updated";
                         }
                     }
@@ -159,9 +165,11 @@ namespace TRSAppUpdated.Controllers
                         _item.Amount = Model.Amount;
                         _item.Description = Model.Description;
                         _item.CreatedByUserID = _UserID;
-                        _item.CreatedDateTime = DateTime.UtcNow.AddHours(5);
+                        _item.CreatedDateTime = AppHelper.NowPakistan;
                         _context.ShowExpenses.Add(_item);
                         await _context.SaveChangesAsync();
+                        _cacheService.Remove(CacheKeys.DashboardMetrics);
+                        _cacheService.Remove(CacheKeys.EventDetails(Model.EventID));
                         TempData["Message"] = $"1,{_Title} Successfully Added";
                     }
                     return RedirectToAction("Index", _viewName, new { EventID=Model.EventID });
@@ -186,10 +194,12 @@ namespace TRSAppUpdated.Controllers
                 {
                     _item.IsDeleted = true;
                     _item.DeletedByUserID = _UserID;
-                    _item.DeletedDateTime = DateTime.UtcNow.AddHours(5);
+                    _item.DeletedDateTime = AppHelper.NowPakistan;
                     _context.ChangeTracker.Clear();
                     _context.Entry(_item).State = EntityState.Modified;
                     await _context.SaveChangesAsync();
+                    _cacheService.Remove(CacheKeys.DashboardMetrics);
+                    _cacheService.Remove(CacheKeys.EventDetails(EventID));
                     TempData["Message"] = $"1,{_Title} Successfully Deleted";
                 }
                 else

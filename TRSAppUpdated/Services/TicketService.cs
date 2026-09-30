@@ -20,12 +20,8 @@ namespace TRSAppUpdated.Services
         {
             try
             {
-                var showIDList = _context.Shows.Where(x => !x.IsDeleted && x.EventID == EventID)
-                                                   .AsNoTracking()
-                                                   .Select(x => x.ID)
-                                                   .ToList();
                 var _ticketList = _context.Tickets
-                    .Where(x => showIDList.Contains(x.ShowID) && !x.IsDeleted)
+                    .Where(x => !x.IsDeleted && !x.Show.IsDeleted && x.Show.EventID == EventID)
                     .AsNoTracking()
                     .Select(x => new TicketVM()
                     {

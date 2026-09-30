@@ -116,6 +116,11 @@ namespace TRSAppUpdated.Controllers
             {
                 ViewData["CountryList"] = _countryService.GetAll();
                 ViewData["CityList"] = _cityService.GetAll();
+                if (Model.ImageFile != null && !AppHelper.IsValidImageFile(Model.ImageFile, out var imgError))
+                {
+                    TempData["Message"] = $"0,{imgError}";
+                    return View(Model);
+                }
                 if (ModelState.IsValid)
                 {
                     var _item = new Venue();
@@ -139,11 +144,13 @@ namespace TRSAppUpdated.Controllers
                             _item.CityID = Model.CityID;
                             _item.Address = Model.Address.Trim();
                             _item.UpdatedByUserID = _UserID;
-                            _item.UpdatedDateTime = DateTime.UtcNow.AddHours(5);
+                            _item.UpdatedDateTime = AppHelper.NowPakistan;
                             _context.ChangeTracker.Clear();
                             _context.Entry(_item).State = EntityState.Modified;
                             await _context.SaveChangesAsync();
                             _cacheService.Remove(CacheKeys.Venues);
+                            _cacheService.RemoveByPrefix(CacheKeys.EventDetailsPrefix);
+                            _cacheService.RemoveByPrefix(CacheKeys.ViewTicketsPrefix);
                             TempData["Message"] = $"1,{_Title} Successfully Updated";
                         }
                     }
@@ -162,29 +169,26 @@ namespace TRSAppUpdated.Controllers
                         _item.CityID = Model.CityID;
                         _item.Address = Model.Address.Trim();
                         _item.CreatedByUserID = _UserID;
-                        _item.CreatedDateTime = DateTime.UtcNow.AddHours(5);
+                        _item.CreatedDateTime = AppHelper.NowPakistan;
                         _context.Venues.Add(_item);
                         await _context.SaveChangesAsync();
                         _cacheService.Remove(CacheKeys.Venues);
+                        _cacheService.RemoveByPrefix(CacheKeys.EventDetailsPrefix);
+                        _cacheService.RemoveByPrefix(CacheKeys.ViewTicketsPrefix);
                         TempData["Message"] = $"1,{_Title} Successfully Added";
                     }
                     if (_item != null && Model.ImageFile != null)
                     {
-                        var folderPath = Path.Combine(_webHostEnvironment.WebRootPath, "assets", "images", "venues");
-                        if (!Directory.Exists(folderPath))
+                        var savedFileName = await AppHelper.SaveUploadedImageAsync(Model.ImageFile, _webHostEnvironment.WebRootPath, "venues", "venue");
+                        if (!string.IsNullOrEmpty(savedFileName))
                         {
-                            Directory.CreateDirectory(folderPath);
+                            _item.ImagePath = savedFileName;
+                            _item.UpdatedByUserID = _UserID;
+                            _item.UpdatedDateTime = AppHelper.NowPakistan;
+                            _context.ChangeTracker.Clear();
+                            _context.Entry(_item).State = EntityState.Modified;
+                            await _context.SaveChangesAsync();
                         }
-                        var _fileName = $"venue" + "_" + _item.CreatedDateTime.ToString("yyyyddMMhhmmss") + Path.GetExtension(Model.ImageFile.FileName);
-                        _item.ImagePath = _fileName.Trim();
-                        _item.UpdatedByUserID = _UserID;
-                        _item.UpdatedDateTime = DateTime.UtcNow.AddHours(5);
-                        var _filePath = Path.Combine(folderPath, _fileName);
-                        var compressedBytes = await AppHelper.CompressImageAsync(Model.ImageFile);
-                        await System.IO.File.WriteAllBytesAsync(_filePath, compressedBytes);
-                        _context.ChangeTracker.Clear();
-                        _context.Entry(_item).State = EntityState.Modified;
-                        await _context.SaveChangesAsync();
                     }
                     return RedirectToAction("Index");
                 }
@@ -207,11 +211,13 @@ namespace TRSAppUpdated.Controllers
                 {
                     _item.IsDeleted = true;
                     _item.DeletedByUserID = _UserID;
-                    _item.DeletedDateTime = DateTime.UtcNow.AddHours(5);
+                    _item.DeletedDateTime = AppHelper.NowPakistan;
                     _context.ChangeTracker.Clear();
                     _context.Entry(_item).State = EntityState.Modified;
                     await _context.SaveChangesAsync();
                     _cacheService.Remove(CacheKeys.Venues);
+                    _cacheService.RemoveByPrefix(CacheKeys.EventDetailsPrefix);
+                    _cacheService.RemoveByPrefix(CacheKeys.ViewTicketsPrefix);
                     TempData["Message"] = $"1,{_Title} Successfully Deleted";
                 }
                 else

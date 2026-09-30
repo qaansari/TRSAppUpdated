@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using TRSAppUpdated.Interfaces;
 using TRSAppUpdated.Models;
 using TRSAppUpdated.ViewModels;
@@ -39,12 +39,18 @@ namespace TRSAppUpdated.Services
             return new List<UserVM>();
         }
         //Get User By Email
-        public User GetUserByEmail(string email)
+        public User? GetUserByEmail(string email)
         {
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                return null;
+            }
+
             try
             {
-                var _user = _context.Users.Where(x => !x.IsDeleted
-                && x.Email.Trim() == email.Trim()).FirstOrDefault();
+                var trimmedEmail = email.Trim().ToLowerInvariant();
+                var _user = _context.Users.FirstOrDefault(x => !x.IsDeleted
+                    && x.Email.ToLower() == trimmedEmail);
                 return _user;
             }
             catch (Exception ex)
@@ -54,13 +60,18 @@ namespace TRSAppUpdated.Services
             return null;
         }
         //Get User By Token
-        public User GetUserByToken(string token)
+        public User? GetUserByToken(string token)
         {
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                return null;
+            }
 
             try
             {
-                var _user = _context.Users.Where(x => !x.IsDeleted
-                && !string.IsNullOrEmpty(x.UserToken) && x.UserToken.Trim() == token.Trim()).FirstOrDefault();
+                var trimmedToken = token.Trim();
+                var _user = _context.Users.FirstOrDefault(x => !x.IsDeleted
+                    && !string.IsNullOrEmpty(x.UserToken) && x.UserToken == trimmedToken);
                 return _user;
             }
             catch (Exception ex)

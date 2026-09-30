@@ -1,24 +1,36 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Tesseract;
+using TRSAppUpdated.Helpers;
 
 namespace TRSAppUpdated.Controllers
 {
+    [Authorize]
     public class ImageProcessController : Controller
     {
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly ILogger<ImageProcessController> _logger;
 
-        public ImageProcessController(IWebHostEnvironment webHostEnvironment)
+        public ImageProcessController(IWebHostEnvironment webHostEnvironment, ILogger<ImageProcessController> logger)
         {
             _webHostEnvironment = webHostEnvironment;
+            _logger = logger;
         }
+
         [HttpPost]
-        [IgnoreAntiforgeryToken]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> ExtractTextFromImage(IFormFile file)
         {
             if (file == null || file.Length == 0)
             {
                 return BadRequest("No file uploaded.");
             }
+
+            if (!AppHelper.IsValidImageFile(file, out var imgError))
+            {
+                return BadRequest(imgError ?? "Invalid image file format.");
+            }
+
             string filePath = null;
             try
             {
@@ -49,7 +61,8 @@ namespace TRSAppUpdated.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Error: {ex.Message}");
+                _logger.LogError(ex, "Error processing OCR in ExtractTextFromImage");
+                return StatusCode(500, new { message = "An error occurred while processing the image." });
             }
             finally
             {

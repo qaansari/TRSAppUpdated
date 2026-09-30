@@ -9,6 +9,7 @@ using TRSAppUpdated.ViewModels;
 
 namespace TRSAppUpdated.Controllers
 {
+    [Authorize(Roles = "Super Admin")]
     public class UserController : Controller
     {
         private readonly AppDbContext _context;
@@ -86,7 +87,6 @@ namespace TRSAppUpdated.Controllers
                             FirstName = x.FirstName,
                             LastName = x.LastName,
                             ContactNumber = x.ContactNumber,
-                            Password = x.Password,
                             ImagePath = x.ImagePath,
                             Email = x.Email,
                             IsActive = x.IsActive,
@@ -105,29 +105,42 @@ namespace TRSAppUpdated.Controllers
             return View(_item);
         }
         //AddOrEdit (POST)
-        [Authorize(Roles = "Super Admin")]
         [HttpPost]
         public async Task<IActionResult> AddOrEdit(UserVM Model)
         {
             try
             {
                 ViewData["RoleList"] = _roleService.GetAll();
+
+                // Validate image file if uploaded
+                if (Model.ImageFile != null && !AppHelper.IsValidImageFile(Model.ImageFile, out var imageError))
+                {
+                    ModelState.AddModelError("ImageFile", imageError ?? "Invalid image file");
+                }
+
+                // Password required on creation
+                if (Model.ID == 0 && string.IsNullOrWhiteSpace(Model.Password))
+                {
+                    ModelState.AddModelError("Password", "Password is required for new users");
+                }
+
                 if (ModelState.IsValid)
                 {
+                    var now = AppHelper.NowPakistan;
                     var _item = new User();
                     if (Model.ID != 0)
                     {
-                        var isExists = _context.Users.Where(x => !x.IsDeleted
+                        var isExists = await _context.Users.Where(x => !x.IsDeleted
                             && x.ID != Model.ID
                             && x.Email.Trim().ToLower() == Model.Email.Trim().ToLower())
-                        .Any();
+                        .AnyAsync();
                         if (isExists)
                         {
                             TempData["Message"] = $"0,{_Title} Already Exists";
                             return View(Model);
                         }
-                        _item = _context.Users.Where(x => !x.IsDeleted && x.ID == Model.ID)
-                            .AsNoTracking().FirstOrDefault();
+                        _item = await _context.Users.Where(x => !x.IsDeleted && x.ID == Model.ID)
+                            .AsNoTracking().FirstOrDefaultAsync();
                         if (_item != null)
                         {
                             _item.FirstName = Model.FirstName.Trim();
@@ -138,7 +151,14 @@ namespace TRSAppUpdated.Controllers
                             _item.IsActive = Model.IsActive;
                             _item.IsVerified = Model.IsVerified;
                             _item.UpdatedByUserID = _UserID;
-                            _item.UpdatedDateTime = DateTime.UtcNow.AddHours(5);
+                            _item.UpdatedDateTime = now;
+
+                            // Update password only if a new one was provided
+                            if (!string.IsNullOrWhiteSpace(Model.Password))
+                            {
+                                _item.Password = Model.Password.Trim().HashWithSalt();
+                            }
+
                             _context.ChangeTracker.Clear();
                             _context.Entry(_item).State = EntityState.Modified;
                             await _context.SaveChangesAsync();
@@ -147,9 +167,9 @@ namespace TRSAppUpdated.Controllers
                     }
                     else
                     {
-                        var isExists = _context.Users.Where(x => !x.IsDeleted
+                        var isExists = await _context.Users.Where(x => !x.IsDeleted
                             && x.Email.Trim().ToLower() == Model.Email.Trim().ToLower())
-                        .Any();
+                        .AnyAsync();
                         if (isExists)
                         {
                             TempData["Message"] = $"0,{_Title} Already Exists";
@@ -164,25 +184,17 @@ namespace TRSAppUpdated.Controllers
                         _item.IsActive = Model.IsActive;
                         _item.IsVerified = Model.IsVerified;
                         _item.CreatedByUserID = _UserID;
-                        _item.CreatedDateTime = DateTime.UtcNow.AddHours(5);
+                        _item.CreatedDateTime = now;
                         _context.Users.Add(_item);
                         await _context.SaveChangesAsync();
                         TempData["Message"] = $"1,{_Title} Successfully Added";
                     }
                     if (_item != null && Model.ImageFile != null)
                     {
-                        var folderPath = Path.Combine(_webHostEnvironment.WebRootPath, "assets", "images", "users");
-                        if (!Directory.Exists(folderPath))
-                        {
-                            Directory.CreateDirectory(folderPath);
-                        }
-                        var _fileName = $"user" + "_" + _item.CreatedDateTime.Value.ToString("yyyyddMMhhmmss") + Path.GetExtension(Model.ImageFile.FileName);
-                        _item.ImagePath = _fileName.Trim();
+                        var savedFileName = await AppHelper.SaveUploadedImageAsync(Model.ImageFile, _webHostEnvironment.WebRootPath, "users", "user");
+                        _item.ImagePath = savedFileName;
                         _item.UpdatedByUserID = _UserID;
-                        _item.UpdatedDateTime = DateTime.UtcNow.AddHours(5);
-                        var _filePath = Path.Combine(folderPath, _fileName);
-                        var compressedBytes = await AppHelper.CompressImageAsync(Model.ImageFile);
-                        await System.IO.File.WriteAllBytesAsync(_filePath, compressedBytes);
+                        _item.UpdatedDateTime = now;
                         _context.ChangeTracker.Clear();
                         _context.Entry(_item).State = EntityState.Modified;
                         await _context.SaveChangesAsync();
@@ -190,7 +202,6 @@ namespace TRSAppUpdated.Controllers
                     return RedirectToAction("Index");
                 }
             }
-
             catch (Exception ex)
             {
                 _logger.LogError($"Error occured at AddOrEdit (POST) in {_Title} Controller due to {ex}");

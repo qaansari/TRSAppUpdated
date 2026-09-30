@@ -28,76 +28,86 @@ namespace TRSAppUpdated.Services
 
         public ReservationDetailVM GetDetailsByID(int ID)
         {
+            return GetDetailsByIDAsync(ID).GetAwaiter().GetResult();
+        }
+
+        public async Task<ReservationDetailVM> GetDetailsByIDAsync(int ID)
+        {
             try
             {
-                var r = _context.Reservations
-                    .Include(x => x.Show).ThenInclude(s => s.Event)
-                    .Include(x => x.PaymentMode)
-                    .Include(x => x.ReservationStatus)
-                    .Include(x => x.ClosedByUser)
-                    .Include(x => x.ReservationImages)
-                    .Include(x => x.ReservationTickets)
-                        .ThenInclude(rt => rt.Ticket)
-                        .ThenInclude(t => t.Seat)
-                        .ThenInclude(s => s.Column)
-                        .ThenInclude(c => c.Row)
-                    .AsNoTracking()
-                    .FirstOrDefault(x => x.ID == ID);
-
-                if (r == null)
+                var cacheKey = CacheKeys.ReservationDetails(ID);
+                return await _cacheService.GetOrCreateAsync(cacheKey, async () =>
                 {
-                    return new ReservationDetailVM();
-                }
+                    var r = await _context.Reservations
+                        .Include(x => x.Show).ThenInclude(s => s.Event)
+                        .Include(x => x.PaymentMode)
+                        .Include(x => x.ReservationStatus)
+                        .Include(x => x.ClosedByUser)
+                        .Include(x => x.ReservationImages)
+                        .Include(x => x.ReservationTickets)
+                            .ThenInclude(rt => rt.Ticket)
+                            .ThenInclude(t => t.Seat)
+                            .ThenInclude(s => s.Column)
+                            .ThenInclude(c => c.Row)
+                        .AsNoTracking()
+                        .FirstOrDefaultAsync(x => x.ID == ID);
 
-                var firstTicket = r.ReservationTickets?.FirstOrDefault()?.Ticket;
-                var seatList = r.ReservationTickets?
-                    .Where(rt => rt.Ticket?.Seat?.Column?.Row != null)
-                    .Select(rt => $"{rt.Ticket.Seat.Column.Row.RowLabel}{rt.Ticket.Seat.SeatNumber}")
-                    .ToList() ?? new List<string>();
+                    if (r == null)
+                    {
+                        return new ReservationDetailVM();
+                    }
 
-                var imageList = r.ReservationImages?
-                    .Select(ri => ri.ImagePath)
-                    .Where(p => !string.IsNullOrEmpty(p))
-                    .ToList() ?? new List<string>();
+                    var firstTicket = r.ReservationTickets?.FirstOrDefault()?.Ticket;
+                    var seatList = r.ReservationTickets?
+                        .Where(rt => rt.Ticket?.Seat?.Column?.Row != null)
+                        .Select(rt => $"{rt.Ticket.Seat.Column.Row.RowLabel}{rt.Ticket.Seat.SeatNumber}")
+                        .ToList() ?? new List<string>();
 
-                string showDateTimeStr = string.Empty;
-                if (r.Show != null)
-                {
-                    showDateTimeStr = r.Show.Date.ToString("dddd, dd MMMM yyyy") + " "
-                        + DateTime.Today.Add(r.Show.Time).ToString("hh:mm tt");
-                }
+                    var imageList = r.ReservationImages?
+                        .Select(ri => ri.ImagePath)
+                        .Where(p => !string.IsNullOrEmpty(p))
+                        .ToList() ?? new List<string>();
 
-                return new ReservationDetailVM
-                {
-                    ID = r.ID,
-                    EventName = r.Show?.Event?.Title ?? string.Empty,
-                    TicketNumber = r.TicketNumber,
-                    CustomerName = r.CustomerName,
-                    CustomerPhone = r.CustomerPhone,
-                    ShowDateTime = showDateTimeStr,
-                    PaymentModeTitle = r.PaymentMode?.Title ?? string.Empty,
-                    ReservationStatusTitle = r.ReservationStatus?.Title ?? string.Empty,
-                    EventImagePath = r.Show?.Event?.ImagePath ?? string.Empty,
-                    IsFullyPaid = r.IsFullyPaid,
-                    TicketCategory = firstTicket?.Category ?? string.Empty,
-                    CostPrice = r.CostPrice,
-                    Discount = r.Discount,
-                    SalePrice = r.SalePrice,
-                    AmountPaid = r.AmountPaid,
-                    ReservationImages = string.Join(",", imageList),
-                    AmountRemaining = r.AmountRemaining,
-                    BookingDateTime = r.BookingDateTime,
-                    TransactionID = r.TransactionID,
-                    CreatedDateTime = r.CreatedDateTime,
-                    UpdatedDateTime = r.UpdatedDateTime,
-                    ClosedByUserName = r.ClosedByUser != null ? r.ClosedByUser.FullName : string.Empty,
-                    ClosedDateTime = r.ClosingDateTime.HasValue ? r.ClosingDateTime.Value.ToString("dddd, dd MMMM yyyy hh:mm tt") : string.Empty,
-                    SeatLabels = string.Join(",", seatList)
-                };
+                    string showDateTimeStr = string.Empty;
+                    if (r.Show != null)
+                    {
+                        showDateTimeStr = r.Show.Date.ToString("dddd, dd MMMM yyyy") + " "
+                            + DateTime.Today.Add(r.Show.Time).ToString("hh:mm tt");
+                    }
+
+                    return new ReservationDetailVM
+                    {
+                        ID = r.ID,
+                        EventName = r.Show?.Event?.Title ?? string.Empty,
+                        TicketNumber = r.TicketNumber,
+                        CustomerName = r.CustomerName,
+                        CustomerPhone = r.CustomerPhone,
+                        ShowDateTime = showDateTimeStr,
+                        PaymentModeTitle = r.PaymentMode?.Title ?? string.Empty,
+                        ReservationStatusTitle = r.ReservationStatus?.Title ?? string.Empty,
+                        EventImagePath = r.Show?.Event?.ImagePath ?? string.Empty,
+                        IsFullyPaid = r.IsFullyPaid,
+                        TicketCategory = firstTicket?.Category ?? string.Empty,
+                        CostPrice = r.CostPrice,
+                        Discount = r.Discount,
+                        SalePrice = r.SalePrice,
+                        AmountPaid = r.AmountPaid,
+                        ReservationImages = string.Join(",", imageList),
+                        AmountRemaining = r.AmountRemaining,
+                        BookingDateTime = r.BookingDateTime,
+                        TransactionID = r.TransactionID,
+                        CreatedByUserID = r.CreatedByUserID,
+                        CreatedDateTime = r.CreatedDateTime,
+                        UpdatedDateTime = r.UpdatedDateTime,
+                        ClosedByUserName = r.ClosedByUser != null ? r.ClosedByUser.FullName : string.Empty,
+                        ClosedDateTime = r.ClosingDateTime.HasValue ? r.ClosingDateTime.Value.ToString("dddd, dd MMMM yyyy hh:mm tt") : string.Empty,
+                        SeatLabels = string.Join(",", seatList)
+                    };
+                }, TimeSpan.FromMinutes(15), TimeSpan.FromHours(1)) ?? new ReservationDetailVM();
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred at GetDetailsByID in {Title} Service", _Title);
+                _logger.LogError(ex, "Error occurred at GetDetailsByIDAsync in {Title} Service", _Title);
             }
             return new ReservationDetailVM();
         }
@@ -162,6 +172,14 @@ namespace TRSAppUpdated.Services
                     .Where(s => s.ID == model.ShowID)
                     .Select(s => s.EventID)
                     .FirstOrDefaultAsync();
+            }
+
+            if (model.ImageFile != null && model.ImageFile.Length > 0)
+            {
+                if (!AppHelper.IsValidImageFile(model.ImageFile, out var imgError))
+                {
+                    return (false, imgError ?? "Invalid image file format", model.EventID);
+                }
             }
 
             if (model.TicketIDs == null || model.TicketIDs.Count == 0)
@@ -442,6 +460,10 @@ namespace TRSAppUpdated.Services
                     }
 
                     await transaction.CommitAsync();
+                    _cacheService.Remove(CacheKeys.ReservationDetails(reservation.ID));
+                    _cacheService.Remove(CacheKeys.EventDetails(model.EventID));
+                    _cacheService.Remove(CacheKeys.ViewTickets(model.ShowID, model.EventID));
+                    _cacheService.RemoveByPrefix(CacheKeys.ViewTicketsPrefix);
                     _cacheService.Remove(CacheKeys.DashboardMetrics);
 
                     var successMsg = model.ID != 0 ? "Reservation Successfully Updated" : "Reservation Successfully Added";
@@ -474,7 +496,7 @@ namespace TRSAppUpdated.Services
                     return (true, "Reservation is already Closed");
                 }
 
-                var now = DateTime.UtcNow.AddHours(5);
+                var now = AppHelper.NowPakistan;
                 reservation.ReservationStatusID = 3; // Closed
                 reservation.ClosedByUserID = currentUserId;
                 reservation.ClosingDateTime = now;
@@ -482,6 +504,8 @@ namespace TRSAppUpdated.Services
                 reservation.UpdatedDateTime = now;
 
                 await _context.SaveChangesAsync();
+                _cacheService.Remove(CacheKeys.ReservationDetails(id));
+                _cacheService.Remove(CacheKeys.EventDetails(eventId));
                 _cacheService.Remove(CacheKeys.DashboardMetrics);
                 return (true, "Reservation Successfully Closed");
             }

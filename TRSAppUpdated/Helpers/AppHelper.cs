@@ -56,12 +56,77 @@ namespace TRSAppUpdated.Helpers
                 numBytesRequested: 256 / 8));
             return hashed;
         }
+        public static DateTime NowPakistan => DateTime.UtcNow.AddHours(5);
+
+        private static readonly HashSet<string> AllowedImageExtensions = new(StringComparer.OrdinalIgnoreCase)
+        {
+            ".jpg", ".jpeg", ".png", ".webp"
+        };
+
+        public static bool IsValidImageFile(IFormFile? file, out string? errorMessage, long maxSizeBytes = 5 * 1024 * 1024)
+        {
+            errorMessage = null;
+            if (file == null || file.Length == 0)
+            {
+                return true;
+            }
+
+            if (file.Length > maxSizeBytes)
+            {
+                errorMessage = $"File size exceeds maximum allowed limit of {maxSizeBytes / (1024 * 1024)}MB.";
+                return false;
+            }
+
+            var ext = Path.GetExtension(file.FileName);
+            if (string.IsNullOrEmpty(ext) || !AllowedImageExtensions.Contains(ext))
+            {
+                errorMessage = "Invalid file type. Allowed extensions are: .jpg, .jpeg, .png, .webp";
+                return false;
+            }
+
+            if (!string.IsNullOrEmpty(file.ContentType) && !file.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
+            {
+                errorMessage = "Invalid content type. Only image files are allowed.";
+                return false;
+            }
+
+            return true;
+        }
+
+        public static async Task<string> SaveUploadedImageAsync(IFormFile file, string webRootPath, string subFolder, string prefix)
+        {
+            var folderPath = Path.Combine(webRootPath, "assets", "images", subFolder);
+            if (!Directory.Exists(folderPath))
+            {
+                Directory.CreateDirectory(folderPath);
+            }
+
+            var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
+            if (string.IsNullOrEmpty(ext) || !AllowedImageExtensions.Contains(ext))
+            {
+                ext = ".jpg";
+            }
+
+            var fileName = $"{prefix}_{NowPakistan:yyyyddMMhhmmss}_{Guid.NewGuid().ToString("N")[..6]}{ext}";
+            var filePath = Path.Combine(folderPath, fileName);
+
+            var compressedBytes = await CompressImageAsync(file);
+            await System.IO.File.WriteAllBytesAsync(filePath, compressedBytes);
+
+            return fileName;
+        }
+
         //Send Password Reset Email
         public static async Task SendVerificationEmailAsync(string emailAddress, string verificationType, string verificationLink, IConfiguration? configuration = null)
         {
             // Configure email settings
             string _senderEmail = configuration?["EmailSettings:SenderEmail"] ?? "eventlandinformation@gmail.com";
-            string _senderPassword = configuration?["EmailSettings:Password"] ?? "ygjjncvsgjplzjwq";
+            string _senderPassword = configuration?["EmailSettings:Password"] ?? string.Empty;
+            if (string.IsNullOrEmpty(_senderPassword))
+            {
+                throw new InvalidOperationException("Email settings are not properly configured in application settings.");
+            }
+
             string _smtpHost = configuration?["EmailSettings:SmtpHost"] ?? "smtp.gmail.com";
             int _smtpPort = int.TryParse(configuration?["EmailSettings:Port"], out var port) ? port : 587;
             string _senderName = configuration?["EmailSettings:SenderName"] ?? "Event Land";
@@ -69,6 +134,7 @@ namespace TRSAppUpdated.Helpers
             string _subject = verificationType.ToLower() == "verify email" ? "Email Verification" : "Reset Password";
             string _btnText = verificationType.ToLower() == "verify email" ? "Login To Continue" : "Reset Password";
             string _paraText = verificationType.ToLower() == "verify email" ? "verify your email" : "reset your password";
+            string _safeVerificationLink = System.Text.Encodings.Web.HtmlEncoder.Default.Encode(verificationLink);
             string _body = $@"
 <html>
 <head>
@@ -125,7 +191,7 @@ namespace TRSAppUpdated.Helpers
         </div>
         <p>Please click the button below to <span class='para_text'>{_paraText}</span></p>
         <div class='button-container'>
-            <a href='{verificationLink}' class='button'>{_btnText}</a>
+            <a href='{_safeVerificationLink}' class='button'>{_btnText}</a>
         </div>
     </div>
 </body>
@@ -145,10 +211,6 @@ namespace TRSAppUpdated.Helpers
             await smtpClient.SendMailAsync(message);
         }
 
-        public static void SendVerificationEmail(string emailAddress, string verificationType, string verificationLink)
-        {
-            SendVerificationEmailAsync(emailAddress, verificationType, verificationLink).GetAwaiter().GetResult();
-        }
         //Compress Size
         public static async Task<byte[]> CompressImageAsync(IFormFile imageFile, int maxFileSizeInBytes = 1 * 1024 * 1024)
         {
