@@ -1,83 +1,49 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Tesseract;
+using Microsoft.AspNetCore.RateLimiting;
 using TRSAppUpdated.Helpers;
+using TRSAppUpdated.Interfaces;
 
 namespace TRSAppUpdated.Controllers
 {
     [Authorize]
     public class ImageProcessController : Controller
     {
-        private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly IOcrService _ocrService;
         private readonly ILogger<ImageProcessController> _logger;
 
-        public ImageProcessController(IWebHostEnvironment webHostEnvironment, ILogger<ImageProcessController> logger)
+        public ImageProcessController(IOcrService ocrService, ILogger<ImageProcessController> logger)
         {
-            _webHostEnvironment = webHostEnvironment;
+            _ocrService = ocrService;
             _logger = logger;
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [EnableRateLimiting("ocr-limit")]
         public async Task<IActionResult> ExtractTextFromImage(IFormFile file)
         {
             if (file == null || file.Length == 0)
             {
-                return BadRequest("No file uploaded.");
+                return BadRequest(new { message = "No file uploaded." });
             }
 
             if (!AppHelper.IsValidImageFile(file, out var imgError))
             {
-                return BadRequest(imgError ?? "Invalid image file format.");
+                return BadRequest(new { message = imgError ?? "Invalid image file format." });
             }
 
-            string filePath = null;
             try
             {
-                string extractedText;
-                // Save the file temporarily
-                filePath = Path.GetTempFileName();
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await file.CopyToAsync(stream);
-                }
-                // Use Tesseract to extract text
-                var path = Path.Combine(_webHostEnvironment.WebRootPath, "assets");
-                if (!Directory.Exists(path))
-                {
-                    Directory.CreateDirectory(path);
-                }
-                using (var engine = new TesseractEngine(path + Path.DirectorySeparatorChar + "tessdata", "eng", EngineMode.Default))
-                {
-                    using (var img = Pix.LoadFromFile(filePath))
-                    {
-                        using (var page = engine.Process(img))
-                        {
-                            extractedText = page.GetText();
-                        }
-                    }
-                }
+                string extractedText = await _ocrService.ExtractTextFromImageAsync(file);
                 return Ok(new { text = extractedText });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error processing OCR in ExtractTextFromImage");
-                return StatusCode(500, new { message = "An error occurred while processing the image." });
-            }
-            finally
-            {
-                if (!string.IsNullOrEmpty(filePath) && System.IO.File.Exists(filePath))
-                {
-                    try
-                    {
-                        System.IO.File.Delete(filePath);
-                    }
-                    catch
-                    {
-                        // Ignore cleanup error
-                    }
-                }
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while processing the image." });
             }
         }
     }
 }
+

@@ -90,6 +90,49 @@ namespace TRSAppUpdated.Helpers
                 return false;
             }
 
+            // Security Hardening: Magic byte inspection to prevent file spoofing
+            try
+            {
+                using var stream = file.OpenReadStream();
+                if (stream.Length >= 4)
+                {
+                    Span<byte> header = stackalloc byte[12];
+                    int bytesRead = stream.Read(header);
+                    if (bytesRead >= 4)
+                    {
+                        bool isValidMagic = false;
+                        // JPEG: FF D8 FF
+                        if (header[0] == 0xFF && header[1] == 0xD8 && header[2] == 0xFF)
+                        {
+                            isValidMagic = true;
+                        }
+                        // PNG: 89 50 4E 47
+                        else if (header[0] == 0x89 && header[1] == 0x50 && header[2] == 0x4E && header[3] == 0x47)
+                        {
+                            isValidMagic = true;
+                        }
+                        // WebP: RIFF .... WEBP
+                        else if (bytesRead >= 12 &&
+                                 header[0] == 0x52 && header[1] == 0x49 && header[2] == 0x46 && header[3] == 0x46 &&
+                                 header[8] == 0x57 && header[9] == 0x45 && header[10] == 0x42 && header[11] == 0x50)
+                        {
+                            isValidMagic = true;
+                        }
+
+                        if (!isValidMagic)
+                        {
+                            errorMessage = "File signature does not match a valid image.";
+                            return false;
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                errorMessage = "Unable to verify file signature.";
+                return false;
+            }
+
             return true;
         }
 
