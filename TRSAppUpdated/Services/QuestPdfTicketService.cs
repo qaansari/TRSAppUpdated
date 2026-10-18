@@ -54,137 +54,144 @@ namespace TRSAppUpdated.Services
                 {
                     container.Page(page =>
                     {
-                        page.Size(210, 80, Unit.Millimetre);
-                        page.Margin(0);
-                        page.DefaultTextStyle(x => x.FontFamily("Lato").FontSize(9).FontColor("#0F0F0F"));
+                        page.Size(210, 140, Unit.Millimetre);
+                        page.Margin(5, Unit.Millimetre);
+                        page.DefaultTextStyle(x => x.FontFamily("Lato").FontSize(9.5f).FontColor("#0F0F0F"));
 
-                        page.Content().Column(col =>
+                        page.Content().Border(1).BorderColor("#D6DADE").CornerRadius(10).Background("#FFFFFF").Column(card =>
                         {
-                            // 1. Header Bar
-                            col.Item().Background("#1AA48B").PaddingVertical(4).AlignCenter().Text(text =>
+                            // 1. Header Bar (cloned from .ticket-header)
+                            card.Item().Background("#1AA48B").PaddingVertical(10).AlignCenter().Text(text =>
                             {
                                 text.Span("E-Ticket")
-                                    .FontSize(13)
-                                    .Bold()
+                                    .FontSize(17)
+                                    .SemiBold()
                                     .FontColor("#FFFFFF")
-                                    .LetterSpacing(0.08f);
+                                    .LetterSpacing(0.06f);
                             });
 
-                            // 2. Ticket Body
-                            col.Item().PaddingHorizontal(14).PaddingTop(4).Column(body =>
+                            // 2. Ticket Body (cloned from .ticket-body)
+                            card.Item().PaddingHorizontal(20).PaddingTop(8).PaddingBottom(6).Column(body =>
                             {
-                                // Logo and Ticket Number Header Row
-                                body.Item().Row(row =>
+                                // Centered Logo (.logo_img_section)
+                                if (logoBytes != null)
                                 {
-                                    if (logoBytes != null)
-                                    {
-                                        row.RelativeItem(1).AlignLeft().Height(28).Image(logoBytes).FitArea();
-                                    }
+                                    body.Item().AlignCenter().Height(40).Image(logoBytes).FitArea();
+                                }
 
-                                    row.RelativeItem(2).AlignCenter().PaddingVertical(2).PaddingHorizontal(6)
-                                        .Border(1).BorderColor("#C8C8C8")
-                                        .Background("#F8F9FA")
-                                        .AlignCenter()
-                                        .Text(text =>
-                                        {
-                                            text.Span(reservation.TicketNumber ?? string.Empty)
-                                                .FontSize(11)
-                                                .Bold()
-                                                .FontColor("#1AA48B")
-                                                .LetterSpacing(0.1f);
-                                        });
-
-                                    if (logoBytes != null)
-                                    {
-                                        row.RelativeItem(1); // Balancer column for visual centering
-                                    }
+                                // Centered E-Ticket heading (.ticket_heading)
+                                body.Item().PaddingTop(3).AlignCenter().Text(text =>
+                                {
+                                    text.Span("E-TICKET")
+                                        .FontSize(15)
+                                        .Bold()
+                                        .FontColor("#1AA48B")
+                                        .LetterSpacing(0.08f);
                                 });
 
-                                // Main Content (Details + Event Poster)
-                                body.Item().PaddingTop(3).Row(contentRow =>
-                                {
-                                    // Info Column
-                                    var infoColumn = eventImageBytes != null ? contentRow.RelativeItem(6) : contentRow.RelativeItem(10);
-
-                                    infoColumn.Column(info =>
+                                // Ticket Number Box (.ticket-number)
+                                body.Item().PaddingTop(5).PaddingBottom(8)
+                                    .Background("#F8F9FA")
+                                    .Border(1).BorderColor("#CCCCCC")
+                                    .CornerRadius(8)
+                                    .PaddingVertical(7)
+                                    .AlignCenter()
+                                    .Text(text =>
                                     {
-                                        // Row: Event Name
-                                        info.Item().BorderBottom(0.5f).BorderColor("#F0F0F0").PaddingVertical(1.5f).Row(r =>
+                                        text.Span(reservation.TicketNumber ?? string.Empty)
+                                            .FontSize(18)
+                                            .Bold()
+                                            .FontColor("#1AA48B")
+                                            .LetterSpacing(0.12f);
+                                    });
+
+                                // Ticket Content (.ticket-content)
+                                body.Item().Row(contentRow =>
+                                {
+                                    var leftCol = eventImageBytes != null ? contentRow.RelativeItem(6) : contentRow.RelativeItem(10);
+                                    leftCol.Column(info =>
+                                    {
+                                        // Event Name
+                                        info.Item().BorderBottom(0.75f).BorderColor("#EEEEEE").PaddingVertical(3).Row(r =>
                                         {
-                                            r.ConstantItem(85).Text("Event Name:").SemiBold().FontColor("#282828");
-                                            r.RelativeItem().Text((reservation.EventName ?? string.Empty).ToUpper()).Bold();
+                                            r.ConstantItem(105).Text("Event Name:").SemiBold().FontColor("#130716").FontSize(9.5f);
+                                            r.RelativeItem().Text((reservation.EventName ?? string.Empty).ToUpper()).Bold().FontColor("#0A0303").FontSize(9.5f);
                                         });
 
-                                        // Row: Show Date
-                                        info.Item().BorderBottom(0.5f).BorderColor("#F0F0F0").PaddingVertical(1.5f).Row(r =>
+                                        // Show Date
+                                        info.Item().BorderBottom(0.75f).BorderColor("#EEEEEE").PaddingVertical(3).Row(r =>
                                         {
-                                            r.ConstantItem(85).Text("Show Date:").SemiBold().FontColor("#282828");
-                                            r.RelativeItem().Text((reservation.ShowDateTime ?? string.Empty).ToUpper()).Bold();
+                                            r.ConstantItem(105).Text("Show Date:").SemiBold().FontColor("#130716").FontSize(9.5f);
+                                            r.RelativeItem().Text((reservation.ShowDateTime ?? string.Empty).ToUpper()).Bold().FontColor("#0A0303").FontSize(9.5f);
                                         });
 
-                                        // Row: Customer Name
-                                        info.Item().BorderBottom(0.5f).BorderColor("#F0F0F0").PaddingVertical(1.5f).Row(r =>
+                                        // Customer Name
+                                        info.Item().BorderBottom(0.75f).BorderColor("#EEEEEE").PaddingVertical(3).Row(r =>
                                         {
-                                            r.ConstantItem(85).Text("Customer Name:").SemiBold().FontColor("#282828");
-                                            r.RelativeItem().Text((reservation.CustomerName ?? string.Empty).ToUpper()).Bold();
+                                            r.ConstantItem(105).Text("Customer Name:").SemiBold().FontColor("#130716").FontSize(9.5f);
+                                            r.RelativeItem().Text((reservation.CustomerName ?? string.Empty).ToUpper()).Bold().FontColor("#0A0303").FontSize(9.5f);
                                         });
 
-                                        // Row: Phone Number
-                                        info.Item().BorderBottom(0.5f).BorderColor("#F0F0F0").PaddingVertical(1.5f).Row(r =>
+                                        // Phone Number
+                                        info.Item().BorderBottom(0.75f).BorderColor("#EEEEEE").PaddingVertical(3).Row(r =>
                                         {
-                                            r.ConstantItem(85).Text("Phone Number:").SemiBold().FontColor("#282828");
-                                            r.RelativeItem().Text((reservation.CustomerPhone ?? string.Empty).ToUpper()).Bold();
+                                            r.ConstantItem(105).Text("Phone Number:").SemiBold().FontColor("#130716").FontSize(9.5f);
+                                            r.RelativeItem().Text((reservation.CustomerPhone ?? string.Empty).ToUpper()).Bold().FontColor("#0A0303").FontSize(9.5f);
                                         });
 
-                                        // Row: Reserved Seats
-                                        info.Item().PaddingVertical(1.5f).Row(r =>
+                                        // Reserved Seats
+                                        info.Item().PaddingTop(3.5f).Row(r =>
                                         {
-                                            r.ConstantItem(85).Text($"Reserved Seats: ({seatLabelsList.Count})").SemiBold().FontColor("#282828");
-                                            r.RelativeItem().Row(seatRow =>
+                                            r.ConstantItem(105).Text($"Reserved Seats: ({seatLabelsList.Count})").SemiBold().FontColor("#130716").FontSize(9.5f);
+                                            r.RelativeItem().Inlined(inlined =>
                                             {
+                                                inlined.Spacing(4);
                                                 if (!string.IsNullOrEmpty(reservation.TicketCategory))
                                                 {
-                                                    seatRow.AutoItem().Text($"{reservation.TicketCategory.ToUpper()} - ").SemiBold();
+                                                    inlined.Item().Text($"{reservation.TicketCategory.ToUpper()} -").SemiBold().FontColor("#0A0303").FontSize(9.5f);
                                                 }
 
                                                 if (isGeneralEvent)
                                                 {
-                                                    seatRow.AutoItem().Background("#58FFD9").PaddingVertical(1).PaddingHorizontal(4)
-                                                        .Text("First Come First Sit").FontSize(8).Bold().FontColor("#100C0C");
+                                                    inlined.Item().Background("#58FFD9").CornerRadius(5).PaddingVertical(2.5f).PaddingHorizontal(7)
+                                                        .Text("First Come First Sit").FontSize(8.5f).Bold().FontColor("#100C0C");
                                                 }
                                                 else if (seatLabelsList.Count > 0)
                                                 {
                                                     foreach (var seat in seatLabelsList)
                                                     {
-                                                        seatRow.AutoItem().PaddingRight(2).Background("#58FFD9").PaddingVertical(1).PaddingHorizontal(4)
-                                                            .Text(seat).FontSize(8).Bold().FontColor("#100C0C");
+                                                        inlined.Item().Background("#58FFD9").CornerRadius(5).PaddingVertical(2.5f).PaddingHorizontal(7)
+                                                            .Text(seat).FontSize(8.5f).Bold().FontColor("#100C0C");
                                                     }
                                                 }
                                                 else
                                                 {
-                                                    seatRow.AutoItem().Background("#58FFD9").PaddingVertical(1).PaddingHorizontal(4)
-                                                        .Text("None").FontSize(8).Bold().FontColor("#100C0C");
+                                                    inlined.Item().Background("#58FFD9").CornerRadius(5).PaddingVertical(2.5f).PaddingHorizontal(7)
+                                                        .Text("None").FontSize(8.5f).Bold().FontColor("#100C0C");
                                                 }
                                             });
                                         });
                                     });
 
-                                    // Event Poster Image Column
+                                    // Event Poster Image Column (.image-info)
                                     if (eventImageBytes != null)
                                     {
-                                        contentRow.RelativeItem(4).AlignRight().PaddingLeft(8).Height(95)
-                                            .Border(0.5f).BorderColor("#EAEAEA")
-                                            .Image(eventImageBytes).FitArea();
+                                        contentRow.RelativeItem(4).AlignRight().PaddingLeft(14)
+                                            .Height(115)
+                                            .Border(1).BorderColor("#EAEAEA")
+                                            .CornerRadius(8)
+                                            .Image(eventImageBytes)
+                                            .FitArea();
                                     }
                                 });
                             });
 
-                            // 3. Footer
-                            col.Item().PaddingTop(3).BorderTop(0.5f).BorderColor("#EEEEEE").Background("#F9F9F9").PaddingVertical(3).AlignCenter().Text(text =>
+                            // 3. Footer Bar (cloned from .footer)
+                            card.Item().BorderTop(0.75f).BorderColor("#EEEEEE").Background("#F9F9F9").PaddingVertical(9).AlignCenter().Text(text =>
                             {
                                 text.Span("Thank you for your reservation. Please present this ticket at the venue.")
-                                    .FontSize(7.5f)
-                                    .FontColor("#787878");
+                                    .FontSize(8.5f)
+                                    .FontColor("#999999");
                             });
                         });
                     });
